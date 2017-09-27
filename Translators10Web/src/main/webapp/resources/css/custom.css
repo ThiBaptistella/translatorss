@@ -1,0 +1,12 @@
+/* Add your CSS here */
+.section {
+  padding: 80px 0;
+}
+
+
+.bar {
+    height: 18px;
+    background: green;
+}
+
+/* Logo Height on Scroll */

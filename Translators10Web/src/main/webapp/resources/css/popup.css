@@ -1,0 +1,75 @@
+
+.popUpTitle {
+    background-color: #258cd1;
+    height: 40px;
+    width: 100%;
+}
+
+.popUpTitle img {
+  float: right;
+  margin-right: 2px;
+  margin-top: 5px;
+  cursor: pointer;
+}
+
+.data {
+    background-color: #FFFFFF;
+    height: auto;
+    overflow: hidden;
+	font-size: 14px;
+    padding: 25px 25px 50px;
+    width: auto;
+}
+
+.buttons li {
+  cursor: pointer;
+  float: left;
+  list-style: outside none none;
+  width: 100px;
+  margin: auto;
+  margin: 0px 20px;
+}
+span.button {
+    background-color: #258cd1;
+	border-radius: 6px;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: bold;
+    padding: 8px 40px;
+    text-align: center;
+}
+span.button:hover {
+    background-color: #258ce8;   
+}
+
+
+.popUpDisplay {
+  border: 1px solid #258cd1;
+  bottom: 50%;
+  display: none;
+  height: 285px;
+  left: 33%;
+  margin: auto;
+  position: fixed;
+  right: 50%;
+  top: 25%;
+  width: 440px;
+  z-index: 1001;
+}
+.dimLayer {
+    /*display: none;
+    outline: 0px none;
+    height: 100%;
+    width: 100%;
+    background: #A9A9A9;
+    top: 0px;
+    left: 0px;
+    z-index: 900;
+    position: absolute;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+    -khtml-opacity: 0.5;
+    -moz-opacity: 0.5;*/
+}
+
