@@ -302,7 +302,7 @@
 								</div>
 								<div class="right-content uk-width-2-3@m">
 									<div class="uk-grid boxwidth">
-										<label class="texthead">Language From</label>
+										<label class="textheadfirst">Language From</label>
 										<spring:bind path="languagefrom">
 											<form:select id="languagefrom" class="uk-margin uk-select"
 												path="languagefrom" items="${languageList}"
@@ -424,7 +424,7 @@
 									</div>
 								</div>
 								<div class="uk-grid">
-									<label style="color: green">Language From</label>
+									<label class="texthead">Language From</label>
 									<spring:bind path="languagefrom">
 										<form:select id="languagefrom" class="uk-margin uk-select"
 											path="languagefrom" items="${languageList}"
@@ -434,7 +434,7 @@
 									</spring:bind>
 								</div>
 								<div class="uk-grid">
-									<label style="color: green">Language To</label>
+									<label class="texthead">Language To</label>
 									<div class="uk-margin">
 										<select class="uk-select">
 											<option>English</option>
@@ -443,7 +443,7 @@
 								</div>
 								<div class="uk-grid">
 									<spring:bind path="files">
-										<label style="color: green">Upload File(s)</label>
+										<label class="texthead">Upload File(s)</label>
 										<table id="fileTable">
 											<tr>
 												<td><input id="file" name="files[0]" type="file" /></td>
@@ -457,13 +457,13 @@
 									<br />
 
 									<spring:bind path="hardcopy">
-										<label style="color: green">Hard copy</label>
+										<label class="texthead">Hard copy</label>
 										<form:checkbox id="hardcopy" class="uk-radio" path="hardcopy" />
 									</spring:bind>
 								</div>
 								<div class="uk-grid">
 									<spring:bind path="serviceRequestCategory">
-										<label style="color: green">Category</label>
+										<label class="texthead">Category</label>
 										<form:select id="servicerequestcategory"
 											class="uk-margin uk-select" path="serviceRequestCategory">
 											<form:option value="" selected="">Please Select...</form:option>
