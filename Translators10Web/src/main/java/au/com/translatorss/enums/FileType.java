@@ -1,0 +1,5 @@
+package au.com.translatorss.enums;
+
+public enum FileType {
+    SERVICE_REQUEST, SERVICE_RESPONSE, INVOICE, PHOTO, PAYMENT_TRANSLATOR_FILE, REFUND_CUSTOMER_FILE
+}

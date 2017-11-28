@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+
+	<!-- Processes application requests -->
+	<servlet>
+		<servlet-name>appServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/spring-web-servlet.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+		<async-supported>true</async-supported>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>appServlet</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+	<session-config>
+		<session-timeout>30</session-timeout>
+	</session-config>
+
+	<!-- Paypal configuration -->
+	<context-param>
+		<param-name>authtoken</param-name>
+		<param-value>AeJV_PFaSvLIDItUhf0mfwQk4dcG1LiDVx-AAw0noTXGqaDGRuLRjiXW8bQ0uslvEiuyIm5n48MwqNUQ</param-value>
+	</context-param>
+
+
+	<context-param>
+		<param-name>posturl</param-name>
+		<param-value>https://www.sandbox.paypal.com/cgi-bin/websrc</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>returnurl</param-name>
+		<param-value>http://localhost:8080/translatorss/chose/</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>business</param-name>
+		<param-value></param-value>
+	</context-param>
+<!-- 	<context-param>
+		<param-name>business</param-name>
+		<param-value>lucas@translatorss.com.au</param-value>
+	</context-param> -->
+	
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+		<async-supported>true</async-supported>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+</filter-mapping>
+
+</web-app>

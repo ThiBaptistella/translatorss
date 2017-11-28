@@ -1,0 +1,49 @@
+<body bgcolor="#FFFFFF" leftmargin="40" topmargin="0" marginwidth="0" marginheight="0">
+<div>
+<br />
+<table style="width: 800px;">
+  <tbody>
+    <tr>
+      <td colspan="2" width="600" height="28"><div style="text-align: left; float: left; font-size: 26px; font-weight: bold; color: #253400; font-family: arial, sans-serif;">
+	  <a style="text-decoration: none;color:black">Translatorss</a></div></td>  
+    </tr>
+    <tr>
+      <td rowspan="2" width="334" height="18" bgcolor="#CEE3F6"></td>
+    </tr>
+    
+    <tr>
+      <table style="width: 450px;">
+          <tbody>
+            <tr>
+              <td style="font-size: 17px; font-family: arial, sans-serif; color: #5d8400; text-align: left;font-weight: bold;">Job Request Created</td>
+            </tr>
+            <tr>
+             <td style="font-size: 12px; font-family: arial, sans-serif; color: #000000; text-align: left;">
+					Hi $customername, how are you?
+					Thank you for selecting your translator. Paypal will send you a receipt for your transaction, and your invoice will be sent once the translation is approved and completed.
+					You may receive a communication from Translator asking for extra information or you will soon receive an email communicating that your translation has been completed.   
+					You can follow up your translation by logging in www.translatorss.com.au. 
+					If you have any questions please contact us.
+					Thank You
+             <br /></td>
+            </tr>
+          </tbody>
+        </table></td>
+      <td width="24" height="65"></td>
+    </tr>
+    <tr>
+      <td colspan="2" width="266" align="center" valign="top">
+      <table style="width: 266; border: 3px solid #ffffff;">
+          <tbody>
+            <tr>
+              <td style="font-size: 15px; font-family: arial, sans-serif; color: #a3a3a3;">
+              		<div style="margin: 0 7px;">Translatorss </div></td>
+            </tr>
+          </tbody>
+        </table>
+       </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</body>
