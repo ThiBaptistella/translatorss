@@ -160,13 +160,18 @@
             <div class="panel-body">
 			 	 <form:form action='updateServiceRequestConfig' method="post" commandName="serviceRequestConfDTO">
 			 	 	<div class="form-group">
-		                  <label>Minimun Quote</label>
-		                  <form:input path="minquote" type="text" class="form-control " id="minquote" placeholder="Minimun Quote" />
+		                  <label>Minimun Quotes(Or System Send Job proposition Email to translators on that language)</label>
+		                  <form:input path="minquote" type="text" class="form-control " id="minquote" placeholder="Minimun Quotes" />
 	                </div>
 	                
 	                <div class="form-group">
-		                  <label>Timmin Percentage %</label>
-		                  <form:input path="timeper" type="text" class="form-control " id="timeper" placeholder="Timmin Percentage" />
+		                  <label>Unquoted Time Limit from a Request to change to Request Expired</label>
+		                  <form:input path="timeper" type="text" class="form-control " id="timeper" placeholder="Unquoted Time Limit" />
+	                </div>
+	                
+	                <div class="form-group">
+		                  <label>Minimum Standar Quote Value</label>
+		                  <form:input path="quoteValue" type="text" class="form-control " id="quoteValue" placeholder="Standar Quote Value" />
 	                </div>
 	                <div class="form-group input-group">
                   		<input class="btn btn-default" type="submit" value="Update">

@@ -1,7 +1,5 @@
 package au.com.translatorss.configuration;
 
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.services.s3.AmazonS3Client;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +22,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 @Configuration
 @EnableTransactionManagement
 @EnableAspectJAutoProxy
-@ComponentScan({"au.com.translatorss.bean", "au.com.translatorss.controller", "au.com.translatorss.dao", "au.com.translatorss.dao.impl", "au.com.translatorss.service", "au.com.translatorss.service.impl","au.com.translatorss.daily.scheduler", "au.com.translatorss.validation"})
+@ComponentScan({"au.com.translatorss.bean","au.com.translatorss.aspect", "au.com.translatorss.controller", "au.com.translatorss.dao", "au.com.translatorss.dao.impl", "au.com.translatorss.service", "au.com.translatorss.service.impl","au.com.translatorss.daily.scheduler", "au.com.translatorss.validation"})
 public class SpringWebConfig extends WebMvcConfigurerAdapter {
 
 	

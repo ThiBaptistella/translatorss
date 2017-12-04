@@ -21,7 +21,7 @@ public class SuscriptionsStatusService {
     @Autowired
     private PurchaseService purchaseService;
     
-    //@Scheduled(cron="0 0 12 * * ?")
+    //@Scheduled(cron="0 0 0 1/1 * ? *")
     public void suscriptionVerification(){
         System.out.println("Reading all Translators "+ new Date());
 

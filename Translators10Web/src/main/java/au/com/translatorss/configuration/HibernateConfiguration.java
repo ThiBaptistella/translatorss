@@ -13,6 +13,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
@@ -22,7 +24,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
 @Configuration
 @EnableTransactionManagement
-@ComponentScan({"au.com.translatorss.bean", "au.com.translatorss.dao","au.com.translatorss.dao.impl","au.com.translatorss.service","au.com.translatorss.service.impl", "au.com.translatorss.interceptors", "au.com.translatorss.listeners","au.com.translatorss.controller"  })
+@ComponentScan({"au.com.translatorss.bean", "au.com.translatorss.dao","au.com.translatorss.dao.impl","au.com.translatorss.service","au.com.translatorss.service.impl", "au.com.translatorss.interceptors", "au.com.translatorss.listeners","au.com.translatorss.controller" })
 @PropertySource(value = { "classpath:hibernate.properties" })
 public class HibernateConfiguration {
  
@@ -48,12 +50,12 @@ public class HibernateConfiguration {
         return dataSource;
     }
 
-//    @Bean
-//    public AmazonS3 amazonS3() {
-//        AWSCredentialsProvider awsCredentialsProvider = new ProfileCredentialsProvider();
-//        AmazonS3 amazonS3=AmazonS3ClientBuilder.standard().withCredentials(awsCredentialsProvider).build();
-//        return amazonS3;
-//    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
 
     private Properties hibernateProperties() {
         Properties properties = new Properties();

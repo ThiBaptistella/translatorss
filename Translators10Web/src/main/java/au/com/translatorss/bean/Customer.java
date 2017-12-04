@@ -18,8 +18,11 @@ public class Customer implements java.io.Serializable {
     private Date updatedate;
     private String phone;
     private String address;
-    private User user = new User();
+    private String paypalClientId;
+	private User user = new User();
     private Set<ServiceRequest> serviceRequestList;
+    private String fullname;
+
 
     @Id
     @SequenceGenerator(name = "customer_sequence", sequenceName = "customerId_sequence", allocationSize = 1)
@@ -89,4 +92,23 @@ public class Customer implements java.io.Serializable {
     public void setUser(User user) {
         this.user = user;
     }
+
+    @Column(name = "fullname", nullable = false)
+    public String getFullname() {
+        return fullname;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
+    }
+    
+    @Column(name = "paypalclientid", nullable = false)
+    public String getPaypalClientId() {
+		return paypalClientId;
+	}
+
+	public void setPaypalClientId(String paypalClientId) {
+		this.paypalClientId = paypalClientId;
+	}
+
 }

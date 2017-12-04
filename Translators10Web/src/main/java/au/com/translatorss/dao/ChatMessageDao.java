@@ -7,5 +7,7 @@ import au.com.translatorss.bean.ChatMessage;
 public interface ChatMessageDao extends GenericDao<ChatMessage, Long>{
 
 	public List<ChatMessage> getUnreadMessageById(Long id);
-	
+
+	public void persistMessage(ChatMessage message);
+
 }

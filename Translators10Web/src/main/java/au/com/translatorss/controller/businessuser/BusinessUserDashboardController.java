@@ -15,15 +15,7 @@ import au.com.translatorss.bean.ServiceResponse;
 import au.com.translatorss.bean.ServiceResponseFiles;
 import au.com.translatorss.bean.Translator;
 import au.com.translatorss.bean.User;
-import au.com.translatorss.bean.dto.AmazonFileDto;
-import au.com.translatorss.bean.dto.BusinessUserDTO;
-import au.com.translatorss.bean.dto.ChatMessageDTO;
-import au.com.translatorss.bean.dto.FileInfoDTO;
-import au.com.translatorss.bean.dto.RateDTO;
-import au.com.translatorss.bean.dto.ServiceRequestApprovedDTO;
-import au.com.translatorss.bean.dto.ServiceRequestDTO;
-import au.com.translatorss.bean.dto.ServiceResponseDTO;
-import au.com.translatorss.bean.dto.TranslatorQuotationDTO;
+import au.com.translatorss.bean.dto.*;
 import au.com.translatorss.controller.BaseController;
 import au.com.translatorss.dao.ServiceRequestCategoryDao;
 import au.com.translatorss.dao.ServiceRequestStatusDao;
@@ -31,20 +23,7 @@ import au.com.translatorss.dao.ServiceResponseStatusDao;
 import au.com.translatorss.dao.TimeFrameDao;
 import au.com.translatorss.enums.FileType;
 import au.com.translatorss.interceptors.QuotationUpdateListener;
-import au.com.translatorss.service.AmazonFilePhotoService;
-import au.com.translatorss.service.AmazonService;
-import au.com.translatorss.service.ChatMessageService;
-import au.com.translatorss.service.ConversationService;
-import au.com.translatorss.service.CustomerServiceRequestService;
-import au.com.translatorss.service.EmailService;
-import au.com.translatorss.service.EmailService2;
-import au.com.translatorss.service.LanguageService;
-import au.com.translatorss.service.ServiceRequestApprovedRegisterService;
-import au.com.translatorss.service.ServiceRequestConfigurationService;
-import au.com.translatorss.service.ServiceResponseService;
-import au.com.translatorss.service.TranslatorQuotationService;
-import au.com.translatorss.service.TranslatorSettingsService;
-import au.com.translatorss.service.UserService;
+import au.com.translatorss.service.*;
 import au.com.translatorss.utils.ConversationUtils;
 import au.com.translatorss.validation.CreateServiceRequestValidator;
 import com.googlecode.charts4j.AxisLabels;
@@ -61,10 +40,9 @@ import com.googlecode.charts4j.LinearGradientFill;
 import com.googlecode.charts4j.PieChart;
 import com.googlecode.charts4j.Plots;
 import com.googlecode.charts4j.Slice;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -79,6 +57,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,7 +89,6 @@ public class BusinessUserDashboardController extends BaseController{
 
 	@Autowired
 	private LanguageService languageService;
-
 
 	@Autowired
 	private CustomerServiceRequestService serviceRequestService;
@@ -169,10 +147,11 @@ public class BusinessUserDashboardController extends BaseController{
 	@Autowired
 	private ServiceRequestApprovedRegisterService serviceRequestApprovedRegisterService;
 
+	@Autowired
+	private RateService rateService;
+	
 	@Value("${donation.value}")
 	private String donationValue;
-
-	private ServiceRequestSingleton lastServiceRequest = ServiceRequestSingleton.getInstance();
 
 	public BusinessUserDashboardController() {}
 
@@ -187,7 +166,7 @@ public class BusinessUserDashboardController extends BaseController{
 		BusinessUser businessUser = (BusinessUser)session.getAttribute("loggedInUser");
 		BusinessUserDTO businessDTO = getBusinessUserDTO(businessUser);
 		List<ChatMessage> messageList = chatMessageService.getUnreadMessageByCustomerId(businessUser.getUser().getId());
-		List<ChatMessageDTO> dtoList = getMessagesDTO(new HashSet(messageList));
+		List<ChatMessageDTO> dtoList = getMessagesDTO(new HashSet<ChatMessage>(messageList));
 		AmazonFilePhoto photoView = amazonFilePhotoService.getAmazonFilePhotoByUserId(businessUser.getUser());
 		if (photoView == null) {
 			model.addAttribute("photoUrl", "resources/assets/layouts/layout2/img/avatar.png");
@@ -229,13 +208,11 @@ public class BusinessUserDashboardController extends BaseController{
 	public String pendingActions(HttpSession session, Model model) {
 		logger.info("Welcome BusinessUserDashboardController: pendingActions");
 		BusinessUser businessUserLogger = (BusinessUser)session.getAttribute("loggedInUser");
-		model.addAttribute("businessUserFormName", businessUserLogger.getUser().getName());
-
+		BusinessUserDTO businessDTO = getBusinessUserDTO(businessUserLogger);
+		model.addAttribute("businessUserForm", businessDTO);
 
 		List<ServiceRequest> unquotedServiceRequestList = serviceRequestService.getServiceRequestFromBusinessUser(businessUserLogger, "Unquoted");
-
 		List<ServiceRequest> quotedServiceRequestList = serviceRequestService.getServiceRequestFromBusinessUser(businessUserLogger, "Quoted");
-
 		unquotedServiceRequestList.addAll(quotedServiceRequestList);
 
 		List<ServiceRequestDTO> serviceRequestDTOList = getServiceRequestArrayDTO(unquotedServiceRequestList);
@@ -279,6 +256,8 @@ public class BusinessUserDashboardController extends BaseController{
 	public String jobInProgress(HttpSession session, Model model) {
 		logger.info("Welcome BusinessUserDashboardController: jobInProgress");
 		BusinessUser businessUserLogger = (BusinessUser)session.getAttribute("loggedInUser");
+		BusinessUserDTO businessDTO = getBusinessUserDTO(businessUserLogger);
+		model.addAttribute("businessUserForm", businessDTO);
 		model.addAttribute("businessUserForm", businessUserLogger);
 
 
@@ -308,16 +287,15 @@ public class BusinessUserDashboardController extends BaseController{
 		BusinessUser businessUserLogger = (BusinessUser)session.getAttribute("loggedInUser");
 		model.addAttribute("businessUserForm", businessUserLogger);
 
+		List<String> statusList = new ArrayList<String>();
+		statusList.add("Approved");
+		statusList.add("Expired");
+		statusList.add("Paid");
+		statusList.add("Refunded");
+		statusList.add("Cancelled");
 
-		List<ServiceRequest> serviceRequestListUnquoted = serviceRequestService.getServiceRequestFromBusinessUser(businessUserLogger, "Approved");
-
-		List<ServiceRequest> serviceRequestListExpired = serviceRequestService.getServiceRequestFromBusinessUser(businessUserLogger, "Expired");
-
-		List<ServiceRequest> serviceRequestListPaied = serviceRequestService.getServiceRequestFromBusinessUser(businessUserLogger, "Paied");
-
-		serviceRequestListUnquoted.addAll(serviceRequestListExpired);
-		serviceRequestListUnquoted.addAll(serviceRequestListPaied);
-		List<ServiceRequestDTO> serviceRequestDTOList = getServiceRequestArrayDTO(serviceRequestListUnquoted);
+		List<ServiceRequest> list = serviceRequestService.getServiceRequestFromBusinessUser(businessUserLogger, statusList);
+		List<ServiceRequestDTO> serviceRequestDTOList = getServiceRequestArrayDTO(list);
 		model.addAttribute("serviceRequestList", serviceRequestDTOList);
 		model.addAttribute("businessUserForm", businessUserLogger);
 
@@ -337,8 +315,7 @@ public class BusinessUserDashboardController extends BaseController{
 	}
 
 	@RequestMapping({"/quotationList/{id}"})
-	public String quotationsServiceRequest(@PathVariable("id") long id, Model model, HttpSession session, RedirectAttributes redirectAttributes) throws Exception
-	{
+	public String quotationsServiceRequest(@PathVariable("id") long id, Model model, HttpSession session, RedirectAttributes redirectAttributes) throws Exception{
 		logger.info("Welcome BusinessUserDashboardController: quotationsServiceRequest");
 		session.setAttribute("serviceRequestid", Long.valueOf(id));
 		return "redirect:/myUserQuotations";
@@ -439,6 +416,9 @@ public class BusinessUserDashboardController extends BaseController{
 			BusinessUser businessUserLogger = (BusinessUser)session.getAttribute("loggedInUser");
 			amazonFilePhotoService.savePhoto(businessUserLogger.getUser(), file.getOriginalFilename(), file.getInputStream(), file.getContentType());
 		}
+		session.setAttribute("info", 200);
+		session.setAttribute("messageDisplay", "Your photo have been uploaded");
+
 		return "redirect:userSettings";
 	}
 
@@ -579,7 +559,11 @@ public class BusinessUserDashboardController extends BaseController{
 		message.setConversationid(conversation.getId());
 		message.setSender(businessUserLogger.getUser().getName());
 		AmazonFilePhoto photo=this.amazonFilePhotoService.getAmazonFilePhotoByUserId(businessUserLogger.getUser());
-		message.setPhotoUrl(photo.getUrl());
+		if(photo ==null){
+			message.setPhotoUrl("resources/assets/layouts/layout2/img/avatar.png");
+		}else {
+			message.setPhotoUrl(photo.getUrl());
+		}
 		model.addAttribute("message", message);
 
 		ServiceResponseDTO serviceResponseDTO = new ServiceResponseDTO();
@@ -600,7 +584,11 @@ public class BusinessUserDashboardController extends BaseController{
 
 		List<ServiceRequest> list = new ArrayList();
 		list.add(conversation.getServiceRequest());
-		model.addAttribute("serviceRequestList", list);
+		
+		List<ServiceRequestDTO> serviceRequestDTOList = getServiceRequestArrayDTO(list);
+
+		
+		model.addAttribute("serviceRequestList", serviceRequestDTOList);
 		Set<AmazonFile> amazonFiles = new HashSet();
 		amazonFiles.addAll(amazonService.findByServiceRequestIdAndType(serviceRequest.getId(), FileType.SERVICE_REQUEST));
 		amazonFiles.addAll(amazonService.findByServiceResponseIdAndType(serviceResponse.getId(), FileType.SERVICE_RESPONSE));
@@ -629,15 +617,89 @@ public class BusinessUserDashboardController extends BaseController{
 	}
 
 	@RequestMapping(value={"/approbeJob"}, method={org.springframework.web.bind.annotation.RequestMethod.GET})
-	public String approbeJob(HttpSession session, HttpServletRequest request, HttpServletResponse response)
-	{
+	public String approbeJob(HttpSession session, HttpServletRequest request, HttpServletResponse response) throws IllegalStateException, IOException {
 		logger.info("Welcome BusinessUserDashboardController: approbeJob");
 		ServiceRequest serviceRequest = (ServiceRequest)session.getAttribute("serviceRequest");
 		serviceRequest.setServiceRequestStatus(serviceRequestStatusDao.findByDescription("Approved"));
+		serviceRequest.setPaidDate(new Date());
 		serviceRequestService.saveOrUpdate(serviceRequest);
 		serviceRequestApprovedRegisterService.registerApprovedSR(serviceRequest);
+
+		//Quotation quotation = this.quotationService.getQuoteFromServiceRequestAndTranslator(serviceRequest.getId(),serviceRequest.getTranslator().getId());
+		//createAndSendInvoice(new InvoicePdfDto(quotation), serviceRequest);
+
 		return "redirect:/rate";
 	}
+
+	@RequestMapping(value={"/approbeJob/{id}"}, method={org.springframework.web.bind.annotation.RequestMethod.GET})
+	public String approbeJob(@PathVariable("id") long id,HttpSession session) throws IllegalStateException, IOException {
+		logger.info("Welcome BusinessUserDashboardController: approbeJob");
+
+		ServiceRequest serviceRequest = this.serviceRequestService.find(id);
+		session.setAttribute("serviceRequest", serviceRequest);
+		serviceRequest.setServiceRequestStatus(serviceRequestStatusDao.findByDescription("Approved"));
+		serviceRequest.setPaidDate(new Date());
+		serviceRequestService.saveOrUpdate(serviceRequest);
+		serviceRequestApprovedRegisterService.registerApprovedSR(serviceRequest);
+
+	//	Quotation quotation = this.quotationService.getQuoteFromServiceRequestAndTranslator(serviceRequest.getId(),serviceRequest.getTranslator().getId());
+	//	createAndSendInvoice(new InvoicePdfDto(quotation), serviceRequest);
+
+		return "redirect:/rate";
+	}
+	
+	
+	
+	/*private void createAndSendInvoice(InvoicePdfDto dto, ServiceRequest serviceRequest) throws IOException {
+		Invoice invoice = new Invoice(serviceRequest);
+		invoice = invoiceService.save(invoice);
+		dto.setInvoiceNum(String.valueOf(invoice.getId()));
+		dto.setInvoiceDate(invoice.getCreatedAt());
+		ByteArrayOutputStream invoiceOutStream = createPdf(dto);
+		byte[] bytes = invoiceOutStream.toByteArray();
+		String fileName = "invoice_" + invoice.getId().toString();
+		AmazonFile amazonFile = amazonService.saveInvoice(serviceRequest, serviceRequest.getCustomer().getUser(), fileName, new ByteArrayInputStream(bytes));
+		invoice.setFile(amazonFile);
+		invoiceService.update(invoice);
+		emailService2.sendInvoice(bytes, serviceRequest.getTranslator().getUser().getEmail(), serviceRequest.getCustomer().getUser().getEmail());
+	}
+
+	private ByteArrayOutputStream createPdf(InvoicePdfDto dto) throws IOException {
+		ByteArrayOutputStream outputStream = null;
+		InputStream templateStream;
+		try {
+			outputStream = new ByteArrayOutputStream();
+
+			templateStream = getClass().getClassLoader().getResourceAsStream(INVOICE_TEMPLATE_HTML);
+
+			String template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
+
+			template = template.replace("{{TRANSLATOR_DETAILS}}", dto.getTranslatorDetails());
+			template = template.replace("{{NAATI_NUMBER}}", dto.getNaatiNumber());
+			template = template.replace("{{INVOICE_NUMBER}}", dto.getInvoiceNum());
+			template = template.replace("{{CUSTOMER_DETAILS}}", dto.getCustomerDetails());
+			template = template.replace("{{INVOICE_DATE}}", formatter.format(dto.getInvoiceDate()));
+			template = template.replace("{{ITEM_NUM}}", "1");
+			template = template.replace("{{DESCRIPTION}}", dto.getDescription());
+			template = template.replace("{{QTY}}", dto.getQty().toString());
+			template = template.replace("{{RATE}}", dto.getRate().toString());
+			template = template.replace("{{PRICE}}", dto.getPrice().toString());
+
+			InputStream contentStream = IOUtils.toInputStream(template, StandardCharsets.UTF_8);
+
+			pdfService.createDocument(contentStream, outputStream, null, false);
+		} finally {
+			if (outputStream != null) {
+				try {
+					outputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return outputStream;
+	}*/
+
 
 	@RequestMapping(value={"/rate"}, method={org.springframework.web.bind.annotation.RequestMethod.GET})
 	public String rate(Model model, RedirectAttributes redirectAttributes, HttpSession session) {
@@ -673,6 +735,22 @@ public class BusinessUserDashboardController extends BaseController{
 		return "customerDashboard/rate";
 	}
 
+	@RequestMapping(value = "/rateInformation/{id}")
+	public String translatorRateInformation(@PathVariable("id") long id,HttpSession session) {
+		logger.debug("show Translator() id: {}", id);
+		Translator translator = (Translator) translatorService.getTranslatorById(id);
+		List<Rate> rateList = translatorService.getAllTranslatorRates(translator);
+		session.setAttribute("rateList",rateList);
+		return "redirect:/rateInformation";
+	}
+
+	@RequestMapping(value = "rateInformation")
+	public String translatorRateInformation(HttpSession session, Model model) {
+		List<Rate> rateList = (List<Rate>) session.getAttribute("rateList");
+		model.addAttribute("rateList",rateList);
+		return "customerDashboard/translatorRateInformation";
+	}
+
 	@RequestMapping(value={"/submitRate"}, method={org.springframework.web.bind.annotation.RequestMethod.POST})
 	public String submitRate(@ModelAttribute("rateTranslator") RateDTO rateDTO, Model model, RedirectAttributes redirectAttributes, HttpSession session)
 	{
@@ -681,28 +759,33 @@ public class BusinessUserDashboardController extends BaseController{
 		BusinessUser businessUSer = serviceRequest.getCustomer();
 
 		Rate rate = new Rate();
+		rate.setServiceRequest(serviceRequest);
 		rate.setCustomer(businessUSer);
 		rate.setTranslator(translator);
-		rate.setServiceAsDescribed(Integer.valueOf(rateDTO.getServiceDescribed()));
-		rate.setTimeDelivery(Integer.valueOf(rateDTO.getTranslatorComunication()));
-		rate.setQuality(Integer.valueOf(rateDTO.getWouldRecomend()));
+		rate.setServiceAsDescribed(Integer.valueOf(rateDTO.getService()));
+		rate.setTimeDelivery(Integer.valueOf(rateDTO.getTimeDelivery()));
+		rate.setQuality(Integer.valueOf(rateDTO.getQuality()));
 		rate.setFeedback(rateDTO.getFeedback());
 		translatorService.rateTranslator(rate);
 
 		if (serviceRequest.getServiceRequestPayment() != null) {
-			emailService2.sendEmailToCustomerServiceRequestAppoved(serviceRequest.getId().toString(), serviceRequest
-					.getCustomer().getUser().getName(), serviceRequest.getCustomer().getUser().getEmail(), "Customer", "11111", serviceRequest
-					.getServiceRequestPayment().getValue().toString());
-			emailService2.sendEmailToCustomerServiceRequestAppoved(serviceRequest.getId().toString(), serviceRequest
-					.getTranslator().getUser().getName(), serviceRequest.getTranslator().getUser().getEmail(), "Translator", "11111", serviceRequest
-					.getServiceRequestPayment().getValue().toString());
+			
+			Quotation quotation = this.quotationService.getQuoteFromServiceRequestAndTranslator(serviceRequest.getId(), serviceRequest.getTranslator().getId());
+			emailService2.sendEmailToCustomerServiceRequestAppoved(serviceRequest, 
+					serviceRequest.getCustomer().getFullname(),
+					serviceRequest.getTranslator().getFullname(),
+					serviceRequest.getCustomer().getUser().getEmail(),
+					serviceRequest.getTranslator().getUser().getEmail(),
+					serviceRequest.getTranslator().getAbn_name(),
+					serviceRequest.getTranslator().getAbn_number(),
+					quotation);			
+			
 		}
 		return "redirect:/history";
 	}
 
 	@RequestMapping(value={"/downloadFile/{id}/{option}"}, method={org.springframework.web.bind.annotation.RequestMethod.GET})
-	public void downloadFileFromCustomer(HttpServletResponse response, @PathVariable("id") long id, @PathVariable("option") String option, HttpServletRequest request) throws IOException
-	{
+	public void downloadFileFromCustomer(HttpServletResponse response, @PathVariable("id") long id, @PathVariable("option") String option, HttpServletRequest request) throws IOException {
 		logger.info("Welcome BusinessUserDashboardController: downloadFiles2");
 
 		if (option.equals("request")) {
@@ -915,15 +998,36 @@ public class BusinessUserDashboardController extends BaseController{
 			dto.setStatus(serviceRequest.getServiceRequestStatus().getDescription());
 			dto.setId(serviceRequest.getId());
 			dto.setFinishDate(serviceRequest.getFinishDate());
+			dto.setPaidDate(serviceRequest.getPaidDate());
+			dto.setCreateDate(serviceRequest.getCreationDate());
 			dto.setFinishQuoteDate(getRemainingDateToSelectQuote(serviceRequest.getFinishQuoteSelection()));
 			dto.setCountOfUnreadMessages(ConversationUtils.getCountOfUnreadMessage(serviceRequest.getConversationList(), userIdByEmail));
+			dto.setDescription(serviceRequest.getDescription());
+
+			Set<AmazonFile> amazonFiles = new HashSet<AmazonFile>();
+			amazonFiles.addAll(amazonService.findByServiceRequestIdAndType(serviceRequest.getId(), FileType.SERVICE_REQUEST));
+			dto.setAmazonList(convertToDto(amazonFiles));
+
 			Invoice invoice = serviceRequest.getInvoice();
 			if (invoice != null)
 				dto.setInvoiceUrl(invoice.getFile().getUrl());
 			Translator translator = serviceRequest.getTranslator();
 			if (translator != null) {
 				dto.setTranslatorName(translator.getUser().getName());
+				Quotation quote = quotationService.getQuoteFromServiceRequestAndTranslator(serviceRequest.getId(), serviceRequest.getTranslator().getId());
+				dto.setQuote(quote.getValue());
 			}
+			
+			 Rate rate = rateService.getRateByServiceRequest(serviceRequest);
+	            if(rate!=null){
+	                RateDTO rateDto = new RateDTO();
+	                rateDto.setFeedback(rate.getFeedback());
+	                rateDto.setService(rate.getServiceAsDescribed());
+	                rateDto.setTimeDelivery(rate.getTimeDelivery());
+	                rateDto.setQuality(rate.getQuality());
+	                dto.setRateDto(rateDto);
+	            }
+			
 			listDTO.add(dto);
 		}
 		return listDTO;

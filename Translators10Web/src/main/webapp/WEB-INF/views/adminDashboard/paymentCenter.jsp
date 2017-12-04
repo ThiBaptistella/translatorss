@@ -155,25 +155,29 @@
             <div class="panel-heading">
               <h3 class="panel-title">Payment Center</h3>
             </div>
+            <button onclick="myFunction()">Refresh table Info</button>
             <div class="panel-body">
-			 	    <div class="col-lg-6">
+			 	    <div class="col-lg-8">
                             <div class="table-responsive">
                                 <table class="table table-bordered table-hover table-striped" id="datatables">
                                     <thead>
                                     <tr>
-                                        <th class="text-center">ServiceRequestID</th>
+                                        <th class="text-center">Paypal ID</th>
                                         <th class="text-center">Amount</th>
-                                        <th class="text-center">Customer</th>
-                                        <th class="text-center">Translator</th>                                        
+                                        <th class="text-center">Currency</th>
+                                        <th class="text-center">Translator</th>
+                                        <th class="text-center">Service Request ID</th>                                      
                                     </tr>
                                     </thead>
                                     <tbody>
 	                                    <c:forEach items="${paymentList}" var="serviceRequestPayment">
 	                                        <tr class="active">
-	                                            <td>${serviceRequestPayment.serviceRequestId}</td>
+	                                            <td>${serviceRequestPayment.paypalId}</td>
 	                                            <td>${serviceRequestPayment.amount}</td>
-	                                            <td>${serviceRequestPayment.customer}</td>
-	                                            <td>${serviceRequestPayment.translator}</td>
+	                                            <td>${serviceRequestPayment.currency}</td>
+	                                            <td>${serviceRequestPayment.user}</td>
+	                                            <td>${serviceRequestPayment.serviceRequestId}</td>
+	                                            
 	                                        </tr>
 	                                    </c:forEach>
                                     </tbody>
@@ -188,11 +192,16 @@
               <h3 class="panel-title">Payment File Generation Center</h3>
             </div>
             <div class="panel-body">
-                <spring:url value="/downloadCSV" var="downloadCSV" />
-				<button class="btn btn-primary" onclick="location.href='${downloadCSV}'">Generate CSV Payments File</button>
             
-            	<%--<spring:url value="/paymentsHistory" var="paymentsHistory" />--%>
-				<%--<button class="btn btn-primary" onclick="location.href='${paymentsHistory}'">Payments History</button>--%>
+            	<c:if test="${not empty paymentList}">
+	                <spring:url value="/downloadPaymentTranslatorsCSV/payment" var="downloadCSV" />
+					<button class="btn btn-primary" onclick="location.href='${downloadCSV}'">Generate CSV Payments File</button>
+                </c:if>
+                
+                <!--
+            	<spring:url value="/paymentsHistory" var="paymentsHistory" />
+				<button class="btn btn-primary" onclick="location.href='${paymentsHistory}'">Previous Payments History</button>
+            -->
             </div>
           </div>
         </div>
@@ -212,7 +221,11 @@
 
 <!-- Bootstrap Core JavaScript -->
 <script src="resources/js/bootstrap.min.js"></script>
-
+<script>
+	function myFunction() {
+	    location.reload();
+	}
+</script>
 </body>
 
 </html>

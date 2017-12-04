@@ -38,7 +38,7 @@
 <div class="tm-header-mobile uk-hidden@m">
     <nav class="uk-navbar-container uk-navbar" uk-navbar="">
         <div class="uk-navbar-left">
-            <a class="uk-navbar-item uk-logo" href="http://www.translatorss.com.au/">
+            <a class="uk-navbar-item uk-logo" href="<c:url value='/' />">
                 <img src="resources/login_files/logo-translatorss.svg" alt="" class="uk-responsive-height">        </a>
         </div>
         <div class="uk-navbar-right">
@@ -69,14 +69,11 @@
         <div class="uk-container ">
             <nav class="uk-navbar" uk-navbar="{&quot;align&quot;:&quot;center&quot;,&quot;dropbar&quot;:true,&quot;dropbar-anchor&quot;:&quot;!.uk-container&quot;,&quot;dropbar-mode&quot;:&quot;slide&quot;}">
                 <div class="uk-navbar-left">
-                    <a href="http://www.translatorss.com.au/" class="uk-logo uk-navbar-item">
+                    <a href="<c:url value='/' />" class="uk-logo uk-navbar-item">
                         <img src="resources/login_files/logo-translatorss.svg" alt="" class="uk-responsive-height"><img src="resources/login_files/logo-translatorss-bco.svg" alt="" class="uk-responsive-height uk-logo-inverse"></a>
                 </div>
                 <div class="uk-navbar-right">
-                    <ul class="uk-navbar-nav">
-                        <li class="uk-active"><a href="http://www.translatorss.com.au/login">login</a></li>
-                        <li><a href="http://www.translatorss.com.au/join-us">join us</a></li>
-                    </ul>
+                   
                     <div class="uk-navbar-item" id="module-0">
                         <div><ul class="uk-grid-small uk-flex-middle uk-flex-nowrap uk-grid" uk-grid="">
                             <li class="uk-first-column">
@@ -111,13 +108,16 @@
                     <div class="uk-width-1-2@m">
                         <div class="uk-panel uk-scrollspy-inview uk-animation-fade" uk-scrollspy-class="" style="">
                             <h3>Login Form</h3>
+                            <div id="loginerrormessage" class="errorblock" style="color:red" >
+                                <b><strong>${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message}</strong></b>
+                            </div>
                             <form:form action='${pageContext.request.contextPath}/j_spring_security_check' method="post" commandName="customerloginForm">
                                 <div class="uk-margin">
-                                    <form:input path="email" class="uk-input" size='18' type='text' id="email" name="email" value="${param.customer}" placeholder="Enter your Email" />
+                                    <form:input path="email" class="uk-input" onclick="cleanErrorMessage()" size='18' type='text' id="email" name="email" value="${param.customer}" placeholder="Enter your Email" />
                                     <form:errors path="email" />
                                 </div>
                                 <div class="uk-margin">
-                                    <form:input path="password" autocomplete='off' class='uk-input' size='18' type='text' id="password" name="password" placeholder="Password" />
+                                    <form:input path="password" autocomplete='off' class='uk-input' onclick="cleanErrorMessage()" size='18' type='password' id="password" name="password" placeholder="Password" />
                                     <span class="input-group-addon input-circle-right"><i class="fa fa-user"></i></span>
                                 </div>
                                 <div class="uk-margin">
@@ -130,6 +130,7 @@
                                 </div>
 
                             </form:form>
+
                         </div>
                     </div>
                     <div class="uk-width-expand@m">
@@ -194,5 +195,12 @@
         </div>
     </div>
 </div>
+
+<script>
+    function cleanErrorMessage() {
+        document.getElementById("loginerrormessage").style.display="none";
+    }
+</script>
+
 </body>
 </html>

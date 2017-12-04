@@ -4,30 +4,24 @@ import java.math.BigDecimal;
 
 public class ServiceRequestPaymentDTO {
 
-	private String paypalTransaction;
-	private Long serviceRequestId;
+	private String paypalId;
 	private BigDecimal amount;
-	private String customer;
-	private String translator;
+	private String currency; 
+	private String user;
+	
+
+	private Long serviceRequestId;
 	
 	public ServiceRequestPaymentDTO(){
 		
 	}
-
-	public String getPaypalTransaction() {
-		return paypalTransaction;
+	
+	public String getPaypalId() {
+		return paypalId;
 	}
 
-	public void setPaypalTransaction(String paypalTransaction) {
-		this.paypalTransaction = paypalTransaction;
-	}
-
-	public Long getServiceRequestId() {
-		return serviceRequestId;
-	}
-
-	public void setServiceRequestId(Long serviceRequestId) {
-		this.serviceRequestId = serviceRequestId;
+	public void setPaypalId(String paypalId) {
+		this.paypalId = paypalId;
 	}
 
 	public BigDecimal getAmount() {
@@ -38,19 +32,29 @@ public class ServiceRequestPaymentDTO {
 		this.amount = amount;
 	}
 
-	public String getCustomer() {
-		return customer;
+	public String getCurrency() {
+		return currency;
 	}
 
-	public void setCustomer(String customer) {
-		this.customer = customer;
+	public void setCurrency(String currency) {
+		this.currency = currency;
 	}
 
-	public String getTranslator() {
-		return translator;
+	public Long getServiceRequestId() {
+		return serviceRequestId;
 	}
 
-	public void setTranslator(String translator) {
-		this.translator = translator;
+	public void setServiceRequestId(Long serviceRequestId) {
+		this.serviceRequestId = serviceRequestId;
 	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	
 }

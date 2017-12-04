@@ -39,7 +39,7 @@ public class AmazonServiceMock implements AmazonService{
 	}
 
 	@Override
-	public AmazonFile saveServiceResponseFile(ServiceResponse serviceResponse, String fileName, InputStream is,
+	public AmazonFile saveServiceResponseFile(ServiceResponse serviceResponse,User createdBy, String fileName, InputStream is,
 			String contentType) {
 		// TODO Auto-generated method stub
 		return null;
@@ -61,6 +61,18 @@ public class AmazonServiceMock implements AmazonService{
 	public void deleteFile(String key) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public List<AmazonFile> getAll() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<AmazonFile> getAllExpiredFiles() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

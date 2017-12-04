@@ -139,28 +139,19 @@ License: You must have a valid license purchased only from themeforest(the above
                             <li class="dropdown dropdown-user">
                                 <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
                                     <img alt="" class="img-circle" src="${photoUrl}" />
-                                    <span class="username username-hide-on-mobile"> ${businessUserFormName} </span>
+                                    <span class="username username-hide-on-mobile">${businessUserForm.fullname}</span>
                                     <i class="fa fa-angle-down"></i>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-default">
                                     <li>
-                                        <a href="page_user_profile_1.html">
-                                            <i class="icon-user"></i> My Profile </a>
+                                        <a href="<c:url value='userSettings'/>"><i class="icon-user"></i> My Profile </a>
                                     </li>
                                     <li>
-                                        <a href="app_inbox.html">
+                                        <a href="<c:url value='conversations'/>">
                                             <i class="icon-envelope-open"></i> My Inbox
-                                            <span class="badge badge-danger"> 3 </span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="app_todo_2.html">
-                                            <i class="icon-rocket"></i> My Tasks
-                                            <span class="badge badge-success"> 7 </span>
                                         </a>
                                     </li>
                                     <li class="divider"> </li>
- 
                                     <li>
                                         <a href="<c:url value='${pageContext.request.contextPath}/j_spring_security_logout'/>"><i class="icon-key"></i> Log Out</a>
                                     </li>
@@ -270,10 +261,21 @@ License: You must have a valid license purchased only from themeforest(the above
                         <div class="col-md-12">
                            
                             <!-- BEGIN SAMPLE TABLE PORTLET-->
+                            <c:if test="${translatorQuoteList.size() ==0}">
+                                <div class="note note-success">
+                                    <p> <b>Soon you will receive quotes from translatorss.</b> </p>
+                                </div>
+                            </c:if>
+							<c:if test="${paymentNotAvailable==true}">
+                                <div class="note note-success">
+                                    <p> <b>At this moment the payment system is not available, please try later!.</b> </p>
+                                </div>
+                            </c:if>
+
+
                             <div class="portlet box green">
                                 <div class="portlet-title">
-                                    <div class="caption">
-                                        <i class="fa fa-cogs"></i>Quote List </div>
+                                    <div class="caption"><i class="fa fa-cogs"></i>Quote List </div>
                                 </div>
                                 <div class="portlet-body flip-scroll">
                                     <table class="table table-bordered table-striped table-condensed flip-content">
@@ -281,67 +283,23 @@ License: You must have a valid license purchased only from themeforest(the above
                                             
                                                       <tr>
                                                       		<th class="text-center">Picture</th>
-					                                        <th class="text-center">Name</th>
-					                                        <th class="text-center">Price(AU$)</th>
-					                                        <th class="text-center">Quality Rating</th>
+					                                        <th class="text-center">Translator Name</th>
+					                                        <th class="text-center">Quote Price(AU$)</th>
 					                                        <th class="text-center">Time Delivery Rating</th>
-					                                        <th class="text-center">Service Described Rating</th>
+														    <th class="text-center">Quality Rating</th>
+					                                        <th class="text-center">Customer Service</th>
+														    <th class="text-center">Translator feedback history</th>
 					                                        <th class="text-center">Action</th>
-					                                        <th class="text-center">Choose</th>
+					                                        <th class="text-center">Select translator</th>
 					                                    </tr>
                                            
                                         </thead>
                                         <tbody>
                                           <c:forEach items="${translatorQuoteList}" var="translatorQuoteRequest">
 		                                        <tr class="active">
-		                                        	<td class="text-center"> <img alt="" class="img-circle" src="${translatorQuoteRequest.photo}" height="72" width="72"/></td>
+		                                        	<td class="text-center"> <img alt="" class="img-circle" src="${translatorQuoteRequest.photo}" height="52" width="52"/></td>
 		                                            <td class="text-center">${translatorQuoteRequest.name}</td>
 		                                            <td class="text-center" data-quote-id="${translatorQuoteRequest.quotationId}">${translatorQuoteRequest.quote}</td>
-		                                            <td class="text-center">
-		                                                <c:if test="${translatorQuoteRequest.quality =='5'}">
-		                                                    <i class="fa fa-star"></i>
-		                                                    <i class="fa fa-star"></i>
-		                                                    <i class="fa fa-star"></i>
-		                                                    <i class="fa fa-star"></i>
-		                                                    <i class="fa fa-star"></i>
-		                                                </c:if>
-		                                                <c:if test="${translatorQuoteRequest.quality =='4'}">
-		                                                    <i class="fa fa-star"></i>
-		                                                    <i class="fa fa-star"></i>
-		                                                    <i class="fa fa-star"></i>
-		                                                    <i class="fa fa-star"></i>
-		                                                    <i class="fa fa-star-o"></i>
-		                                                </c:if>
-		                                                <c:if test="${translatorQuoteRequest.quality =='3'}">
-		                                                    <i class="fa fa-star"></i>
-		                                                    <i class="fa fa-star"></i>
-		                                                    <i class="fa fa-star"></i>
-		                                                    <i class="fa fa-star-o"></i>
-		                                                    <i class="fa fa-star-o"></i>
-		                                                </c:if>
-		                                                <c:if test="${translatorQuoteRequest.quality =='2'}">
-		                                                    <i class="fa fa-star"></i>
-		                                                    <i class="fa fa-star"></i>
-		                                                    <i class="fa fa-star-o"></i>
-		                                                    <i class="fa fa-star-o"></i>
-		                                                    <i class="fa fa-star-o"></i>
-		                                                </c:if>
-		                                                <c:if test="${translatorQuoteRequest.quality =='1'}">
-		                                                    <i class="fa fa-star"></i>
-		                                                    <i class="fa fa-star-o"></i>
-		                                                    <i class="fa fa-star-o"></i>
-		                                                    <i class="fa fa-star-o"></i>
-		                                                    <i class="fa fa-star-o"></i>
-		                                                </c:if>
-		                                                <c:if test="${translatorQuoteRequest.quality =='0'}">
-		                                                    <i class="fa fa-star-o"></i>
-		                                                    <i class="fa fa-star-o"></i>
-		                                                    <i class="fa fa-star-o"></i>
-		                                                    <i class="fa fa-star-o"></i>
-		                                                    <i class="fa fa-star-o"></i>
-		                                                </c:if>
-		                                            </td>
-		
 		                                            <td class="text-center">
 		                                                <c:if test="${translatorQuoteRequest.timeDelivery =='5'}">
 		                                                    <i class="fa fa-star"></i>
@@ -379,6 +337,51 @@ License: You must have a valid license purchased only from themeforest(the above
 		                                                    <i class="fa fa-star-o"></i>
 		                                                </c:if>
 		                                                <c:if test="${translatorQuoteRequest.timeDelivery =='0'}">
+		                                                    <i class="fa fa-star-o"></i>
+		                                                    <i class="fa fa-star-o"></i>
+		                                                    <i class="fa fa-star-o"></i>
+		                                                    <i class="fa fa-star-o"></i>
+		                                                    <i class="fa fa-star-o"></i>
+		                                                </c:if>
+		                                            </td>
+		
+		                                            <td class="text-center">
+		                                                <c:if test="${translatorQuoteRequest.quality =='5'}">
+		                                                    <i class="fa fa-star"></i>
+		                                                    <i class="fa fa-star"></i>
+		                                                    <i class="fa fa-star"></i>
+		                                                    <i class="fa fa-star"></i>
+		                                                    <i class="fa fa-star"></i>
+		                                                </c:if>
+		                                                <c:if test="${translatorQuoteRequest.quality =='4'}">
+		                                                    <i class="fa fa-star"></i>
+		                                                    <i class="fa fa-star"></i>
+		                                                    <i class="fa fa-star"></i>
+		                                                    <i class="fa fa-star"></i>
+		                                                    <i class="fa fa-star-o"></i>
+		                                                </c:if>
+		                                                <c:if test="${translatorQuoteRequest.quality =='3'}">
+		                                                    <i class="fa fa-star"></i>
+		                                                    <i class="fa fa-star"></i>
+		                                                    <i class="fa fa-star"></i>
+		                                                    <i class="fa fa-star-o"></i>
+		                                                    <i class="fa fa-star-o"></i>
+		                                                </c:if>
+		                                                <c:if test="${translatorQuoteRequest.quality =='2'}">
+		                                                    <i class="fa fa-star"></i>
+		                                                    <i class="fa fa-star"></i>
+		                                                    <i class="fa fa-star-o"></i>
+		                                                    <i class="fa fa-star-o"></i>
+		                                                    <i class="fa fa-star-o"></i>
+		                                                </c:if>
+		                                                <c:if test="${translatorQuoteRequest.quality =='1'}">
+		                                                    <i class="fa fa-star"></i>
+		                                                    <i class="fa fa-star-o"></i>
+		                                                    <i class="fa fa-star-o"></i>
+		                                                    <i class="fa fa-star-o"></i>
+		                                                    <i class="fa fa-star-o"></i>
+		                                                </c:if>
+		                                                <c:if test="${translatorQuoteRequest.quality =='0'}">
 		                                                    <i class="fa fa-star-o"></i>
 		                                                    <i class="fa fa-star-o"></i>
 		                                                    <i class="fa fa-star-o"></i>
@@ -430,8 +433,12 @@ License: You must have a valid license purchased only from themeforest(the above
 		                                                    <i class="fa fa-star-o"></i>
 		                                                </c:if>
 		                                            </td>
+													<td class="text-center">
+														<a href="<c:url value='/rateInformation/${translatorQuoteRequest.translatorId}' />" >Work History</a>
+													</td>
+
 													<td>
-														<a href="<c:url value='/startConversation/${translatorQuoteRequest.translatorId}/${serviceRequestid}/${translatorQuoteRequest.quotationId}'/>" >Send a Message</a>
+														<a href="<c:url value='/startConversation/${translatorQuoteRequest.translatorId}/${serviceRequestid}/${translatorQuoteRequest.quotationId}'/>" >Chat with translator</a>
 													</td>
 		                                            <td><a href="#"
 		                                                   onclick="showPayModal(${translatorQuoteRequest.quotationId});"><img
@@ -456,8 +463,8 @@ License: You must have a valid license purchased only from themeforest(the above
 	                                            <div class="modal-body">
 	                                                <div class="row">
 	                                                    <div class="col-md-12">
-	                                                        <form id="checkoutContainer" method="post" action='chose'
-	                                                              enctype="application/x-www-form-urlencoded">
+	                                                        <form id="checkoutContainer" method="post" action='chose' onsubmit="closeModal();"
+ 	                                                              enctype="application/x-www-form-urlencoded">
 	                                                            <input id="quotationId" name="quotationId" type="hidden">
 	                                                            <input id="isDonation" type="checkbox" name="isDonation"
 	                                                                   aria-labelledby="isDonationLabel">
@@ -475,7 +482,6 @@ License: You must have a valid license purchased only from themeforest(the above
 	                                                            </div>
 	                                                            <div style="clear: both"></div>
 	                                                        </form>
-	                                                        <button id="btnCancel" class="close">Cancel</button>
 	                                                    </div>
 	                                                </div>
 	                                            </div>
@@ -574,6 +580,10 @@ License: You must have a valid license purchased only from themeforest(the above
 				        $('#payModal').show();
 				    }
 				
+				    function closeModal(){
+				    	 $('#payModal').hide();
+				    }
+				    
 				    window.paypalCheckoutReady = function () {
 				        paypal.checkout.setup('DE3ZKSXBXWBVN', {
 				            environment: 'sandbox',

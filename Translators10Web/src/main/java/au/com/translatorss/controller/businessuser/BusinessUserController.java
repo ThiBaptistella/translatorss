@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -111,17 +112,30 @@ public class BusinessUserController {
         session.setAttribute("loggedInUser", businessUser);
 
         ServiceRequestDTO serviceRequestDTO = (ServiceRequestDTO)session.getAttribute("servcieRequestLead");
+		TranslatorQuotationDTO translatorQuotationDTO = (TranslatorQuotationDTO) session.getAttribute("homeQuotation");
 
-		ServiceRequest serviceRequest = mapServiceRequestFromDTO(serviceRequestDTO, businessUser);
+        
+		ServiceRequest serviceRequest = mapServiceRequestFromDTO(serviceRequestDTO, businessUser,translatorQuotationDTO);
 		serviceRequest.setServiceRequestStatus(serviceRequestStatusDao.findByDescription("Unquoted"));
         serviceRequest.setFinishDate(getFinishDate(serviceRequest.getTimeFrame().getDescription()));
 		serviceRequestService.saveOrUpdate(serviceRequest);
 
-		TranslatorQuotationDTO translatorQuotationDTO = (TranslatorQuotationDTO) session.getAttribute("homeQuotation");
+        List<byte[]> bytes = (List<byte[]>) session.getAttribute("files");
+        for(int i=0;i<bytes.size();i++) {
+            MultipartFile multipartFile = serviceRequestDTO.getFiles().get(i);
+            ByteArrayInputStream is = new ByteArrayInputStream(bytes.get(i));
+            amazonService.saveServiceRequestFile(serviceRequest, multipartFile.getOriginalFilename(), is, multipartFile.getContentType());
+        }
+
 		if(translatorQuotationDTO!=null){
 	        serviceRequest.setTranslator(translatorService.getTranslatorById(translatorQuotationDTO.getTranslatorId()));
 	        conversationService.startOrContinueConversation(serviceRequest);
 
+	        ServiceRequestPayment srp = (ServiceRequestPayment)session.getAttribute("serviceRequestPayment");
+            srp.setValue(new BigDecimal(translatorQuotationDTO.getQuote()));
+            srp.setServiceRequest(serviceRequest);
+			serviceRequest.setServiceRequestPayment(srp);
+	        
 	     // poner el serviceResponse
 	        ServiceResponse serviceResponse = new ServiceResponse();
 	        serviceResponse.setCreationDate(new Date());
@@ -134,31 +148,38 @@ public class BusinessUserController {
 
 	        serviceRequestService.saveOrUpdate(serviceRequest);
 	        serviceResponseService.saveOrUpdate(serviceResponse);
-		}
-        return "redirect:/jobInProgress";
+
+	        emailService2.sendEmailQuoteAcceptedCustomer(serviceRequest.getCustomer().getUser().getEmail(), serviceRequest.getCustomer().getUser().getName(), Long.getLong(translatorQuotationDTO.getQuote()), serviceRequest.getId().toString(), serviceRequest.getFinishDate());
+            emailService2.sendEmailQuoteAcceptedTranslator(serviceRequest.getTranslator().getUser().getEmail(), serviceRequest.getTranslator().getUser().getName(), serviceRequest.getTimeFrame().getDescription(), serviceRequest.getId().toString(), serviceRequest.getFinishDate());
+	        
+            return "redirect:/jobInProgress";
+        }else{
+		    session.setAttribute("serviceRequestid",serviceRequest.getId());
+            return "redirect:/myUserQuotations";
+        }
 	}
 
 	@RequestMapping(value = "/registerBusinessUser", method = RequestMethod.POST)
-	public String processUser(HttpSession session, @ModelAttribute("businessUserForm") @Validated BusinessUserDTO businessUserDto, BindingResult result, Model model, RedirectAttributes redirectAttributes) throws IllegalStateException, IOException {
+	public String processUser(HttpSession session, @ModelAttribute("businessUserForm") @Validated BusinessUserDTO businessUserDto, BindingResult result, Model model) throws IllegalStateException, IOException {
 		logger.info("Welcome BusinessUserController: processUser");
 		if (result.hasErrors()) {
             Loggin loggin = new Loggin();
 			model.addAttribute("businessUserForm", businessUserDto);
             model.addAttribute("loginSRForm", loggin);
-
             return"businessUserForm";
 		}
 
-        redirectAttributes.addFlashAttribute("businessUserForm", businessUserDto);
         BusinessUser businessUser = businessUserDtoToBusinessUser(businessUserDto);
-		businessUserService.saveOrUpdate(businessUser);
+        session.setAttribute("loggedInUser", businessUser);
 
-//	    emailService2.sendEmailWelcomeCutomer(businessUser.getUser().getPassword(), businessUser.getUser().getEmail(), businessUser.getUser().getName());
-
-		ServiceRequestDTO serviceRequestDTO = (ServiceRequestDTO)session.getAttribute("servcieRequestLead");
-        ServiceRequest serviceRequest = mapServiceRequestFromDTO(serviceRequestDTO, businessUser);
-
+        ServiceRequestDTO serviceRequestDTO = (ServiceRequestDTO)session.getAttribute("servcieRequestLead");
+		TranslatorQuotationDTO translatorQuotationDTO = (TranslatorQuotationDTO) session.getAttribute("homeQuotation");
+		
+        ServiceRequest serviceRequest = mapServiceRequestFromDTO(serviceRequestDTO, businessUser, translatorQuotationDTO);
+        
+        businessUserService.saveOrUpdate(businessUser);
 		serviceRequestService.saveWithoutFiles(serviceRequest, serviceRequestDTO);
+        emailService2.sendEmailWelcomeCutomer(businessUser.getUser().getPassword(), businessUser.getUser().getEmail(), businessUser.getUser().getName());
 
         List<byte[]> bytes = (List<byte[]>) session.getAttribute("files");
         for(int i=0;i<bytes.size();i++) {
@@ -167,34 +188,44 @@ public class BusinessUserController {
             amazonService.saveServiceRequestFile(serviceRequest, multipartFile.getOriginalFilename(), is, multipartFile.getContentType());
         }
 
-		TranslatorQuotationDTO translatorQuotationDTO = (TranslatorQuotationDTO) session.getAttribute("homeQuotation");
 		if(translatorQuotationDTO!=null){
             Translator translator = translatorService.getTranslatorById(translatorQuotationDTO.getTranslatorId());
+            ServiceRequestPayment srp = (ServiceRequestPayment)session.getAttribute("serviceRequestPayment");
+            srp.setValue(new BigDecimal(translatorQuotationDTO.getQuote()));
+            srp.setServiceRequest(serviceRequest);
+			serviceRequest.setServiceRequestPayment(srp);
+
             serviceRequest.setTranslator(translator);
 			serviceRequest.setServiceRequestStatus(serviceRequestStatusDao.findByDescription("OpenService"));
-
+			serviceRequest.setServiceRequestPayment(srp);
 	        conversationService.startOrContinueConversation(serviceRequest);
 
 	     // poner el serviceResponse
 	        ServiceResponse serviceResponse = new ServiceResponse();
 	        serviceResponse.setCreationDate(new Date());
 	        serviceResponse.setDescription("description");
-	        //serviceResponse.setServiceRequest(serviceRequest);
             serviceResponse.setTranslator(translator);
             serviceResponse.setUpdateDate(new Date());
             serviceResponseService.saveOrUpdate(serviceResponse);
             serviceRequestService.saveOrUpdate(serviceRequest);
 
-            InvoicePdfDto dto = new InvoicePdfDto(translatorQuotationDTO, serviceRequest);
-            createAndSendInvoice(dto, serviceRequest);
+            emailService2.sendEmailQuoteAcceptedCustomer(serviceRequest.getCustomer().getUser().getEmail(), serviceRequest.getCustomer().getUser().getName(), Long.getLong(translatorQuotationDTO.getQuote()), serviceRequest.getId().toString(), serviceRequest.getFinishDate());
+            emailService2.sendEmailQuoteAcceptedTranslator(serviceRequest.getTranslator().getUser().getEmail(), serviceRequest.getTranslator().getUser().getName(), serviceRequest.getTimeFrame().getDescription(), serviceRequest.getId().toString(), serviceRequest.getFinishDate());
+            
         }
 
         businessUser.setServiceRequestList(new HashSet<ServiceRequest>());
         session.setAttribute("servcieRequestLead", null);
         authorityHelper.updateGrantedAuthoritiesForCurrentUser(businessUser.getUser());
         securityService.autologin(businessUser.getUser().getEmail(), businessUser.getUser().getPassword());
-        session.setAttribute("loggedInUser", businessUser);
-        return "redirect:/jobInProgress";
+        if(translatorQuotationDTO!=null){
+            return "redirect:/jobInProgress";
+
+        }else{
+            session.setAttribute("serviceRequestid", serviceRequest.getId());
+            return "redirect:/myUserQuotations";
+
+        }
 	}
 
 	@RequestMapping("/chose")
@@ -204,6 +235,14 @@ public class BusinessUserController {
 		paypalController.checkoutSale(quotationId, isDonation, "/chose/payment/" + quotationId + "/?guid=","/chose/payment_cancel/" + quotationId + "/?guid=", guid, request, response);
 	}
 
+	@RequestMapping("/choseHP")
+	public void choseHP(@RequestParam("quotationId") Long quotationId, @RequestParam(required = false, value = "isDonation") Boolean isDonation, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		logger.info("Welcome BusinessUserDashboardController: choseHP");
+		String guid = UUID.randomUUID().toString().replaceAll("-", "");
+		paypalController.checkoutSaleHP(quotationId, isDonation, "/chose/payment/" + quotationId + "/?guid=","/chose/payment_cancel/" + quotationId + "/?guid=", guid, request, response);
+	}
+	
+	
 	@RequestMapping(value = "/chose/payment_cancel/{quotationId}", method = RequestMethod.GET)
 	public String chosePaymentCancel(@PathVariable("quotationId") long id, @RequestParam("guid") String guid) throws Exception {
 		paypalController.cancelPayment(guid);
@@ -211,7 +250,7 @@ public class BusinessUserController {
 	}
 
 	@RequestMapping(value = "/chose/payment/{quotationId}", method = RequestMethod.GET)
-	public String chosePayment(@PathVariable("quotationId") long id, RedirectAttributes redirectAttributes, HttpServletRequest request) throws Exception {
+	public String chosePayment(@PathVariable("quotationId") Long id, RedirectAttributes redirectAttributes, HttpServletRequest request) throws Exception {
 		logger.info("Welcome BusinessUserDashboardController: chose");
 
 		Payment paypalPayment = null;
@@ -252,8 +291,8 @@ public class BusinessUserController {
 				serviceResponse.setUpdateDate(new Date());
 			}
 
-            createAndSendInvoice(new InvoicePdfDto(quotation), serviceRequest);
-
+//            createAndSendInvoice(new InvoicePdfDto(quotation), serviceRequest);
+//
             serviceRequestService.saveOrUpdate(serviceRequest);
             serviceResponseService.saveOrUpdate(serviceResponse);
             emailService2.sendEmailQuoteAcceptedCustomer(serviceRequest.getCustomer().getUser().getEmail(), serviceRequest.getCustomer().getUser().getName(), quotation.getValue().longValue(), serviceRequest.getId().toString(), serviceRequest.getFinishDate());
@@ -261,10 +300,22 @@ public class BusinessUserController {
             redirectAttributes.addFlashAttribute("serviceRequest", serviceRequest);
         } else {
             for (TranslatorQuotationDTO translatorQuotationDTO : quoteList) {
-                if (translatorQuotationDTO.getQuotationId() == id) {
+            	long quoteValue = translatorQuotationDTO.getQuotationId();
+                if (quoteValue==id) {
                     request.getSession().setAttribute("homeQuotation", translatorQuotationDTO);
                     request.getSession().setAttribute("businessUserForm", new BusinessUser());
                     request.getSession().removeAttribute("translatorQuoteList");
+                    
+        			String saleId;
+        			if (transactions.size() > 0) {
+        				List<RelatedResources> relRes = transactions.get(0).getRelatedResources();
+        				if (relRes.size() > 0) {
+        					saleId = relRes.get(0).getSale().getId();
+        					ServiceRequestPayment serviceRequestPayment = new ServiceRequestPayment();
+        					serviceRequestPayment.setPaypalTransactionId(saleId);
+                            request.getSession().setAttribute("serviceRequestPayment", serviceRequestPayment);
+        				}
+        			}
                     return "redirect:/businessUserForm";
                 }
             }
@@ -279,30 +330,19 @@ public class BusinessUserController {
         return quoteList;
     }
 
-    private void createAndSendInvoice(InvoicePdfDto dto, ServiceRequest serviceRequest) throws IOException {
-        Invoice invoice = new Invoice(serviceRequest);
-        invoice = invoiceService.save(invoice);
-        dto.setInvoiceNum(String.valueOf(invoice.getId()));
-        dto.setInvoiceDate(invoice.getCreatedAt());
-        ByteArrayOutputStream invoiceOutStream = createPdf(dto);
-        byte[] bytes = invoiceOutStream.toByteArray();
-        String fileName = "invoice_" + invoice.getId().toString();
-        AmazonFile amazonFile = amazonService.saveInvoice(serviceRequest, serviceRequest.getCustomer().getUser(), fileName, new ByteArrayInputStream(bytes));
-        invoice.setFile(amazonFile);
-        invoiceService.update(invoice);
-        emailService2.sendInvoice(bytes, serviceRequest.getTranslator().getUser().getEmail(), serviceRequest.getCustomer().getUser().getEmail());
-    }
 
     private BusinessUser businessUserDtoToBusinessUser(BusinessUserDTO businessUserDto) {
         BusinessUser bu = new BusinessUser();
         bu.setAddress(businessUserDto.getAddress());
+        bu.setFullname(businessUserDto.getFullname());
         bu.setCreationdate(new Date());
         bu.setPhone(businessUserDto.getPhone());
         bu.setUpdatedate(new Date());
         bu.setAcnabn("11");
 
         bu.getUser().setEmail(businessUserDto.getEmail());
-        bu.getUser().setName(businessUserDto.getFullname());
+        bu.setPaypalClientId(businessUserDto.getPaypalid());
+        bu.getUser().setName(businessUserDto.getPreferedname());
         bu.getUser().setPassword(businessUserDto.getPassword());
         bu.getUser().setRole(Role.CLIENT);
 
@@ -313,41 +353,6 @@ public class BusinessUserController {
         return bu;
     }
 
-    private ByteArrayOutputStream createPdf(InvoicePdfDto dto) throws IOException {
-        ByteArrayOutputStream outputStream = null;
-        InputStream templateStream;
-        try {
-            outputStream = new ByteArrayOutputStream();
-
-            templateStream = getClass().getClassLoader().getResourceAsStream(INVOICE_TEMPLATE_HTML);
-
-            String template = IOUtils.toString(templateStream, StandardCharsets.UTF_8);
-
-            template = template.replace("{{TRANSLATOR_DETAILS}}", dto.getTranslatorDetails());
-            template = template.replace("{{NAATI_NUMBER}}", dto.getNaatiNumber());
-            template = template.replace("{{INVOICE_NUMBER}}", dto.getInvoiceNum());
-            template = template.replace("{{CUSTOMER_DETAILS}}", dto.getCustomerDetails());
-            template = template.replace("{{INVOICE_DATE}}", formatter.format(dto.getInvoiceDate()));
-            template = template.replace("{{ITEM_NUM}}", "1");
-            template = template.replace("{{DESCRIPTION}}", dto.getDescription());
-            template = template.replace("{{QTY}}", dto.getQty().toString());
-            template = template.replace("{{RATE}}", dto.getRate().toString());
-            template = template.replace("{{PRICE}}", dto.getPrice().toString());
-
-            InputStream contentStream = IOUtils.toInputStream(template, StandardCharsets.UTF_8);
-
-            pdfService.createDocument(contentStream, outputStream, null, false);
-        } finally {
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return outputStream;
-    }
 
     private Date getFinishDate(String timeFrame) {
         Date finishDate = new Date();
@@ -368,10 +373,22 @@ public class BusinessUserController {
         return finishDate;
     }
 
-	private ServiceRequest mapServiceRequestFromDTO(ServiceRequestDTO serviceRequestDTO, BusinessUser businessUserLogger)
+	private ServiceRequest mapServiceRequestFromDTO(ServiceRequestDTO serviceRequestDTO, BusinessUser businessUserLogger, TranslatorQuotationDTO translatorQuotationDTO)
             throws IllegalStateException, IOException {
         ServiceRequest serviceRequest = new ServiceRequest();
-
+        
+        if(translatorQuotationDTO!=null) {
+        	 Translator tran = this.translatorService.getTranslatorById(translatorQuotationDTO.getTranslatorId());
+             Quotation quote = new Quotation();
+             quote.setIsAutomatic(true);
+             quote.setIsValid(true);
+             quote.setServiceRequest(serviceRequest);
+             quote.setTranslator(tran);
+             quote.setValue(new BigDecimal(translatorQuotationDTO.getQuote()));
+             serviceRequest.getQuotationList().add(quote);
+        }
+       
+        
         Date requestCreationDate = new Date();
         serviceRequest.setCreationDate(requestCreationDate);
         serviceRequest.setCustomer(businessUserLogger);
@@ -385,7 +402,6 @@ public class BusinessUserController {
         serviceRequest.setTimeFrame(timeFrameDao.findByDescription(serviceRequestDTO.getTimeFrame()));
         serviceRequest.setFinishQuoteSelection(quoteService.getFinishDateSelectionQuote(serviceRequestDTO.getTimeFrame()));
         serviceRequest.setFinishDate(new Date()); //will be completed after the customer selects the candidate
-        serviceRequest.setServiceRequestStatus(serviceRequestStatusDao.findByDescription("Unquoted"));//mal: depende de si es OpenService or no
         serviceRequest.setFinishDate(getFinishDate(serviceRequest.getTimeFrame().getDescription()));
         return serviceRequest;
     }

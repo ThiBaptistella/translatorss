@@ -19,7 +19,7 @@
             </tr>
             <tr>
              <td style="font-size: 12px; font-family: arial, sans-serif; color: #000000; text-align: left;">
-					Hello Matt,
+					Hello $customername,
 					Thank you for approving the translation $servicerequestid. Attached is the associated invoice.
 					We will send the payment to the translator on the next xxx days.
 					If you have any question please contact us.

@@ -4,15 +4,31 @@ public class QuoteSettingDTO {
 
 	private Long translatorId;
 	private String driverLic;
-    private String birthDeath;
-    private String academicTranscript;
+    private String birthCertificate;
+	private String marriageCertificate;
     private String passport;
     private boolean valid;
 	
 
 	public QuoteSettingDTO() {
 	}
-	
+
+	public String getBirthCertificate() {
+		return birthCertificate;
+	}
+
+	public void setBirthCertificate(String birthCertificate) {
+		this.birthCertificate = birthCertificate;
+	}
+
+	public String getMarriageCertificate() {
+		return marriageCertificate;
+	}
+
+	public void setMarriageCertificate(String marriageCertificate) {
+		this.marriageCertificate = marriageCertificate;
+	}
+
 	public Long getTranslatorId() {
 		return translatorId;
 	}
@@ -27,22 +43,6 @@ public class QuoteSettingDTO {
 	
 	public void setDriverLic(String driverLic) {
 		this.driverLic = driverLic;
-	}
-	
-	public String getBirthDeath() {
-		return birthDeath;
-	}
-	
-	public void setBirthDeath(String birthDeath) {
-		this.birthDeath = birthDeath;
-	}
-	
-	public String getAcademicTranscript() {
-		return academicTranscript;
-	}
-	
-	public void setAcademicTranscript(String academicTranscript) {
-		this.academicTranscript = academicTranscript;
 	}
 	
 	public String getPassport() {

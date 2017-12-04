@@ -160,24 +160,24 @@
                                 <table class="table table-bordered table-hover table-striped" id="datatables">
                                     <thead>
                                     <tr>
-                                         <th width="80">Translator ID</th>
-                                         <th width="80">Translator Prefered Name</th>
-                                         <th width="80">Translator Status</th>
-                                         <th width="80">Customer ID</th>
-                                         <th width="80">Request ID</th>
-                                         <th width="80">Request Date</th>
-                                         <th width="80">Time left to close the quote</th>
-                                         <th width="80">Request Status</th>
-                                         <th width="80">Time left to finish the assignment</th>
-                                         <th width="80">Quote Price</th>
-									     <th width="80">Customer Name</th>
-									     <th width="80">Chat</th>
-									     <th width="80">Category</th>
-									     <th width="80">Description</th>
-									     <th width="80">TimeFrame</th>
-									     <th width="80">HardCopy</th>
-									     <th width="80">Original Language</th>
-									     <th width="80">Expire Request</th>
+                                         <th width="60">Translator ID</th>
+                                         <th width="60">Translator Prefered Name</th>
+                                         <th width="60">Status(Active, Paused, Cancelled)</th>
+                                         <th width="60">Client ID</th>
+                                         <th width="60">Request ID</th>
+                                         <th width="60">Request Date</th>
+                                         <th width="60">Time left to close the quote</th>
+                                         <th width="60">Request State(Opened, Quoted, Expired)</th>
+                                         <th width="60">Time left to finish the assignment</th>
+                                         <th width="60">Quote Price</th>
+									     <th width="60">Client Full Name</th>
+									     <th width="60"> View Chat</th>
+									     <th width="60">Document Category</th>
+									     <th width="60">Translation Description</th>
+									     <th width="60">Digital Copy Urgency</th>
+									     <th width="60">HardCopy(Within Australia Only)</th>
+									     <th width="60">Original Language</th>
+									     <th width="60">Expire Request Button</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -196,8 +196,8 @@
 										            <td>${quote.quote}</td>
 										            <td>${quote.customerName}</td>
 										            <td>
-														<c:if test="${serviceRequest.translatorId != null }">
-												            <a href="<c:url value='/seeServiceRequestDetials2/${quote.serviceRequestID}/${quote.translatorid}'/>" >See Details</a>
+														<c:if test="${quote.conversationid != null }">
+												            <a href="<c:url value='/seeServiceRequestDetials2/${quote.serviceRequestID}/${quote.conversationid}'/>" >See Details</a>
 												        </c:if>										            
 										            </td>
 										            <td>${quote.category}</td>

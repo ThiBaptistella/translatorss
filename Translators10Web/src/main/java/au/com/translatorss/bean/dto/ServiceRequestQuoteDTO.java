@@ -21,6 +21,16 @@ public class ServiceRequestQuoteDTO {
 	private boolean hardcopy;
 	private String origenLanguage;
 	private String description;
+	private Long conversationid;
+
+
+	public Long getConversationid() {
+		return conversationid;
+	}
+
+	public void setConversationid(Long conversationid) {
+		this.conversationid = conversationid;
+	}
 
 	public String getDescription() {
 		return description;

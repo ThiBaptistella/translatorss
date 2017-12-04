@@ -28,20 +28,11 @@ public class TranslatorValidatorImpl implements TranslatorValidator {
     @Override
     public void validate(Object target, Errors errors) {
         Translator translator = (Translator) target;
-
-//        User user = translatorDTO.getUser();
-//        if (user == null || StringUtils.isEmpty(user.getEmail())) {
-//            errors.reject("user.name", "fieldEmpty");
-//        } else if (StringUtils.isEmpty(user.getPassword())) {
-//            errors.reject("user.password", "fieldEmpty");
-//        } else if (translatorDTO.getId() != null && userService.isExistEmail(user.getEmail())) {
-//            errors.rejectValue("naatiNumber", "naatiNumberUsed");
-//        } else if (translatorService.getTranslatorByNatiNumber(translatorDTO.getNaatiNumber()) != null) {
+//        if(!userService.isAvailableEmailAndExcludeUser(translator.getUser().getEmail(), translator.getUser().getId())){
 //            errors.rejectValue("email", "emailUsed");
 //        }
-
-        if(!userService.isAvailableEmailAndExcludeUser(translator.getUser().getEmail(), translator.getUser().getId())){
-            errors.rejectValue("email", "emailUsed");
+        if(userService.isExistEmail(translator.getUser().getEmail())){
+            errors.rejectValue("user.email", "emailUsed");
         }
     }
 }

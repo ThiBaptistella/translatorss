@@ -32,7 +32,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 			throw new UsernameNotFoundException("User Name Not Valid");
 		}
 		if (logintryService.getTriesByUser(user.getId()) >= MAX_LOGIN_TRIES) {
-			throw new InsufficientAuthenticationException("You have reached "+MAX_LOGIN_TRIES+" wrong password limit");
+			throw new InsufficientAuthenticationException("After many invalid attempts your account is locked, please contact us, to recover your password");
 		}
 
 		// if (!user.getPassword().equals(new

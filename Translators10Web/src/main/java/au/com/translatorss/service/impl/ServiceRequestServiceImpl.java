@@ -8,6 +8,7 @@ import au.com.translatorss.dao.ServiceRequestDao;
 import au.com.translatorss.dao.ServiceRequestFilesDao;
 import au.com.translatorss.enums.FileType;
 import au.com.translatorss.service.AmazonService;
+import au.com.translatorss.service.ConversationService;
 import au.com.translatorss.service.CustomerServiceRequestService;
 import au.com.translatorss.service.UserService;
 import org.slf4j.Logger;
@@ -22,6 +23,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.CascadeType;
 
 @Service
 @Transactional
@@ -41,6 +44,9 @@ public class ServiceRequestServiceImpl implements CustomerServiceRequestService{
     @Autowired
     private AmazonService amazonService;
 
+    @Autowired
+    private ConversationService conversationService;
+    
     @Override
     public void saveOrUpdate(ServiceRequest entity) {
         serviceRequestDao.saveOrUpdate(entity);
@@ -81,11 +87,16 @@ public class ServiceRequestServiceImpl implements CustomerServiceRequestService{
 	}
 
 	@Override
-	public void remove(ServiceRequest entity) throws Exception {
-	   serviceRequestDao.remove(entity);
-        for (AmazonFile file : entity.getAmazonFiles()) {
+	public void remove(ServiceRequest serviceRequest) throws Exception {
+		for (AmazonFile file : serviceRequest.getAmazonFiles()) {
             amazonService.deleteFile(file);
         }
+		
+		for(Conversation conv: serviceRequest.getConversationList()) {
+			serviceRequest.getConversationList().remove(conv);
+		}
+		serviceRequestDao.saveOrUpdate(serviceRequest);
+	 	serviceRequestDao.remove(serviceRequest);
 	}
 
 	@Override
@@ -135,7 +146,7 @@ public class ServiceRequestServiceImpl implements CustomerServiceRequestService{
     public List<ServiceRequest> getServiceRequestAvailableForTranslator(Translator translatorloged) {
 	    List<ServiceRequest> serviceRequestList;
 	    serviceRequestList = serviceRequestDao.getNotStandarServiceRequestAvailableForTranslator(translatorloged);
-	    serviceRequestList.addAll(serviceRequestDao.getStandarsServiceRequestAvailableForTransalator(translatorloged));
+	   // serviceRequestList.addAll(serviceRequestDao.getStandarsServiceRequestAvailableForTransalator(translatorloged));
 	    return serviceRequestList;
     }
 	
@@ -181,10 +192,19 @@ public class ServiceRequestServiceImpl implements CustomerServiceRequestService{
     }
 
     @Override
-    public List<ServiceRequest> getServiceRequestFromBusinessUser(BusinessUser businessUser,String status) {
-        return serviceRequestDao.getServiceRequestFromBusinessUSerId(businessUser.getId(),status);
+    public List<ServiceRequest> getServiceRequestFromBusinessUser(BusinessUser businessUser,String serviceRequestStatus) {
+        return serviceRequestDao.getServiceRequestFromBusinessUSerId(businessUser.getId(),serviceRequestStatus);
     }
 
+    public List<ServiceRequest> getServiceRequestFromBusinessUser(BusinessUser businessUser, List<String> statusList) {
+        return serviceRequestDao.getServiceRequestFromBusinessUser(businessUser,statusList);
+    }
+    
+	@Override
+	public List<ServiceRequest> getServiceRequestFromTranslator(Translator translator, List<String> statusList) {
+		return serviceRequestDao.getServiceRequestFromTranslator(translator, statusList);
+	}
+    
     @Override
     public List<ServiceRequest> getServiceRequestFromTanslator(Long id, String status) {
         return serviceRequestDao.getServiceRequestFromTranslatorId(id,status);
@@ -196,8 +216,18 @@ public class ServiceRequestServiceImpl implements CustomerServiceRequestService{
     }
 
     @Override
-    public List<ServiceRequest> getServiceRequestStandartWithoutQuote(Translator translator) {
-        return this.getServiceRequestWithoutQuote(translator, getAll());
+    public List<ServiceRequest> getServiceRequestStandartWithoutQuote(Translator translator, String timeFrame) {
+        //return this.getServiceRequestWithoutQuote(translator, getAll());
+    	List<ServiceRequest> auxList= new ArrayList<ServiceRequest>();
+    	List<ServiceRequest>  serviceRequestList = serviceRequestDao.getStandarsServiceRequestAvailableForTransalator(translator,timeFrame);
+    	
+    	for(ServiceRequest sr: serviceRequestList) {
+    		if(!sr.hasQuoteFrom(translator.getId())) {
+    			auxList.add(sr);
+    		}
+    	}
+    	
+    	return auxList;
     }
     
     public ServiceRequestFiles getServiceRequestFile(long id){
@@ -213,4 +243,5 @@ public class ServiceRequestServiceImpl implements CustomerServiceRequestService{
 	public List<ServiceRequest> getServiceRequestFromTranslator(Long translatorid, String status) {
 		return serviceRequestDao.getServiceRequestFromTranslatorId(translatorid, status);
 	}
+
 }

@@ -135,7 +135,7 @@ License: You must have a valid license purchased only from themeforest(the above
                             <li class="dropdown dropdown-user">
                                 <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
                                     <img alt="" class="img-circle" src="${photoUrl}" />
-                                    <span class="username username-hide-on-mobile"> ${businessUserFormName} </span>
+                                    <span class="username username-hide-on-mobile"> ${businessUserForm.fullname} </span>
                                     <i class="fa fa-angle-down"></i>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-default">
@@ -264,32 +264,37 @@ License: You must have a valid license purchased only from themeforest(the above
                                     <table class="table table-bordered table-striped table-condensed flip-content">
                                         <thead class="flip-content">
                                            <tr>
-		                                      <th class="text-center">ID</th>
-		                                      <th class="text-center">Remaining Time to get the job Completed</th>
-		                                   	  <th class="text-center">Category</th>
-		                                      <th class="text-center">Timeframe</th>
-		                                      <th class="text-center">From</th>
-		                                      <th class="text-center">To</th>
-		                                      <th class="text-center">Hard copy?</th>
-		                                      <th class="text-center">Status</th>
-		                                      <th class="text-center">Details</th>
-		                                      <th class="text-center">Unread messages</th>
+		                                      <th class="text-center">Assignment ID</th>
+		                                      <th class="text-center">Translators Name</th>
+		                                      <th class="text-center">Document Category</th>
+		                                      <th class="text-center">Original Language</th>
+		                                      <th class="text-center">Language to be translated to</th>
+		                                      <th class="text-center">Quote</th>
+		                                      <th class="text-center">Description</th>
+		                                      <th class="text-center">Hard copy (within Australia only)</th>
+		                                      <th class="text-center">Digital Copy Urgency</th>
+		                                      <th class="text-center">Remaning time for translation to be completed</th>
+		                                      <th class="text-center">Assignment details</th>
+		                                      <th class="text-center">Approve</th>
 		                                    </tr>
                                         </thead>
                                         <tbody>
                                              <c:forEach items="${serviceRequestList}" var="serviceRequest">
 			        							<tr class="active">
 			        							    <td class="servicerequestid">${serviceRequest.id}</td>
+			        							    <td>${serviceRequest.translatorName}</td>
+			        							    <td>${serviceRequest.serviceRequestCategory}</td>
+			        							    <td>${serviceRequest.languagefrom}</td>
+			        							    <td>${serviceRequest.languageTo}</td>
+			        							    <td>${serviceRequest.quote}</td>
+			        							    <td>${serviceRequest.description}</td>
+			        							    <td>${serviceRequest.hardcopy}</td> 
+			        							    <td>${serviceRequest.timeFrame}</td>
 			 										<td class="countdown bg_green" data-id="${serviceRequest.id}"></td>
 			 										<td class="finishdate" hidden="true">${serviceRequest.finishDate}</td>
-			            							<td>${serviceRequest.serviceRequestCategory}</td>
-			            							<td>${serviceRequest.timeFrame}</td>
-			            							<td>${serviceRequest.languagefrom}</td>
-										            <td>${serviceRequest.languageTo}</td>
-										            <td>${serviceRequest.hardcopy}</td> 
-										            <td>${serviceRequest.status}</td>
 										            <td><a href="<c:url value='/conversationWithTranslator/${serviceRequest.id}' />" >Details</a></td>
-			                                        <td class="text-center unreadmessages">${serviceRequest.countOfUnreadMessages}</td>
+			         								<td><a href="<c:url value='/approbeJob/${serviceRequest.id}' />" >Approve</a></td>
+			         							
 			         							</tr>
 			                                   </c:forEach>  
                                         </tbody>

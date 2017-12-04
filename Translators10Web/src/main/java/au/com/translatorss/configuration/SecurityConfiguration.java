@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 
 import com.amazonaws.services.appstream.model.Session;
@@ -21,6 +22,8 @@ import com.amazonaws.services.appstream.model.Session;
 import au.com.translatorss.security.configuration.CustomAuthenticationProvider;
 import au.com.translatorss.security.configuration.CustomAuthenticationSuccessHandler;
 import au.com.translatorss.security.configuration.CustomSimpleUrlAuthenticationFailureHandler;
+
+import javax.sql.DataSource;
 
 @Configuration
 @Order(23)
@@ -32,10 +35,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	UserDetailsService userDetailsService;
 
 	@Autowired
+	private DataSource dataSource;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 		// authenticationProviderList.add(rememberMeAuthenticationProvider());
 		auth.authenticationProvider(customAuthenticationProvider());
 		// auth.authenticationProvider(rememberMeAuthenticationProvider());
+
+		//vee in details later for encription
+		//auth.jdbcAuthentication().dataSource(dataSource).passwordEncoder(passwordEncoder);
 		super.configure(auth);
 	}
 
@@ -112,12 +124,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.failureHandler(customSimpleUrlAuthenticationFailureHandler()).and().rememberMe().key("rememberme-key")
 				.rememberMeServices(tokenBasedRememberMeServices()).and().csrf().disable();
 		http.logout().logoutUrl("/j_spring_security_logout").logoutSuccessUrl("/");
-
-//		http.authorizeRequests()
-//			.and().formLogin().loginPage("/businessUserForm").usernameParameter("email").passwordParameter("password")
-//			.loginProcessingUrl("/j_spring_security_check2").successHandler(customAuthenticationSuccessHandler())
-//			.failureHandler(customSimpleUrlAuthenticationFailureHandler2()).and().rememberMe().key("rememberme-key")
-//			.rememberMeServices(tokenBasedRememberMeServices()).and().csrf().disable();
 
 		http.exceptionHandling().accessDeniedPage("/403");
 

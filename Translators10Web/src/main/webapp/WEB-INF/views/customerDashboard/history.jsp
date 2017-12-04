@@ -164,7 +164,7 @@ License: You must have a valid license purchased only from themeforest(the above
                             <li class="dropdown dropdown-user">
                                 <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
                                     <img alt="" class="img-circle" src="${photoUrl}" />
-                                    <span class="username username-hide-on-mobile"> ${businessUserFormName} </span>
+                                    <span class="username username-hide-on-mobile"> ${businessUserForm.fullname} </span>
                                     <i class="fa fa-angle-down"></i>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-default">
@@ -233,7 +233,7 @@ License: You must have a valid license purchased only from themeforest(the above
                                 <span class="arrow"></span>
                             </a>
                         </li>    
-                        <li class="nav-item ">
+                        <li class="nav-item">
                             <a href="<c:url value='jobInProgress'/>" class="nav-link nav-toggle">
                                 <span class="title">Follow Up your Translation</span>
                                 <span class="arrow"></span>
@@ -294,7 +294,7 @@ License: You must have a valid license purchased only from themeforest(the above
                                 <div class="portlet-body flip-scroll">
                                     <table class="table table-bordered table-striped table-condensed flip-content" id="tableData">
                                         <thead class="flip-content">
-                                           <tr>
+                                           <%--<tr>
 			                                      <th class="text-center" onclick="sortTable(0)">ID</th>
 			                                   	  <th class="text-center"onclick="sortTable(1)">Category</th>
 			                                      <th class="text-center" onclick="sortTable(2)">Timeframe</th>
@@ -304,24 +304,48 @@ License: You must have a valid license purchased only from themeforest(the above
 			                                      <th class="text-center"onclick="sortTable(6)">Hard copy?</th>
 			                                      <th class="text-center" onclick="sortTable(7)">Status</th>
 			                                      <th class="text-center">Invoice</th>
-		                                    </tr>
+		                                    </tr>--%>
+                                           <tr>
+                                               <th class="text-center" onclick="sortTable(0)">Assignment ID</th>
+                                               <th class="text-center" onclick="sortTable(1)">Status</th>
+                                               <th class="text-center" onclick="sortTable(2)">Quote</th>
+                                               <th class="text-center" onclick="sortTable(3)">Approve/Cancel Date</th>
+                                               <th class="text-center" onclick="sortTable(4)">Document Category</th>
+                                               <th class="text-center" onclick="sortTable(5)">Original Language</th>
+                                               <th class="text-center" onclick="sortTable(6)">Language to be translated to</th>
+                                               <th class="text-center" onclick="sortTable(7)">Description</th>
+                                               <th class="text-center" onclick="sortTable(8)">Hard copy (within Australia only) </th>
+                                               <th class="text-center" onclick="sortTable(9)">Translator Prefered Name</th>
+                                               <th class="text-center">Invoice</th>
+                                               <th class="text-center">On time delivery</th>
+                                               <th class="text-center">Quality of the Translated Document</th>
+                                               <th class="text-center">Customer Service</th>
+                                               <th class="text-center">Client Feedback</th>
+                                               
+                                           </tr>
                                         </thead>
                                         <tbody>
                                              <c:forEach items="${serviceRequestList}" var="serviceRequest">
 				        							<tr class="active">
 				        								<td class="servicerequestid">${serviceRequest.id}</td>
+				        								<td>${serviceRequest.status}</td>
+				        								<td>${serviceRequest.quote}</td>
+				        								<td>${serviceRequest.paidDate}</td>
 				            							<td>${serviceRequest.serviceRequestCategory}</td>
-				            							<td>${serviceRequest.timeFrame}</td>
 				            							<td>${serviceRequest.languagefrom}</td>
 											            <td>${serviceRequest.languageTo}</td>
-											            <td>${serviceRequest.translatorName}</td>
+				            							<td>${serviceRequest.description}</td>
 											            <td>${serviceRequest.hardcopy}</td> 
-											            <td>${serviceRequest.status}</td>
+											            <td>${serviceRequest.translatorName}</td>
 				                                        <td>
 				                                            <c:if test="${serviceRequest.invoiceUrl!=null}">
 				                                                <a href="${serviceRequest.invoiceUrl}" target="_blank" download="invoice.pdf">invoice</a>
 				                                            </c:if>
 				                                        </td>
+				                                        <td>${serviceRequest.rateDto.timeDelivery} </td>
+                                                    <td>${serviceRequest.rateDto.quality} </td>
+                                                    <td>${serviceRequest.rateDto.service} </td>
+                                                    <td>${serviceRequest.rateDto.feedback}</td>
 				         							</tr>
 				                              </c:forEach>  
                                         </tbody>
@@ -411,7 +435,7 @@ License: You must have a valid license purchased only from themeforest(the above
 			<script>
 		        function onLoad() {
 		            requestSetCountOfUnreadMessages()
-                    sortTable(1)
+                   // sortTable(1)
 		            var funcs=[
 		                subscribeUnreadMessages
 		            ];

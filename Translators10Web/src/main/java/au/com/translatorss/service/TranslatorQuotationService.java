@@ -43,4 +43,12 @@ public interface TranslatorQuotationService {
     List<Quotation> getQuotesFromServiceRequestQuotedAndUnquoted();
 
     Date getFinishDateSelectionQuote(String timeFrame);
+    
+    void generateNewQuotations(Translator translator,String timeFrame);
+
+	List<Quotation> getValidQuotesFromSRQuoted(Long translatorid);
+	
+    List<Quotation> getInValidQuotesFromSRUnquotedOrQuoted(Long translatorid);
+
+
 }

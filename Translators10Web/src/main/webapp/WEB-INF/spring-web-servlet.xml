@@ -16,6 +16,7 @@
     <!-- Scan the JavaConfig -->
 	<context:component-scan base-package="au.com.translatorss.configuration" />
 	<context:component-scan base-package="au.com.translatorss.realtime" />
+	<context:component-scan base-package="au.com.translatorss.aspect" />
 	<context:property-placeholder location="classpath*:app.properties"/>
 <!-- 	<context:property-placeholder location="classpath*:util.properties" />
  -->	

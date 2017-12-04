@@ -147,7 +147,7 @@ License: You must have a valid license purchased only from themeforest(the above
                             <li class="dropdown dropdown-user">
                                 <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
                                     <img alt="" class="img-circle" src="${photoUrl}" />
-                                    <span class="username username-hide-on-mobile"> ${businessUserFormName} </span>
+                                    <span class="username username-hide-on-mobile"> ${businessUserForm.fullname} </span>
                                     <i class="fa fa-angle-down"></i>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-default">
@@ -274,32 +274,22 @@ License: You must have a valid license purchased only from themeforest(the above
 														<tbody>
 														<c:forEach items="${messageList}" var="message" >
 														   <tr>
-															<%--<c:if test="${message.read}">--%>
-																<%--<tr style="background-color: #cacaca" id="${message.id}">--%>
-															<%--</c:if>--%>
-															<%--<c:otherwise>--%>
-																<%--<tr class="active" id="${message.id}">--%>
-															<%--</c:otherwise>--%>
-
 																<c:choose>
 																	<c:when test="${message.read == false} && ${message.sender}!= ${businessUserFormName}">
 																		<tr style="background-color: #cacaca" id="${message.id}">
 																	</c:when>
 																	<c:otherwise>
-																		<tr class="active" id="${message.id}">
+																		<tr id="${message.id}">
 																	</c:otherwise>
 																</c:choose>
-																<td class="text-left"><img alt="" class="img-circle text-center" src="${message.photoUrl}" height="72" width="52"/>
+																<td class="text-center">
+																	<img alt="${message.sender}" class="img-circle" src="${message.photoUrl}" height="62" width="52"/>
 																	<footer>
-																		<time><span> ${message.sender}</span></time>
+																		<span> ${message.sender}</span>
 																	</footer>
 																</td>
-																<td class="text-left">${message.message}</td>
-																<td class="text-right" size="6">
-																			<footer>
-																				<span size="6"> ${message.date}</span>
-																			</footer>
-																</td>
+																<td class="text-center">${message.message}</td>
+																<td class="text-center">${message.date}</td>
 															</tr>
 														</c:forEach>
 														</tbody>
@@ -340,28 +330,30 @@ License: You must have a valid license purchased only from themeforest(the above
 						                            <div class="panel-heading">
 						                                <h3 class="panel-title">Upload File for Revision</h3>
 						                            </div>
-					                                <form:form name="myForm" class="form-horizontal" role="form" onsubmit=" return AlertFilesize();"  action='serviceResponseCustomerProcesor' method="post" commandName="serviceResponse" enctype="multipart/form-data">
-					                                    <fieldset id="fieldset">
-					                                        <table id="fileTable">
-					                                            <tr>
-					                                                <td><input id="fileInput" name="files[0]" type="file"/></td>
-					                                                <p id="demo" style="color:red"></p>
-					                                            </tr>
-					                                        </table>
-					                                        <br />
-					                                        <spring:bind path="id">
-					                                            <form:input path="id" type="hidden" class="form-control " id="id" placeholder="id"/>
-					                                        </spring:bind>
-					                                        <div class="form-group">
-					                                            <div class="col-sm-offset-2 col-sm-10">
-					                                                <button name="serviceResponseCustomerCreate" value="serviceResponseCustomerCreate" class="btn btn-primary btn-bMember">Upload Files NOW !</button>
-					                                            </div>
-					                                        </div>
-					                                    </fieldset>
-					                                </form:form>
+						                            <div class="panel-body">
+						                                <form:form name="myForm" class="form-horizontal" role="form" onsubmit=" return validateFileSubmit()"  action='serviceResponseCustomerProcesor' method="post" commandName="serviceResponse" enctype="multipart/form-data">
+						                                    <fieldset id="fieldset">
+						                                        <table id="fileTable">
+						                                            <tr>
+						                                                <td><input id="fileInput" name="files[0]" type="file"/></td>
+						                                                <p id="demo" style="color:red"></p>
+						                                            </tr>
+						                                        </table>
+						                                        <br />
+						                                        <spring:bind path="id">
+						                                            <form:input path="id" type="hidden" class="form-control " id="id" placeholder="id"/>
+						                                        </spring:bind>
+						                                        <div class="form-group">
+						                                            <div class="col-sm-offset-2 col-sm-10">
+						                                                <button name="serviceResponseCustomerCreate" id="submitFileForm" value="serviceResponseCustomerCreate" class="btn btn-primary btn-bMember">Upload File!</button>
+						                                            </div>
+						                                        </div>
+						                                    </fieldset>
+						                                </form:form>
+						                             </div>   
 					                        	</div>
                 						  </div>
-                						  <div class="col-lg-6">
+                						  <div class="col-lg-8">
 						                    <div class="panel panel-primary">
 						                        <div class="panel-heading">
 						                            <h3 class="panel-title">Service Request Details</h3>
@@ -373,29 +365,32 @@ License: You must have a valid license purchased only from themeforest(the above
 						                                        <thead>
 						                                        <tr>
 						                                            <th class="text-center">ID</th>
-						                                            <!-- <th class="text-center">Remaining Time to select a candidate</th> -->
+						                                            <th class="text-center">Translator Name</th>
 						                                            <th class="text-center">Category</th>
+						                                            <th class="text-center">Description</th>
 						                                            <th class="text-center">Timeframe</th>
 						                                            <th class="text-center">From</th>
 						                                            <th class="text-center">To</th>
 						                                            <th class="text-center">Hard copy?</th>
+						                                            <th class="text-center">Quote</th>
 						                                            <th class="text-center">Status</th>
-						                                            <th class="text-center">Translator Assigned</th>
+						                                            
 						                                        </tr>
 						                                        </thead>
 						                                        <tbody>
 						                                        <c:forEach items="${serviceRequestList}" var="serviceRequest">
 						                                            <tr class="active">
 						                                                <td class="servicerequestid">${serviceRequest.id}</td>
-<%-- 						                                                <td class="countdown bg_green" data-id="${serviceRequest.id}"></td>
- --%>						                                                <td class="finishdate" hidden="true">${serviceRequest.finishDate}</td>
-						                                                <td>${serviceRequest.serviceRequestCategory.description}</td>
-						                                                <td>${serviceRequest.timeFrame.description}</td>
+						                                                <td>${serviceRequest.translatorName}</td>
+						                                                <td class="finishdate" hidden="true">${serviceRequest.finishDate}</td>
+						                                                <td>${serviceRequest.serviceRequestCategory}</td>
+						                                                <td>${serviceRequest.description}</td>
+						                                                <td>${serviceRequest.timeFrame}</td>
 						                                                <td>${serviceRequest.languagefrom}</td>
 						                                                <td>${serviceRequest.languageTo}</td>
 						                                                <td>${serviceRequest.hardcopy}</td>
-						                                                <td>${serviceRequest.serviceRequestStatus.description}</td>
-						                                                <td>${serviceRequest.translator.user.name}</td>
+						                                                <td>${serviceRequest.quote}</td>
+						                                                <td>${serviceRequest.status}</td>
 						                                            </tr>
 						                                        </c:forEach>
 						                                        </tbody>
@@ -405,7 +400,7 @@ License: You must have a valid license purchased only from themeforest(the above
 						                        </div>
 						                    </div>
 						                  </div>
-                						  <div class="col-lg-4">
+                						  <div class="col-lg-8">
 									          <div class="panel panel-primary">
 									            <div class="panel-heading">
 									              <h3 class="panel-title">Service Request Files Details</h3>
@@ -416,7 +411,6 @@ License: You must have a valid license purchased only from themeforest(the above
 								                                <table class="table table-bordered table-hover table-striped">
 								                                    <thead>
 								                                    <tr>
-								                                    	<th class="text-center">ID</th>
 									                                    <th class="text-center">File name</th>
 								                                        <th class="text-center">Sender</th>
 								                                        <th class="text-center">Date</th>
@@ -425,7 +419,6 @@ License: You must have a valid license purchased only from themeforest(the above
 								                                    <tbody>
 									                                   <c:forEach items="${fileList}" var="file">
 									                                        <tr class="active">
-									                                        	<td>${file.id}</td>
 									                                        	<td>
 									                                        		<a href="${file.url}" download="${file.fileName}">${file.fileName}</a>
 									                                        	</td>
@@ -582,7 +575,12 @@ License: You must have a valid license purchased only from themeforest(the above
 		            connect(funcs);
 		        }
 		    </script>
-		    <!-- jQuery -->
+		
+			<script>
+				function validateFileSubmit(){
+			        document.getElementById("submitFileForm").disabled = true;
+				}
+			</script>
 		
 		    <script>
 				function validateForm() {
@@ -593,10 +591,10 @@ License: You must have a valid license purchased only from themeforest(the above
 				    	document.getElementById("demo").innerHTML = text;
 				        return false;
 				    }
-
                     onMessageSubmit();
 				}
 			</script>
+			
             <script src="resources/js/jquery.js"></script>
 		    <script src="resources/js/modal.js"></script>
 			<script src="resources/js/jquery.countdown.js"></script>

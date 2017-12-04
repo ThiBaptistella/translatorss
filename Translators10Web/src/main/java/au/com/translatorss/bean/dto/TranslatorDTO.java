@@ -42,6 +42,7 @@ public class TranslatorDTO {
     private boolean natyExtiryDate; 
     private boolean validSuscription;
     private boolean manualyPaused ;
+
     private boolean inactiveCancelled; 
     private boolean inactiveRefunded ;
 

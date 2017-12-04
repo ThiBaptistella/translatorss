@@ -1,5 +1,6 @@
 package au.com.translatorss.service.impl;
 
+import java.math.BigInteger;
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -11,11 +12,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import au.com.translatorss.bean.BusinessUser;
+import au.com.translatorss.bean.Quotation;
 import au.com.translatorss.bean.ServiceRequest;
 import au.com.translatorss.bean.ServiceRequestApprovedRegister;
 import au.com.translatorss.bean.Translator;
 import au.com.translatorss.bean.dto.ServiceRequestApprovedDTO;
 import au.com.translatorss.service.ServiceRequestApprovedRegisterService;
+import au.com.translatorss.service.TranslatorQuotationService;
+import au.com.translatorss.service.TranslatorSettingsService;
 import au.com.translatorss.dao.ServiceRequestApprovedRegisterDao;
 
 @Service
@@ -24,6 +28,12 @@ public class ServiceRequestApprovedRegisterServiceImpl extends GenericServiceImp
 
 	@Autowired
 	private ServiceRequestApprovedRegisterDao ServiceRequestApprovedRegisterDao;
+	
+	@Autowired
+	private TranslatorSettingsService translatorService;
+	
+	@Autowired
+	private TranslatorQuotationService quotationService;
 	
 	@Override
 	public void registerApprovedSR(ServiceRequest serviceRequest) {
@@ -87,5 +97,20 @@ public class ServiceRequestApprovedRegisterServiceImpl extends GenericServiceImp
         }
         return month;
     }
+
+	@Override
+	public int getTotalRevenue(Long translatorid) {
+		Translator translator = translatorService.getTranslatorById(translatorid);	
+		List<ServiceRequestApprovedRegister> list = ServiceRequestApprovedRegisterDao.getApprovedSRByTranslator(translator);
+		Integer revenue = 0;
+		if(list!=null) {
+			for(ServiceRequestApprovedRegister sra: list) {
+				ServiceRequest sr = sra.getServiceRequest();
+				Quotation quote = quotationService.getQuoteFromServiceRequestAndTranslator(sr.getId(), translatorid);
+				revenue += quote.getValue().intValue();
+			}
+		}
+		return revenue;
+	}
 	
 }

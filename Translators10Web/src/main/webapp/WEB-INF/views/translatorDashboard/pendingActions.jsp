@@ -263,6 +263,9 @@ License: You must have a valid license purchased only from themeforest(the above
                                 <div class="portlet-title">
                                     <div class="caption">
                                         <i class="fa fa-cogs"></i>Special assignments to be quoted </div>
+                                    <div class="tools">
+                                        <a href="javascript:;" class="collapse"> </a>
+                                    </div>
                                 </div>
                                 <div class="portlet-body flip-scroll">
                                     <table class="table table-bordered table-striped table-condensed flip-content">
@@ -274,13 +277,14 @@ License: You must have a valid license purchased only from themeforest(the above
                                                   <th class="text-center">Enter/Edit quote price</th>
                                                   <th class="text-center">Client Name</th>
                                                   <th class="text-center">Request Details</th>
+                                                  <th class="text-center">Download Files</th>
 							                      <th class="text-center">Document category</th>
                                                   <th class="text-center">Translation Description</th>
 							                      <th class="text-center">Digital Copy Urgency</th>
                                                   <th class="text-center">Hard copy (within Australia only) </th>
 							                      <th class="text-center">Original Language</th>
 							                      <th class="text-center">Language To be translated to</th>
-							                      <th class="text-center">Download Files</th>
+
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -295,17 +299,18 @@ License: You must have a valid license purchased only from themeforest(the above
                                                     <td>
                                                         <a href="<c:url value='/startConversationWithCustomer/${serviceRequest.id}'/>" >Send a Message</a>
                                                     </td>
+                                                    <td>
+                                                        <c:forEach items="${serviceRequest.amazonList}" var="file">
+                                                            <li><a href="${file.url}" download="${file.fileName}">${file.fileName}</a></li>
+                                                        </c:forEach>
+                                                    </td>
 			            							<td>${serviceRequest.serviceRequestCategory}</td>
                                                     <td>${serviceRequest.description}</td>
                                                     <td>${serviceRequest.timeFrame}</td>
                                                     <td>${serviceRequest.hardcopy}</td>
 			            							<td>${serviceRequest.languagefrom}</td>
 										            <td>${serviceRequest.languageTo}</td>
-			         								<td>
-			         									<c:forEach items="${serviceRequest.amazonList}" var="file">
-								         										<li><a href="${file.url}" download="${file.fileName}">${file.fileName}</a></li> 
-								         				</c:forEach>
-			         								</td>
+
 			         							</tr>
                         					</c:forEach> 
                                         </tbody>

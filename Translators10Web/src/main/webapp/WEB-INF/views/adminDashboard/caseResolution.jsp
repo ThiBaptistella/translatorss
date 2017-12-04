@@ -170,23 +170,25 @@
                                     <thead>
                                     <tr>
                                          <th width="60">Translator Id</th>
-									     <th width="60">Translator Prefered Name</th>
-									     <th width="60">Translator Status</th>
-									     <th width="60">Customer Id</th>
-									     <th width="60">Service Request Id</th>
-									     <th width="60">Service Request Status</th>
-									     <th width="60">Request Date</th>
+									     <th width="60">Translator Preferred Name</th>
+									     <th width="60">Status(Active, Paused, Cancelled)</th>
+									     <th width="60">User Id</th>
+									     <th width="60">Request Id</th>
+										 <th width="60">Request Date</th>
+									     <th width="60">Service Status(Open Service, Approved, Cancelled)</th>
+									     <th width="60">Request Paid</th>
 									     <th width="60">Time left to finish the assignment</th>
 									     <th width="60">Quote price</th>
 									     <th width="60">Client full name</th>
+										 <th width="60">View Assignment/Case Resolution(Approved/Cancelled)</th>
 									     <th width="60">Document category</th>
 									     <th width="60">Translation Description </th>
 									     <th width="60">Digital Copy Urgency</th>
 									     <th width="60">Hard copy (within Australia only) </th>
 									     <th width="60">Original Language</th>
 									     <th width="60">Language to be translated to</th>
-									     <th width="60">View Assignment/Case Resolution</th>
-                                         <th width="60">Action</th>
+									     
+                                         <%--<th width="60">Action</th>--%>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -197,30 +199,30 @@
 										            <td>${serviceRequest.translatorStatus}</td>
 										            <td>${serviceRequest.customerId}</td>
 										            <td>${serviceRequest.id}</td>
+													<td>${serviceRequest.creationDate}</td>
 										            <td>${serviceRequest.status}</td>
-										            <td>${serviceRequest.creationDate}</td>
-
+										            <td>${serviceRequest.paidDate}</td>
                                                     <td class="countdown bg_green" data-id="${serviceRequest.id}"></td>
                                                     <td class="finishdate" hidden="true">${serviceRequest.finishDate}</td>
-
 										            <td>${serviceRequest.quote}</td>
 										            <td>${serviceRequest.clientName}</td>
+													<td> 
+														<c:if test="${serviceRequest.translatorId != null }">
+															<a href="<c:url value='/seeServiceRequestDetials/${serviceRequest.id}'/>" >View Assignment</a>
+														</c:if>
+										            </td>
 										            <td>${serviceRequest.serviceRequestCategory}</td>
 										            <td>${serviceRequest.description}</td>
 										            <td>${serviceRequest.timeFrame}</td>
 										            <td>${serviceRequest.hardcopy}</td>
 										            <td>${serviceRequest.languagefrom}</td>
 										            <td>English</td>
-										            <td> 
-										            <c:if test="${serviceRequest.translatorId != null }">
-											            <a href="<c:url value='/seeServiceRequestDetials/${serviceRequest.id}'/>" >See Details</a>
-											        </c:if>
-										            </td>
-                                                    <td>
-                                                        <c:if test="${serviceRequest.translatorId == null }">
-                                                            <a href="<c:url value='/adminCancelSR/${serviceRequest.id}'/>" >Cancel</a>
-                                                        </c:if>
-                                                    </td>
+										            
+                                                    <%--<td>--%>
+                                                        <%--<c:if test="${serviceRequest.translatorId == null }">--%>
+                                                            <%--<a href="<c:url value='/adminCancelSR/${serviceRequest.id}'/>" >Cancel</a>--%>
+                                                        <%--</c:if>--%>
+                                                    <%--</td>--%>
 										        </tr>
 										    </c:forEach>
                                     </tbody>

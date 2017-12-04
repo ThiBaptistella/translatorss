@@ -58,7 +58,7 @@ public class ConversationServiceImpl implements ConversationService{
 
     @Override
     public void remove(Conversation entity) {
-        conversationDao.remove(null);
+        conversationDao.remove(entity);
     }
 
     @Override

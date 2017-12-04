@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import au.com.translatorss.bean.Quotation;
+import au.com.translatorss.bean.dto.TranslatorQuotationDTO;
 import au.com.translatorss.service.TranslatorQuotationService;
 import com.amazonaws.services.devicefarm.model.BillingMethod;
 import com.paypal.api.payments.*;
@@ -13,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
 
 import au.com.translatorss.paypal.configuration.PaypalSuccess;
 
@@ -56,22 +59,25 @@ public class PaypalController {
 //    Can be converted to REST method and used for other operations while further development
 //    @RequestMapping("/checkout")
 //    public void checkoutSale(@RequestParam(required=false, value = "quotationId") Long quotationId, @RequestParam(required=false, value = "isDonation") Boolean isDonation, HttpServletRequest request, HttpServletResponse response) {
-    public void checkoutSale(Long quotationId, Boolean isDonation, String processPaymentUri, String cancelPaymentUri, String guid, HttpServletRequest request, HttpServletResponse response) {
+    public void checkoutSale(Long quotationId, Boolean isDonation, String processPaymentUri, String cancelPaymentUri, String guid, HttpServletRequest request, HttpServletResponse response) throws Exception {
         Quotation quotation = quotationService.find(quotationId);
         try {
             checkout_base(request, response, INTENT_SALE, quotation.getValue().floatValue(), "Payment for translating services", isDonation, processPaymentUri, cancelPaymentUri, guid);
         } catch (Exception e) {
             //TODO: handle properly
             e.printStackTrace();
+            throw e;
         }
     }
 
-	public void checkoutSaleSuscription(Long type, Long suscriptionvalue, Boolean isDonation, String processPaymentUri, String cancelPaymentUri, String guid, HttpServletRequest request, HttpServletResponse response) {
+	public void checkoutSaleSuscription(Long type, Long suscriptionvalue, Boolean isDonation, String processPaymentUri, String cancelPaymentUri, String guid, HttpServletRequest request, HttpServletResponse response) throws Exception
+	{
 		try {
             checkout_base(request, response, INTENT_SALE, suscriptionvalue.floatValue(), "Payment for Suscription Services", isDonation, processPaymentUri, cancelPaymentUri, guid);
         } catch (Exception e) {
             //TODO: handle properly
             e.printStackTrace();
+            throw e;
         }
 		
 	}
@@ -105,11 +111,12 @@ public class PaypalController {
                     response.sendRedirect(link.getHref());
                 } catch (IOException e) {
                     e.printStackTrace();
+                    throw e;
                 }
             }
         }
         // Should not happen
-        throw new Exception("Payment is not created correctly. Wrong integration with Paypal services via In-Context popup.");
+        //throw new Exception("Payment is not created correctly. Wrong integration with Paypal services via In-Context popup.");
     }
 
     private Payment processPayment(HttpServletRequest request) throws Exception {
@@ -138,12 +145,13 @@ public class PaypalController {
                 LOGGER.info("Executed the payment with id = " + executedPayment.getId() + " and status = " + executedPayment.getState());
             } catch (PayPalRESTException e) {
 //                 LOGGER.error(req, resp, "Executed The Payment", Payment.getLastRequest(), null, e.getMessage());
+            	throw e;
             }
         }
         return executedPayment;
     }
 
-    private Payment createPayment(HttpServletRequest request, String intent, Float subtotal, String description, Boolean isDonation, String processPaymentUri, String cancelPaymentUri, String guid) {
+    private Payment createPayment(HttpServletRequest request, String intent, Float subtotal, String description, Boolean isDonation, String processPaymentUri, String cancelPaymentUri, String guid) throws PayPalRESTException {
 
         Payment createdPayment = null;
         APIContext apiContext = new APIContext(clientId, clientSecret, mode);
@@ -214,11 +222,32 @@ public class PaypalController {
             map.put(guid, createdPayment.getId());
         } catch (PayPalRESTException e) {
             e.printStackTrace();
+            throw e;
 //               LOGGER.error(req, resp, "Payment with PayPal", Payment.getLastRequest(), null, e.getMessage());
         }
         return createdPayment;
     }
 
+
+    
+    
+	public void checkoutSaleHP(Long quotationId, Boolean isDonation, String processPaymentUri, String cancelPaymentUri, String guid, HttpServletRequest request, HttpServletResponse response) {	
+		List<TranslatorQuotationDTO> quoteList = (List<TranslatorQuotationDTO>) request.getSession().getAttribute("translatorQuoteList");
+		Float value = null;
+		for(TranslatorQuotationDTO quote: quoteList) {
+			if(quote.getQuotationId()==quotationId) {
+				value=Float.valueOf(quote.getQuote());
+			}
+		}
+		
+	     try {
+	            checkout_base(request, response, INTENT_SALE, value, "Payment for translating services", isDonation, processPaymentUri, cancelPaymentUri, guid);
+	     } catch (Exception e) {
+	            //TODO: handle properly
+	            e.printStackTrace();
+	     }
+
+	}
 
 }
 

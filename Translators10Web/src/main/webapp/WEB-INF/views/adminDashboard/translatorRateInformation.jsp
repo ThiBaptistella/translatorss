@@ -141,31 +141,31 @@
                                 <table class="table table-bordered table-hover table-striped">
                                     <thead>
                                     <tr>
-                                        <th width="40">ID</th>
-                                        <th width="40">Customer Name</th>
-                                        <th width="40">Time Delivery</th>
-                                        <th width="40">Service</th>
-                                        <th width="40">Quality</th>
-                                        <th width="40">Feedback</th>
+                                        <th>Assignemnt ID</th>
+                                        <th>Customer Name</th>
+                                        <th>Time Delivery</th>
+                                        <th>Service</th>
+                                        <th>Quality</th>
+                                        <th>Feedback</th>
                                         <%--<th width="40">Details</th>--%>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <c:forEach items="${rateList}" var="rate">
-                                        <tr>
-                                            <td>${rate.id}</td>
-                                            <td>${rate.customer.user.name}</td>
-                                            <td>${rate.timeDelivery}</td>
-                                            <td>${rate.serviceAsDescribed}</td>
-                                            <td>${rate.quality}</td>
-                                            <td>${rate.feedback}</td>
-                                            <%--<td>--%>
-                                                <%--<a href="<c:url value='/seeServiceRequestDetials/${rate.serviceRequest.id}'/>">See Details</a>--%>
-                                                <%--&lt;%&ndash;<a href="<c:url value='/seeServiceRequestDetials2/${quote.serviceRequestID}/${quote.translatorid}'/>" >See Details</a>&ndash;%&gt;--%>
+                                        <c:forEach items="${rateList}" var="rate">
+                                            <tr>
+                                                <td>${rate.serviceRequest.id}</td>
+                                                <td>${rate.customer.fullname}</td>
+                                                <td>${rate.timeDelivery}</td>
+                                                <td>${rate.serviceAsDescribed}</td>
+                                                <td>${rate.quality}</td>
+                                                <td>${rate.feedback}</td>
+                                                <%--<td>--%>
+                                                    <%--<a href="<c:url value='/seeServiceRequestDetials/${rate.serviceRequest.id}'/>">See Details</a>--%>
+                                                    <%--&lt;%&ndash;<a href="<c:url value='/seeServiceRequestDetials2/${quote.serviceRequestID}/${quote.translatorid}'/>" >See Details</a>&ndash;%&gt;--%>
 
-                                            <%--</td>--%>
-                                        </tr>
-                                    </c:forEach>
+                                                <%--</td>--%>
+                                            </tr>
+                                        </c:forEach>
                                     </tbody>
                                 </table>
                             </div>

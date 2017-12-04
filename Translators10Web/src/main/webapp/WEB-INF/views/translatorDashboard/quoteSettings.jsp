@@ -283,37 +283,39 @@ License: You must have a valid license purchased only from themeforest(the above
                                                 <div class="tab-content">
                                                     <!-- PERSONAL INFO TAB -->
                                                     <div class="tab-pane active" id="tab_1_1">
+                                                        <div class="panel-heading">
+                                                            <h3 class="panel-title"><strong>Urgent Timeframe Requests</strong> - 24 Hours</h3>
+                                                            <h6>Activates automatic quotation for requests to be completed within 24 hours (for digital copy) </h6>
+                                                            <p id="urgentMessage" style="color:green"></p>
+                                                            <button id="enableUrgent" onclick="enableUrgent()">Enable Urgent Values</button>
+                                                            <button id ="disableUrgent" onclick="DisableUrgent()">Disable Urgent Values</button>
+                                                        </div>
+
                                                         <form:form action='urgentUpdateQuotationConfig' name="myForm" onsubmit="return validateUrgentForm()" method="post" commandName="urgentQuoteForm" enctype="multipart/form-data">
-							                    				<div class="panel-heading">
-																	<h3 class="panel-title"><strong>Urgent Timeframe Requests</strong> - 24 Hours</h3>
-                                                                    <h6>Tickbox Activates automatic quotation for requests to be completed within 24 hours (for digital copy) </h6>
-																	<input type="checkbox" id="urgentValue" onclick="enableDisableUrgent()">Disable
-																	<p id="urgentMessage" style="color:green"></p>
-																</div>
 							                    				<div class="panel-body">
 							                    	        		<div class="form-group">
 							                        	        		<label for="111">Document Category: Drivers License</label>
-							                        	        		<form:input path="driverLic" type="text" class="form-control " id="urgenDriverLic" />
+							                        	        		<form:input path="driverLic" type="text" class="form-control" id="urgenDriverLic" placeholder="AUD" />
 							                        	        		<form:errors path="driverLic" class="control-label" />
 							                        	        		<p id="urgenDriverLicerror" style="color:red">${message}</p>
 							                            			</div>
                                                                     <div class="form-group">
                                                                         <label for="444">Document Category: Passport</label>
-                                                                        <form:input path="passport" type="text" class="form-control " id="urgentBusinessDocument"/>
+                                                                        <form:input path="passport" type="text" class="form-control " id="urgentPassport" placeholder="AUD"/>
                                                                         <form:errors path="passport" class="control-label" />
-                                                                        <p id="urgentBusinessDocumenterror" style="color:red">${message}</p>
+                                                                        <p id="urgentPassporterror" style="color:red">${message}</p>
                                                                     </div>
                                                                     <div class="form-group">
-							                                			<label for="222">Document Category: Birth, Death or Marriage Certificate</label>
-							                                			<form:input path="birthDeath" type="text" class="form-control " id="urgentBirthDeath"/>
-							                                			<form:errors path="birthDeath" class="control-label" />
-							                                			<p id="urgentBirthDeatherror" style="color:red">${message}</p>
+							                                			<label for="222">Document Category: Birth Certificate</label>
+							                                			<form:input path="birthCertificate" type="text" class="form-control " id="urgentBirthCertificate" placeholder="AUD"/>
+							                                			<form:errors path="birthCertificate" class="control-label" />
+							                                			<p id="urgentBirthCertificateerror" style="color:red">${message}</p>
 							                            			</div>
 							                  						<div class="form-group">
-							                                			<label for="333">Document Category: Academic Records / Transcripts</label>
-							                                			<form:input path="academicTranscript" type="text" class="form-control " id="urgentAcademicTranscript"/>
-							                                			<form:errors path="academicTranscript" class="control-label" />
-							                                			<p id="urgentAcademicTranscripterror" style="color:red">${message}</p>
+							                                			<label for="333">Document Category: Marriage Certificate</label>
+							                                			<form:input path="marriageCertificate" type="text" class="form-control " id="urgentMarriageCertificate" placeholder="AUD"/>
+							                                			<form:errors path="marriageCertificate" class="control-label" />
+							                                			<p id="urgentMarriageCertificateerror" style="color:red">${message}</p>
 							                            			</div>
 
 																</div>
@@ -327,37 +329,38 @@ License: You must have a valid license purchased only from themeforest(the above
                                                     <!-- END PERSONAL INFO TAB -->
                                                     <!-- CHANGE AVATAR TAB -->
                                                     <div class="tab-pane" id="tab_1_2">
+                                                        <div class="panel-heading">
+                                                            <h3 class="panel-title"><strong>Medium Timeframe Requests</strong> - 48 Hours</h3>
+                                                            <h6>Activates automatic quotation for requests to be completed within 48 hours (for digital copy) </h6>
+                                                            <p id="mediumMessage" style="color:green"></p>
+                                                            <button id="enableMedium" onclick="enableMedium()">Enable Medium Values</button>
+                                                            <button id ="disableMedium" onclick="DisableMedium()">Disable Medium Values</button>
+                                                        </div>
                                                         <form:form action='mediumUpdateQuotationConfig' name="myForm" onsubmit="return validateMediumForm()"  method="post" commandName="mediumQuoteForm" enctype="multipart/form-data">
-							                    				<div class="panel-heading">
-																	<h3 class="panel-title"><strong>Medium Timeframe Requests</strong> - 48 Hours</h3>
-                                                                    <h6>Tickbox Activates automatic quotation for requests to be completed within 48 hours (for digital copy) </h6>
-																	<input type="checkbox" id="mediumValue" onclick="enableDisableMedium()">Disable
-																	<p id="mediumMessage" style="color:green"></p>
-																</div>
 							                    				<div class="panel-body">
 							                    	        		<div class="form-group">
 							                        	        		<label for="111">Document Category: Drivers License</label>
-							                        	        		<form:input path="driverLic" type="text" class="form-control " id="mediumDriverLic" />
+							                        	        		<form:input path="driverLic" type="text" class="form-control " id="mediumDriverLic" placeholder="AUD"/>
 							                        	        		<form:errors path="driverLic" class="control-label" />
 							                        	        		<p id="mediumDriverLicerror" style="color:red">${message}</p>
 							                            			</div>
                                                                     <div class="form-group">
                                                                         <label for="444">Document Category: Passport</label>
-                                                                        <form:input path="passport" type="text" class="form-control " id="mediumBusinessDocument"/>
+                                                                        <form:input path="passport" type="text" class="form-control " id="mediumPassport" placeholder="AUD"/>
                                                                         <form:errors path="passport" class="control-label" />
-                                                                        <p id="mediumBusinessDocumenterror" style="color:red">${message}</p>
+                                                                        <p id="mediumPassporterror" style="color:red">${message}</p>
                                                                     </div>
 								                 		 			<div class="form-group">
-							                                			<label for="222">Document Category: Birth, Death or Marriage Certificate</label>
-							                                			<form:input path="birthDeath" type="text" class="form-control " id="mediumBirthDeath"/>
-							                                			<form:errors path="birthDeath" class="control-label" />
-							                                			<p id="mediumBirthDeatherror" style="color:red">${message}</p>
+							                                			<label for="222">Document Category: Birth Certificate</label>
+							                                			<form:input path="birthCertificate" type="text" class="form-control " id="mediumBirthCertificate" placeholder="AUD"/>
+							                                			<form:errors path="birthCertificate" class="control-label" />
+							                                			<p id="mediumBirthCertificateerror" style="color:red">${message}</p>
 							                            			</div>
 							                  						<div class="form-group">
-							                                			<label for="333">Document Category: Academic Records / Transcripts</label>
-							                                			<form:input path="academicTranscript" type="text" class="form-control " id="mediumAcademicTranscript"/>
-							                                			<form:errors path="academicTranscript" class="control-label" />
-							                                			<p id="mediumAcademicTranscripterror" style="color:red">${message}</p>
+							                                			<label for="333">Document Category: Marriage Certificate</label>
+							                                			<form:input path="marriageCertificate" type="text" class="form-control " id="mediumMarriageCertificate" placeholder="AUD"/>
+							                                			<form:errors path="marriageCertificate" class="control-label" />
+							                                			<p id="mediumMarriageCertificateerror" style="color:red">${message}</p>
 							                            			</div>
 
 																</div>
@@ -371,37 +374,40 @@ License: You must have a valid license purchased only from themeforest(the above
                                                     <!-- END CHANGE AVATAR TAB -->
                                                     <!-- CHANGE PASSWORD TAB -->
                                                     <div class="tab-pane" id="tab_1_3">
+                                                        <div class="panel-heading">
+                                                            <h3 class="panel-title"><strong>Relaxed Timeframe Requests</strong> - 72 Hours</h3>
+                                                            <h6>Activates automatic quotation for requests to be completed within 72 hours (for digital copy) </h6>
+                                                            <p id="relaxedMessage" style="color:green"></p>
+                                                            <button id="enableRelaxed" onclick="enableRelaxed()">Enable Relaxed Values</button>
+                                                            <button id ="disableRelaxed" onclick="DisableRelaxed()">Disable Relaxed Values</button>
+                                                        </div>
+
+
                                                          <form:form action='relaxedUpdateQuotationConfig' name="myForm" onsubmit="return validateRelaxedForm()" method="post" commandName="relaxedQuoteForm" enctype="multipart/form-data">
-							                    				<div class="panel-heading">
-																	<h3 class="panel-title"><strong>Relaxed Timeframe Requests</strong> - 72 Hours</h3>
-                                                                    <h6>Tickbox Activates automatic quotation for requests to be completed within 72 hours (for digital copy) </h6>
-                                                                    <input type="checkbox" id="relaxedValue" onclick="enableDisableRelaxed()">Disable
-																	<p id="relaxedMessage" style="color:green"></p>
-																</div>
 							                    				<div class="panel-body">
 							                    	        		<div class="form-group">
 							                        	        		<label for="111">Document Category: Drivers License</label>
-							                        	        		<form:input path="driverLic" type="text" class="form-control " id="relaxedDriverLic" />
+							                        	        		<form:input path="driverLic" type="text" class="form-control " id="relaxedDriverLic" placeholder="AUD"/>
 							                        	        		<form:errors path="driverLic" class="control-label" />
 							                        	        		<p id="relaxedDriverLicerror" style="color:red">${message}</p>
 							                            			</div>
                                                                     <div class="form-group">
                                                                         <label for="444">Document Category: Passport</label>
-                                                                        <form:input path="passport" type="text" class="form-control " id="relaxedBusinessDocument"/>
+                                                                        <form:input path="passport" type="text" class="form-control " id="relaxedPassport" placeholder="AUD"/>
                                                                         <form:errors path="passport" class="control-label" />
-                                                                        <p id="relaxedBusinessDocumenterror" style="color:red">${message}</p>
+                                                                        <p id="relaxedpassporterror" style="color:red">${message}</p>
                                                                     </div>
                                                                     <div class="form-group">
-							                                			<label for="222">Document Category: Birth, Death or Marriage Certificate</label>
-							                                			<form:input path="birthDeath" type="text" class="form-control " id="relaxedBirthDeath"/>
-							                                			<form:errors path="birthDeath" class="control-label" />
-							                                			<p id="relaxedBirthDeatherror" style="color:red">${message}</p>
+							                                			<label for="222">Document Category: Birth Certificate</label>
+							                                			<form:input path="birthCertificate" type="text"  class="form-control " id="relaxedBirthCertificate" placeholder="AUD"/>
+							                                			<form:errors path="birthCertificate" class="control-label" />
+							                                			<p id="relaxedBirthCertificateerror" style="color:red">${message}</p>
 							                            			</div>
 							                  						<div class="form-group">
-							                                			<label for="333">Document Category: Academic Records / Transcripts</label>
-							                                			<form:input path="academicTranscript" type="text" class="form-control " id="relaxedAcademicTranscript"/>
-							                                			<form:errors path="academicTranscript" class="control-label" />
-							                                			<p id="relaxedAcademicTranscripterror" style="color:red">${message}</p>
+							                                			<label for="333">Document Category: Marriage Certificate</label>
+							                                			<form:input path="marriageCertificate" type="text" class="form-control " id="relaxedMarriageCertificate" placeholder="AUD"/>
+							                                			<form:errors path="marriageCertificate" class="control-label" />
+							                                			<p id="relaxedMarriageCertificateerror" style="color:red">${message}</p>
 							                            			</div>
 
 																</div>
@@ -470,33 +476,28 @@ License: You must have a valid license purchased only from themeforest(the above
             
             
             <!-- jQuery -->
-		      <script src="resources/js/jquery.js"></script>
-		      <script src="resources/js/modal.js"></script>
-		 	  <script src="resources/js/jquery.countdown.js"></script>
-			  <script src="resources/js/jquery.countdown.min.js"></script>
-		 	  <script src="resources/js/countdown1.js"></script>
-		      <script src="resources/js/datatable.js"></script>
+            <script src="resources/js/jquery.js"></script>
+            <script src="resources/js/modal.js"></script>
+            <script src="resources/js/jquery.countdown.js"></script>
+            <script src="resources/js/jquery.countdown.min.js"></script>
+            <script src="resources/js/countdown1.js"></script>
+            <script src="resources/js/datatable.js"></script>
             
             
             <!--Realtime-->
 		    <script src="resources/js/realtime/sockjs.js"></script>
 		    <script src="resources/js/realtime/stomp.js"></script>
 		    <script src="resources/js/realtime/realtime.js"></script>
-		   
-            <script>
-		          function onLoad() {
-		              requestSetCountOfUnreadMessages()
-		              var funcs=[
-		                  subscribeUnreadMessages
-		              ];
-		              connect(funcs);
-		          }
-		    </script>
+
 		    <script type="text/javascript">
+		    
+			    function onclickCleanField(idfield){
+	                document.getElementById(idfield).style.display="none";
+	            }
+			    
 			    function validateUrgentForm(){
 					var drivLic = document.getElementById('urgenDriverLic').value;
-					alert(drivLic);
-					if (isNaN(drivLic)||drivLic==null){
+					if (isNaN(drivLic)||drivLic==null || drivLic==0){
 						  document.getElementById('urgenDriverLicerror').innerHTML ="Value must be a number";
 						  return false;
 			    	}
@@ -504,44 +505,45 @@ License: You must have a valid license purchased only from themeforest(the above
 						  document.getElementById('urgenDriverLicerror').innerHTML ="Value must be greater than $20";
 						  return false;
 			    	}
+
+                    var passport = document.getElementById('urgentPassport').value;
+                    if (isNaN(passport)||passport==null){
+                        document.getElementById('urgentPassporterror').innerHTML ="Value must be a number";
+                        return false;
+                    }
+                    if (passport<20){
+                        document.getElementById('urgentPassporterror').innerHTML ="Value must be greater than $20";
+                        return false;
+                    }
+
+			    	var birthCertificate = document.getElementById('urgentBirthCertificate').value;
+			    	if (isNaN(birthCertificate)||birthCertificate==null){
+						  document.getElementById('urgentBirthCertificateerror').innerHTML ="Value must be a number";
+						  return false;
+			    	}
+			    	if (birthCertificate<20){
+						  document.getElementById('urgentBirthCertificateerror').innerHTML ="Value must be greater than $20";
+						  return false;
+			    	}
 			    	
-			    	
-			    	var birthDeath = document.getElementById('urgentBirthDeath').value;
-			    	if (isNaN(birthDeath)||birthDeath==null){
-						  document.getElementById('urgentBirthDeatherror').innerHTML ="Value must be a number";
+			    	var marrigeCertificate = document.getElementById('urgentMarriageCertificate').value;
+			    	if (isNaN(marrigeCertificate)||marrigeCertificate==null){
+						  document.getElementById('urgentMarriageCertificateerror').innerHTML ="Value must be a number";
 						  return false;
 			    	}
-			    	if (birthDeath<20){
-						  document.getElementById('urgentBirthDeatherror').innerHTML ="Value must be greater than $20";
-						  return false;
-			    	}
-			    	
-			    	var academic = document.getElementById('urgentAcademicTranscript').value;
-			    	if (isNaN(academic)||academic==null){
-						  document.getElementById('urgentAcademicTranscripterror').innerHTML ="Value must be a number";
-						  return false;
-			    	}
-			    	if (academic<20){
-						  document.getElementById('urgentAcademicTranscripterror').innerHTML ="Value must be greater than $20";
-						  return false;
-			    	}
-			    	
-			    	var businessDoc=document.getElementById('urgentBusinessDocument').value;
-			    	if (isNaN(businessDoc)||businessDoc==null){
-						  document.getElementById('urgentBusinessDocumenterror').innerHTML ="Value must be a number";
-						  return false;
-			    	}
-			    	if (businessDoc<20){
-						  document.getElementById('urgentBusinessDocumenterror').innerHTML ="Value must be greater than $20";
+			    	if (marrigeCertificate<20){
+						  document.getElementById('urgentMarriageCertificateerror').innerHTML ="Value must be greater than $20";
 						  return false;
 			    	}
 			    }
+			    
+
 		    </script>
 		    
 		    <script type="text/javascript">
 				    function validateMediumForm(){
 						var drivLic = document.getElementById('mediumDriverLic').value;
-						alert(drivLic);
+						//alert(drivLic);
 						if (isNaN(drivLic)||drivLic==null){
 							  document.getElementById('mediumDriverLicerror').innerHTML ="Value must be a number";
 							  return false;
@@ -550,35 +552,34 @@ License: You must have a valid license purchased only from themeforest(the above
 							  document.getElementById('mediumDriverLicerror').innerHTML ="Value must be greater than $20";
 							  return false;
 				    	}
+
+                        var passport = document.getElementById('mediumPassport').value;
+                        if (isNaN(passport)||passport==null){
+                            document.getElementById('mediumPassporterror').innerHTML ="Value must be a number";
+                            return false;
+                        }
+                        if (passport<20){
+                            document.getElementById('mediumPassporterror').innerHTML ="Value must be greater than $20";
+                            return false;
+                        }
+
+				    	var birthCertificate = document.getElementById('mediumBirthCertificate').value;
+				    	if (isNaN(birthCertificate)||birthCertificate==null){
+							  document.getElementById('mediumBirthCertificateerror').innerHTML ="Value must be a number";
+							  return false;
+				    	}
+				    	if (birthCertificate<20){
+							  document.getElementById('mediumBirthCertificateerror').innerHTML ="Value must be greater than $20";
+							  return false;
+				    	}
 				    	
-				    	
-				    	var birthDeath = document.getElementById('mediumBirthDeath').value;
-				    	if (isNaN(birthDeath)||birthDeath==null){
-							  document.getElementById('mediumBirthDeatherror').innerHTML ="Value must be a number";
+				    	var marriageCertificate = document.getElementById('mediumMarriageCertificate').value;
+				    	if (isNaN(marriageCertificate)||marriageCertificate==null){
+							  document.getElementById('mediumMarriageCertificateerror').innerHTML ="Value must be a number";
 							  return false;
 				    	}
-				    	if (birthDeath<20){
-							  document.getElementById('mediumBirthDeatherror').innerHTML ="Value must be greater than $20";
-							  return false;
-				    	}
-				    	
-				    	var academic = document.getElementById('mediumAcademicTranscript').value;
-				    	if (isNaN(academic)||academic==null){
-							  document.getElementById('mediumAcademicTranscripterror').innerHTML ="Value must be a number";
-							  return false;
-				    	}
-				    	if (academic<20){
-							  document.getElementById('mediumAcademicTranscripterror').innerHTML ="Value must be greater than $20";
-							  return false;
-				    	}
-				    	
-				    	var businessDoc=document.getElementById('mediumBusinessDocument').value;
-				    	if (isNaN(businessDoc)||businessDoc==null){
-							  document.getElementById('mediumBusinessDocumenterror').innerHTML ="Value must be a number";
-							  return false;
-				    	}
-				    	if (businessDoc<20){
-							  document.getElementById('mediumBusinessDocumenterror').innerHTML ="Value must be greater than $20";
+				    	if (marriageCertificate<20){
+							  document.getElementById('mediumMarriageCertificateerror').innerHTML ="Value must be greater than $20";
 							  return false;
 				    	}
 				    }
@@ -587,7 +588,7 @@ License: You must have a valid license purchased only from themeforest(the above
 	    	<script type="text/javascript">
 			    function validateRelaxedForm(){
 					var drivLic = document.getElementById('relaxedDriverLic').value;
-					alert(drivLic);
+					//alert(drivLic);
 					if (isNaN(drivLic)||drivLic==null){
 						  document.getElementById('relaxedDriverLicerror').innerHTML ="Value must be a number";
 						  return false;
@@ -596,128 +597,140 @@ License: You must have a valid license purchased only from themeforest(the above
 						  document.getElementById('relaxedDriverLicerror').innerHTML ="Value must be greater than $20";
 						  return false;
 			    	}
+
+                    var passport=document.getElementById('relaxedPassport').value;
+                    if (isNaN(passport)||passport==null){
+                        alert(passport);
+
+                        document.getElementById('relaxedpassporterror').innerHTML ="Value must be a number";
+                        return false;
+                    }
+                    if (passport<20){
+                        document.getElementById('relaxedpassporterror').innerHTML ="Value must be greater than $20";
+                        return false;
+                    }
+
+			    	var birthCertificate = document.getElementById('relaxedBirthCertificate').value;
+			    	if (isNaN(birthCertificate)||birthCertificate==null){
+						  document.getElementById('relaxedBirthCertificateerror').innerHTML ="Value must be a number";
+						  return false;
+			    	}
+			    	if (birthCertificate<20){
+						  document.getElementById('relaxedBirthCertificateerror').innerHTML ="Value must be greater than $20";
+						  return false;
+			    	}
 			    	
-			    	
-			    	var birthDeath = document.getElementById('relaxedBirthDeath').value;
-			    	if (isNaN(birthDeath)||birthDeath==null){
-						  document.getElementById('relaxedBirthDeatherror').innerHTML ="Value must be a number";
+			    	var marriageCertificate = document.getElementById('relaxedMarriageCertificate').value;
+			    	if (isNaN(marriageCertificate)||marriageCertificate==null){
+						  document.getElementById('relaxedMarriageCertificateerror').innerHTML ="Value must be a number";
 						  return false;
 			    	}
-			    	if (birthDeath<20){
-						  document.getElementById('relaxedBirthDeatherror').innerHTML ="Value must be greater than $20";
-						  return false;
-			    	}
-			    	
-			    	var academic = document.getElementById('relaxedAcademicTranscript').value;
-			    	if (isNaN(academic)||academic==null){
-						  document.getElementById('relaxedAcademicTranscripterror').innerHTML ="Value must be a number";
-						  return false;
-			    	}
-			    	if (academic<20){
-						  document.getElementById('relaxedAcademicTranscripterror').innerHTML ="Value must be greater than $20";
-						  return false;
-			    	}
-			    	
-			    	var businessDoc=document.getElementById('relaxedBusinessDocument').value;
-			    	if (isNaN(businessDoc)||businessDoc==null){
-						  document.getElementById('relaxedBusinessDocumenterror').innerHTML ="Value must be a number";
-						  return false;
-			    	}
-			    	if (businessDoc<20){
-						  document.getElementById('relaxedBusinessDocumenterror').innerHTML ="Value must be greater than $20";
+			    	if (marriageCertificate<20){
+						  document.getElementById('relaxedMarriageCertificateerror').innerHTML ="Value must be greater than $20";
 						  return false;
 			    	}
 			    }
 		    </script>
 	    	
 		    <script type="text/javascript">
-				function enableDisableUrgent(){
-					if (document.getElementById('urgentValue').checked){
-				          document.getElementById('urgenDriverLic').disabled = true;
-						  document.getElementById('urgentBirthDeath').disabled = true;
-						  document.getElementById('urgentAcademicTranscript').disabled = true;
-						  document.getElementById('urgentBusinessDocument').disabled = true;
-						  document.getElementById('urgentBotton').disabled = true;
-						  document.getElementById('urgentMessage').innerHTML ="Urgent Values are Disabled";
 
-						  $.ajax({  
-			                    type : 'GET',  
-			                    url : "/disableValue/Urgent",  
-			 
-			                });  
-					}else{
-						  document.getElementById('urgenDriverLic').disabled = false;
-						  document.getElementById('urgentBirthDeath').disabled = false;
-						  document.getElementById('urgentAcademicTranscript').disabled = false;
-						  document.getElementById('urgentBusinessDocument').disabled = false;
-						  document.getElementById('urgentBotton').disabled = false;
-						  document.getElementById('urgentMessage').innerHTML ="Urgent Values are Enabled";
-						  $.ajax({  
-			                    type : 'GET',  
-			                    url : "/enableValue/Urgent",  
-			 
-			                });  
-					}
-				}
-				
-				function enableDisableMedium(){
-					if (document.getElementById('mediumValue').checked){
-				          document.getElementById('mediumDriverLic').disabled = true;
-						  document.getElementById('mediumBirthDeath').disabled = true;
-						  document.getElementById('mediumAcademicTranscript').disabled = true;
-						  document.getElementById('mediumBusinessDocument').disabled = true;
-						  document.getElementById('mediumBotton').disabled = true;
-						  document.getElementById('mediumMessage').innerHTML ="Medium Values are Disabled";
+                function enableUrgent(){
+                    alert("I aknoweldege that activating the Automatic Quotation, makes me responsible for completing any paid request on the determined time as I have configured. The completion time time will count from the moment the client selects my automatic quote and the system sends a notification to my registered email (at the Settings Profile Account)." );
+                    document.getElementById("disableUrgent").style.display="block";
+                    document.getElementById("enableUrgent").style.display="none";
+                    document.getElementById('urgenDriverLic').disabled = false;
+                    document.getElementById('urgentPassport').disabled = false;
+                    document.getElementById('urgentBirthCertificate').disabled = false;
+                    document.getElementById('urgentMarriageCertificate').disabled = false;
+                    document.getElementById('urgentBotton').disabled = false;
+                    document.getElementById('urgentMessage').innerHTML ="Urgent Values are Enabled";
+                    $.ajax({
+                        type : 'GET',
+                        url : "/enableValue/Urgent",
+                    });
+                }
 
-						  $.ajax({  
-			                    type : 'GET',  
-			                    url : "/disableValue/Medium",  
-			 
-			                });  
-					}else{
-						  document.getElementById('mediumDriverLic').disabled = false;
-						  document.getElementById('mediumBirthDeath').disabled = false;
-						  document.getElementById('mediumAcademicTranscript').disabled = false;
-						  document.getElementById('mediumBusinessDocument').disabled = false;
-						  document.getElementById('mediumBotton').disabled = false;
-						  document.getElementById('mediumMessage').innerHTML ="Medium Values are Enabled";
-						  $.ajax({  
-			                    type : 'GET',  
-			                    url : "/enableValue/Medium",  
-			 
-			                });  
-					}
-				}
-				
-				function enableDisableRelaxed(){
-					if (document.getElementById('relaxedValue').checked){
-				          document.getElementById('relaxedDriverLic').disabled = true;
-						  document.getElementById('relaxedBirthDeath').disabled = true;
-						  document.getElementById('relaxedAcademicTranscript').disabled = true;
-						  document.getElementById('relaxedBusinessDocument').disabled = true;
-						  document.getElementById('relaxedBotton').disabled = true;
-						  document.getElementById('relaxedMessage').innerHTML ="Relaxed Values are Disabled";
+                function enableMedium(){
+                    alert("I aknoweldege that activating the Automatic Quotation, makes me responsible for completing any paid request on the determined time as I have configured. The completion time time will count from the moment the client selects my automatic quote and the system sends a notification to my registered email (at the Settings Profile Account)." );
+                    document.getElementById("disableMedium").style.display="block";
+                    document.getElementById("enableMedium").style.display="none";
+                    document.getElementById('mediumDriverLic').disabled = false;
+                    document.getElementById('mediumPassport').disabled = false;
+                    document.getElementById('mediumBirthCertificate').disabled = false;
+                    document.getElementById('mediumMarriageCertificate').disabled = false;
+                    document.getElementById('mediumBotton').disabled = false;
+                    document.getElementById('mediumMessage').innerHTML ="Medium Values are Enabled";
 
-						  $.ajax({  
-			                    type : 'GET',  
-			                    url : "/disableValue/Relaxed",  
-			 
-			                });  
-					}else{
-						  document.getElementById('relaxedDriverLic').disabled = false;
-						  document.getElementById('relaxedBirthDeath').disabled = false;
-						  document.getElementById('relaxedAcademicTranscript').disabled = false;
-						  document.getElementById('relaxedBusinessDocument').disabled = false;
-						  document.getElementById('relaxedBotton').disabled = false;
-						  document.getElementById('relaxedMessage').innerHTML ="Relaxed Values are Enabled";
-						  $.ajax({  
-			                    type : 'GET',  
-			                    url : "/enableValue/Relaxed",  
-			 
-			                });  
-					}
-				}
-				
+                    $.ajax({
+                        type : 'GET',
+                        url : "/enableValue/Medium",
+
+                    });
+                }
+
+                function DisableUrgent(){
+                    document.getElementById("disableUrgent").style.display="none";
+                    document.getElementById("enableUrgent").style.display="block";
+                    document.getElementById('urgenDriverLic').disabled = true;
+                    document.getElementById('urgentPassport').disabled = true;
+                    document.getElementById('urgentBirthCertificate').disabled = true;
+                    document.getElementById('urgentMarriageCertificate').disabled = true;
+                    document.getElementById('urgentBotton').disabled = true;
+                    document.getElementById('urgentMessage').innerHTML ="Urgent Values are Disabled";
+                    $.ajax({
+                        type : 'GET',
+                        url : "/disableValue/Urgent",
+                    });
+                }
+
+                function DisableMedium(){
+                    document.getElementById("disableMedium").style.display="none";
+                    document.getElementById("enableMedium").style.display="block";
+                    document.getElementById('mediumDriverLic').disabled = true;
+                    document.getElementById('mediumPassport').disabled = true;
+                    document.getElementById('mediumBirthCertificate').disabled = true;
+                    document.getElementById('mediumMarriageCertificate').disabled = true;
+                    document.getElementById('mediumBotton').disabled = true;
+                    document.getElementById('mediumMessage').innerHTML ="Medium Values are Disabled";
+                    $.ajax({
+                        type : 'GET',
+                        url : "/disableValue/Medium",
+                    });
+                }
+
+                function enableRelaxed(){
+
+                    alert("I aknoweldege that activating the Automatic Quotation, makes me responsible for completing any paid request on the determined time as I have configured. The completion time time will count from the moment the client selects my automatic quote and the system sends a notification to my registered email (at the Settings Profile Account)");
+                    document.getElementById("disableRelaxed").style.display="block";
+                    document.getElementById("enableRelaxed").style.display="none";
+                    document.getElementById('relaxedDriverLic').disabled = false;
+                    document.getElementById('relaxedPassport').disabled = false;
+                    document.getElementById('relaxedBirthCertificate').disabled = false;
+                    document.getElementById('relaxedMarriageCertificate').disabled = false;
+                    document.getElementById('relaxedBotton').disabled = false;
+                    document.getElementById('relaxedMessage').innerHTML ="Relaxed Values are Enabled";
+                    $.ajax({
+                        type : 'GET',
+                        url : "/enableValue/Relaxed",
+
+                    });
+                }
+
+
+                function DisableRelaxed(){
+                    document.getElementById("disableRelaxed").style.display="none";
+                    document.getElementById("enableRelaxed").style.display="block";
+                    document.getElementById('relaxedDriverLic').disabled = true;
+                    document.getElementById('relaxedPassport').disabled = true;
+                    document.getElementById('relaxedBirthCertificate').disabled = true;
+                    document.getElementById('relaxedMarriageCertificate').disabled = true;
+                    document.getElementById('relaxedBotton').disabled = true;
+                    document.getElementById('relaxedMessage').innerHTML ="Relaxed Values are Disabled";
+                    $.ajax({
+                        type : 'GET',
+                        url : "/disableValue/Relaxed",
+                    });
+                }
 			</script>
 			<script>
 		        function onLoad() {
@@ -726,37 +739,48 @@ License: You must have a valid license purchased only from themeforest(the above
 		                subscribeUnreadMessages
 		            ];
 		            connect(funcs);
-		            
+
 		            if(${urgentQuoteForm.valid}===false){
-		                  document.getElementById("urgentValue").checked = true;
+		                  document.getElementById("disableUrgent").style.display="none";
+                          document.getElementById("enableUrgent").style.display="block";
 		                  document.getElementById('urgenDriverLic').disabled = true;
-						  document.getElementById('urgentBirthDeath').disabled = true;
-						  document.getElementById('urgentAcademicTranscript').disabled = true;
-						  document.getElementById('urgentBusinessDocument').disabled = true;
+						  document.getElementById('urgentPassport').disabled = true;
+						  document.getElementById('urgentBirthCertificate').disabled = true;
+						  document.getElementById('urgentMarriageCertificate').disabled = true;
 						  document.getElementById('urgentBotton').disabled = true;
 						  document.getElementById('urgentMessage').innerHTML ="Urgent Values are Disabled";
-		            }
-		            
-		            
+		            }else{
+                        document.getElementById("disableUrgent").style.display="block";
+                        document.getElementById("enableUrgent").style.display="none";
+                    }
+
 		            if(${mediumQuoteForm.valid}===false){
-		                  document.getElementById("mediumValue").checked = true;
+                          document.getElementById("disableMedium").style.display="none";
+                          document.getElementById("enableMedium").style.display="block";
 		                  document.getElementById('mediumDriverLic').disabled = true;
-						  document.getElementById('mediumBirthDeath').disabled = true;
-						  document.getElementById('mediumAcademicTranscript').disabled = true;
-						  document.getElementById('mediumBusinessDocument').disabled = true;
+						  document.getElementById('mediumPassport').disabled = true;
+						  document.getElementById('mediumBirthCertificate').disabled = true;
+						  document.getElementById('mediumMarriageCertificate').disabled = true;
 						  document.getElementById('mediumBotton').disabled = true;
 						  document.getElementById('mediumMessage').innerHTML ="Medium Values are Disabled";
-		            }
-		            
+		            }else{
+                        document.getElementById("disableMedium").style.display="block";
+                        document.getElementById("enableMedium").style.display="none";
+                    }
+
 		            if(${relaxedQuoteForm.valid}===false){
-		                  document.getElementById("relaxedValue").checked = true;
+                          document.getElementById("disableRelaxed").style.display="none";
+                          document.getElementById("enableRelaxed").style.display="block";
 		                  document.getElementById('relaxedDriverLic').disabled = true;
-						  document.getElementById('relaxedBirthDeath').disabled = true;
-						  document.getElementById('relaxedAcademicTranscript').disabled = true;
-						  document.getElementById('relaxedBusinessDocument').disabled = true;
+						  document.getElementById('relaxedPassport').disabled = true;
+						  document.getElementById('relaxedBirthCertificate').disabled = true;
+						  document.getElementById('relaxedMarriageCertificate').disabled = true;
 						  document.getElementById('relaxedBotton').disabled = true;
 						  document.getElementById('relaxedMessage').innerHTML ="Relaxed Values are Disabled";
-		            }
+		            }else{
+                        document.getElementById("disableRelaxed").style.display="block";
+                        document.getElementById("enableRelaxed").style.display="none";
+                    }
 		        }
 		    </script>
     </body>

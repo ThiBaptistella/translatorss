@@ -18,8 +18,8 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private ChatMessageDao chatMessageDao;
 
     @Override
-    public void saveOrUpdate(ChatMessage entity) {
-        chatMessageDao.saveOrUpdate(entity);
+    public void saveOrUpdate(ChatMessage chatMessage) {
+        chatMessageDao.persistMessage(chatMessage);
     }
 
 	@Override

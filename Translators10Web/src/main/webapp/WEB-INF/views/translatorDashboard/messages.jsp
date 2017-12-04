@@ -277,26 +277,29 @@ License: You must have a valid license purchased only from themeforest(the above
 													<tbody>
 															<c:forEach items="${messageList}" var="message" >
 														   <tr>
-																<c:choose>
-																	<c:when test="${message.read}">
-																		<tr class="active" id="${message.id}">
-																	</c:when>
-																	<c:otherwise>
-																		<tr style="background-color: #cacaca" id="${message.id}">
-																	</c:otherwise>
-																</c:choose>
-
 																<%--<c:choose>--%>
-																	<%--<c:when test="${message.read == false} && ${message.sender}!= ${translatorName}">--%>
-																		<%--<tr style="background-color: #cacaca" id="${message.id}">--%>
+																	<%--<c:when test="${message.read}">--%>
+																		<%--<tr class="active" id="${message.id}">--%>
 																	<%--</c:when>--%>
 																	<%--<c:otherwise>--%>
-																		<%--<tr class="active" id="${message.id}">--%>
+																		<%--<tr style="background-color: #cacaca" id="${message.id}">--%>
 																	<%--</c:otherwise>--%>
 																<%--</c:choose>--%>
 
+																<c:choose>
+																	<c:when test="${message.read == false} && ${message.sender}!= ${translatorName}">
+																		<tr style="background-color: #cacaca" id="${message.id}">
+																	</c:when>
+																	<c:otherwise>
+																		<tr id="${message.id}">
+																	</c:otherwise>
+																</c:choose>
 
-																<td class="text-center"><img alt="" class="img-circle" src="${message.photoUrl}" height="62" width="52"/></td>
+																<td class="text-center"><img alt="" class="img-circle" src="${message.photoUrl}" height="62" width="52"/>
+																	<footer>
+																		<time><span> ${message.sender}</span></time>
+																	</footer>
+																</td>
 																<td class="text-center">${message.message}</td>
 																<td class="text-center">${message.date}</td>
 															</tr>
@@ -338,7 +341,7 @@ License: You must have a valid license purchased only from themeforest(the above
 									</form:form>
 									<p id="demo" style="color:red">${messageChat}</p>
                                    
-                            <div class="col-lg-6">
+                            <div class="col-lg-4">
 		                    	<div class="panel panel-primary">
 						            <div class="panel-heading">
 						              <h3 class="panel-title">Upload File for Customer</h3>
@@ -348,7 +351,6 @@ License: You must have a valid license purchased only from themeforest(the above
 				                             <fieldset>
 												<table id="fileTable">
 				        							<tr>
-	                                                    <td><label style="margin-right: 4px"> Upload File(s) </label></td>
 	                                                    <td><input name="files[0]" type="file" /></td>
 				               						</tr>
 				            					</table>
@@ -360,10 +362,9 @@ License: You must have a valid license purchased only from themeforest(the above
 														</div>
 													</div>
 												</spring:bind>
-				            					<input id="addFile" type="button" value="Add File" />
 				     							<div class="form-group">
 													<div class="col-sm-offset-2 col-sm-10">
-															<button name="serviceResponseCreate" value="serviceResponseCreate" class="btn btn-primary btn-bMember">Upload Files NOW !</button>
+															<button name="serviceResponseCreate" value="serviceResponseCreate" class="btn btn-primary btn-bMember">Upload File!</button>
 													</div>
 												</div>
 				     						   </fieldset>
@@ -371,7 +372,7 @@ License: You must have a valid license purchased only from themeforest(the above
 	                    		  </div>
 						        </div>
 	        				</div>
-	        				<div class="col-lg-6">
+	        				<div class="col-lg-8">
 				          <div class="panel panel-primary">
 				            <div class="panel-heading">
 				              <h3 class="panel-title">Service Request Details</h3>
@@ -390,7 +391,6 @@ License: You must have a valid license purchased only from themeforest(the above
 			                                        <th class="text-center">To</th>
 			                                        <th class="text-center">Hard copy?</th>
 			                                        <th class="text-center">Status</th>
-			                                        <th class="text-center">Translator Assigned</th>
 			                                    </tr>
 			                                    </thead>
 			                                    <tbody>
@@ -414,7 +414,7 @@ License: You must have a valid license purchased only from themeforest(the above
 				            </div>
 				          </div>
 				</div>
-						<div class="col-lg-4">
+						<div class="col-lg-8">
 				          <div class="panel panel-primary">
 				            <div class="panel-heading">
 				              <h3 class="panel-title">Service Request Files Details</h3>

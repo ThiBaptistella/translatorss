@@ -185,7 +185,7 @@ License: You must have a valid license purchased only from themeforest(the above
                                 <span class="arrow open"></span>
                             </a>
                         </li>
-                        <li class="nav-item  start active open">
+                        <li class="nav-item">
                             <a href="<c:url value='uploadFile'/>" class="nav-link nav-toggle">
                                 <span class="title">Request a new Translation</span>
                                 <span class="arrow"></span>
@@ -246,24 +246,33 @@ License: You must have a valid license purchased only from themeforest(the above
                     <!-- END PAGE HEADER-->
                     <div class="row">
                         <div class="col-md-12">
+                        
+                        	
+                          <c:if test="${messageDisplay != null}">
+                                <div id="note" class="note note-success">
+                                    <p> <b>${messageDisplay}</b> </p>
+                                </div>
+                            </c:if>
+                            
+                            
                            	<div class="profile-content">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <div class="portlet light ">
+                                        <div class="portlet light" onclick="onclickCleanMessage()">
                                             <div class="portlet-title tabbable-line">
                                                 <div class="caption caption-md">
                                                     <i class="icon-globe theme-font hide"></i>
                                                     <span class="caption-subject font-blue-madison bold uppercase">Profile Account</span>
                                                 </div>
                                                 <ul class="nav nav-tabs">
-                                                    <li class="active">
-                                                        <a href="#tab_1_1" data-toggle="tab">Personal Info</a>
+                                                    <li class="active" id="personal">
+                                                        <a href="#tab_1_1" onclick="activePersonalInfo()" data-toggle="tab">Personal Info</a>
                                                     </li>
-                                                    <li>
-                                                        <a href="#tab_1_2" data-toggle="tab">Change Avatar</a>
+                                                    <li id="avatar">
+                                                        <a href="#tab_1_2" onclick="activeAvatar()" data-toggle="tab">Change Avatar</a>
                                                     </li>
-                                                    <li>
-                                                        <a href="#tab_1_3" data-toggle="tab">Change Password</a>
+                                                    <li id="password">
+                                                        <a href="#tab_1_3" onclick="activePassword()" data-toggle="tab">Change Password</a>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -272,34 +281,44 @@ License: You must have a valid license purchased only from themeforest(the above
                                                     <!-- PERSONAL INFO TAB -->
                                                     <div class="tab-pane active" id="tab_1_1">
                                                        	<form:form action='updateBusinessUser' onsubmit="return validateForm()" method="post" name="myForm1" commandName="businessUserForm">
-												                <form:input path="id" type="hidden" class="form-control " id="id"/>
-												                <div class="form-group">
+                                                                <form:input path="id" type="hidden" class="form-control " id="id"/>
+
+                                                                <div class="form-group">
+                                                                    <label>Full Name</label>
+                                                                    <form:input path="fullname" type="text" class="form-control " onclick="onclickCleanField('fullnameerror')" id="fullname" placeholder="Full Name" />
+                                                                    <form:errors path="fullname" class="control-label" />
+                                                                    <p id="fullnameerror" style="color:red"></p>
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label>Prefered Name</label>
+                                                                    <form:input path="preferedname" type="text" class="form-control " onclick="onclickCleanField('preferednameerror')" id="preferedname" placeholder="Prefered Name" />
+                                                                    <form:errors path="preferedname" class="control-label" />
+                                                                    <p id="preferednameerror" style="color:red"></p>
+                                                                </div>
+
+                                                                <div class="form-group">
 												                  <label>E-mail</label>
-												                  <form:input path="email" type="text" class="form-control " id="email" placeholder="email" />
+												                  <form:input path="email" type="text" class="form-control " onclick="onclickCleanField('emailerror')" id="email" placeholder="email" />
 												                  <form:errors path="email" class="control-label" style="color:red"/>
 												                  <p id="emailerror" style="color:red"></p>
 												                </div>
 												
-												                <div class="form-group">
-												                  	<label>Full Name</label>
-												                    <form:input path="fullname" type="text" class="form-control " id="fullname" placeholder="fullname" />
-																	<form:errors path="fullname" class="control-label" />
-																	<p id="fullnameerror" style="color:red"></p>
-												                </div>
+
 												                <div class="form-group">
 												                  <label>Phone</label>
-												                  <form:input path="phone" type="tel" class="form-control " id="phone" placeholder="phone" />
+												                  <form:input path="phone" type="tel" class="form-control " onclick="onclickCleanField('phoneerror')" id="phone" placeholder="phone" />
 												                  <form:errors path="phone" class="control-label" />
 												                  <p id="phoneerror" style="color:red"></p>
 												                </div>
 												                <div class="form-group">
 												                  <label>Postal Address</label>
-												                  <form:input path="address" type="text" class="form-control " id="address" placeholder="address" />
+												                  <form:input path="address" type="text" class="form-control " onclick="onclickCleanField('addresserror')" id="address" placeholder="address" />
 												                  <form:errors path="address" class="control-label" /> 
 												                  <p id="addresserror" style="color:red"></p>
 												                </div>
 												                <div class="form-group input-group">
-												                  <input class="btn btn-default" type="submit" value="Update">
+												                  <input class="btn btn-default" type="submit" id="mySubmitButton" value="Save/update my details">
 												                </div>
 											             </form:form>
                                                     </div>
@@ -321,21 +340,21 @@ License: You must have a valid license purchased only from themeforest(the above
 												              	
 												                <div class="form-group">
 												                  <label>Current Password</label>
-												                  	<form:input path="currentPassword" type="text" class="form-control " id="currentPassword" placeholder="currentPassword" />
-																	<form:errors path="currentPassword" class="control-label" />
+												                  	<form:input path="currentPassword" type="password" class="form-control " id="currentPassword" placeholder="Current Password" />
+																    <form:errors path="currentPassword" class="control-label" style="color:red"/>
 																	<p id="currentPassworderror" style="color:red"></p>
 												                </div> 
 												
 												                <div class="form-group">
 												                  	<label>New Password</label>
-												                  	<form:input path="newPassword" type="text" class="form-control " id="newPassword" placeholder="newPassword" />
+												                  	<form:input path="newPassword" type="password" class="form-control " id="newPassword" placeholder="New Password" />
 																	<form:errors path="newPassword" class="control-label" />
 																	<p id="newPassworderror" style="color:red"></p>
 												                </div>
 												
 												                <div class="form-group">
 												                  	<label>New Password Confirmation</label>
-												                  	<form:input path="confirmNewPassword" type="text" class="form-control " id="confirmNewPassword" placeholder="confirmNewPassword" />
+												                  	<form:input path="confirmNewPassword" type="password" class="form-control " id="confirmNewPassword" placeholder="Confirm New Password" />
 																	<form:errors path="confirmNewPassword" class="control-label" />
 																	<p id="confirmNewPassworderror" style="color:red"></p>
 												                </div>
@@ -426,6 +445,35 @@ License: You must have a valid license purchased only from themeforest(the above
 			              subscribeUnreadMessages
 			          ];
 			          connect(funcs);
+
+			    	  var field = ${info};
+			    	
+			    	   if(field==100){
+			    		  $('#tab_1_1').show();
+			    		  $('#tab_1_2').hide();
+			    		  $('#tab_1_3').hide();
+			    		  document.getElementById("personal").classList.add('active');
+			    		  document.getElementById("avatar").classList.remove('active');
+			    		  document.getElementById("password").classList.remove('active');
+		    	       }
+			    	  
+			    	   if(field==200){
+				    		  $('#tab_1_1').hide();
+				    		  $('#tab_1_2').show();
+				    		  $('#tab_1_3').hide();
+				    		  document.getElementById("personal").classList.remove('active');
+				    		  document.getElementById("avatar").classList.add('active');
+				    		  document.getElementById("password").classList.remove('active');
+			    	   }
+			    	   
+			    	   if(field==300){
+				    		  $('#tab_1_1').hide();
+				    		  $('#tab_1_2').hide();
+				    		  $('#tab_1_3').show();
+				    		  document.getElementById("personal").classList.remove('active');
+				    		  document.getElementById("avatar").classList.remove('active');
+				    		  document.getElementById("password").classList.add('active');
+				    	  }
 			      }
 			  </script>
 
@@ -437,12 +485,44 @@ License: You must have a valid license purchased only from themeforest(the above
 
 		    
         <script>
+        
+        	function activePersonalInfo(){
+        		$('#tab_1_1').show();
+	    		  $('#tab_1_2').hide();
+	    		  $('#tab_1_3').hide();
+	    		  document.getElementById("personal").classList.add('active');
+	    		  document.getElementById("avatar").classList.remove('active');
+	    		  document.getElementById("password").classList.remove('active');
+        	}
+        
+        	function activeAvatar(){
+        		  $('#tab_1_1').hide();
+	    		  $('#tab_1_2').show();
+	    		  $('#tab_1_3').hide();
+	    		  document.getElementById("personal").classList.remove('active');
+	    		  document.getElementById("avatar").classList.add('active');
+	    		  document.getElementById("password").classList.remove('active');
+        	}
+        	
+        	function activePassword(){
+      		      $('#tab_1_1').hide();
+	    		  $('#tab_1_2').hide();
+	    		  $('#tab_1_3').show();
+	    		  document.getElementById("personal").classList.remove('active');
+	    		  document.getElementById("avatar").classList.remove('active');
+	    		  document.getElementById("password").classList.add('active');
+      	    }
+        	
 			function resetpasswordErrorValues() {
 			    $('#currentPassworderror').hide();
 			    $('#newPassworderror').hide();
 			    $('#confirmPassworderror').hide(); 
 			}
-			
+
+            function onclickCleanField(idfield){
+                document.getElementById(idfield).style.display="none";
+            }
+
 			function validatePassword(){
 				resetpasswordErrorValues();
 				var text;
@@ -526,36 +606,63 @@ License: You must have a valid license purchased only from themeforest(the above
 			        $('#languagelisterror').hide();
 			}
 			
+			function onclickCleanField(idfield){
+			  document.getElementById(idfield).style.display="none";
+			}
+
+			function onclickCleanMessage(){
+				document.getElementById("note").style.display="none";
+			} 
 			
 			function validateForm() {
-
                 resetPayModal();
-
                 var text;
-                var name = document.forms["myForm"]["fullName"].value;
+                
+                var name = document.forms["myForm1"]["fullname"].value;
                 if (name == null || name == "") {
-                    text = "The Name was not selected!";
-                    document.getElementById("nameerror").innerHTML = text;
+                    text = "Full Name was not selected!";
+                    document.getElementById("fullnameerror").innerHTML = text;
                     $('#fullnameerror').show();
                     return false;
                 }
+                
+                var preferedname = document.forms["myForm1"]["preferedname"].value;
+                if (preferedname == null || preferedname == "") {
+                    text = "The Prefered Name was not selected!";
+                    document.getElementById("preferednameerror").innerHTML = text;
+                    $('#preferednameerror').show();
+                    return false;
+                }
 
+                var email = document.forms["myForm1"]["email"].value;
+                if (!validateEmail(email)) {
+                    document.getElementById("emailerror").innerHTML = "Email format incorrect";
+                    $('#emailerror').show();
+                    return false;
+                }
 
-                var phone = document.forms["myForm"]["phone"].value;
+                var phone = document.forms["myForm1"]["phone"].value;
                 if (phone == null || phone == "") {
-                    text = "The phone needs to be selected!";
+                    text = "Phone needs to be selected!";
                     document.getElementById("phoneerror").innerHTML = text;
                     $('#phoneerror').show();
                     return false;
                 }
 
-                var email = document.forms["myForm"]["email"].value;
-                if (email == null || email == "") {
-                    text = "The email needs to be selected!";
-                    document.getElementById("emailerror").innerHTML = text;
-                    $('#emailerror').show();
+                var address = document.forms["myForm1"]["address"].value;
+                if(address== null || address==""){
+                    text = "Address needs to be selected";
+                    document.getElementById("addresserror").innerHTML = text;
+                    $('#addresserror').show();
                     return false;
                 }
+                
+                document.getElementById("mySubmitButton").disabled = true;
+            }
+
+            function validateEmail(email) {
+                var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(email);
             }
         </script>
     </body>

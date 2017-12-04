@@ -25,12 +25,18 @@ public class ServiceRequestDTO {
 	private String status;
 	private String translatorName;
 	private Date finishDate;
+	private Date createDate;
+	private Date paidDate;
 	private String finishQuoteDate;
 	private Integer countOfUnreadMessages;
 	private String clientName;
 	private BigDecimal quote;
 	private String invoiceUrl;
 	private List<AmazonFileDto> amazonList;
+	private RateDTO rateDto;
+
+
+	public ServiceRequestDTO(){ }
 
 	public RateDTO getRateDto() {
 		return rateDto;
@@ -40,7 +46,6 @@ public class ServiceRequestDTO {
 		this.rateDto = rateDto;
 	}
 
-	private RateDTO rateDto;
 
 	public List<AmazonFileDto> getAmazonList() {
 		return amazonList;
@@ -58,73 +63,98 @@ public class ServiceRequestDTO {
 		this.finishQuoteDate = finishQuoteDate;
 	}
 
-	public ServiceRequestDTO(){
-	    
+	public Date getCreateDate() {
+		return createDate;
 	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
 
 	public String getServiceRequestCategory() {
 		return serviceRequestCategory;
 	}
+	
 	public void setServiceRequestCategory(String serviceRequestCategory) {
 		this.serviceRequestCategory = serviceRequestCategory;
 	}
+	
 	public String getLanguagefrom() {
 		return languagefrom;
 	}
+	
 	public void setLanguagefrom(String languagefrom) {
 		this.languagefrom = languagefrom;
 	}
+	
 	public String getLanguageTo() {
 		return languageTo;
 	}
+	
 	public void setLanguageTo(String languageTo) {
 		this.languageTo = languageTo;
 	}
+	
 	public String getTimeFrame() {
 		return timeFrame;
 	}
+	
 	public void setTimeFrame(String timeFrame) {
 		this.timeFrame = timeFrame;
 	}
 	public String getDescription() {
 		return description;
 	}
+	
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	
 	public Boolean getHardcopy() {
 		return hardcopy;
 	}
+	
 	public void setHardcopy(Boolean hardcopy) {
 		this.hardcopy = hardcopy;
 	}
+	
 	public List<MultipartFile> getFiles() {
 		return files;
 	}
+	
 	public void setFiles(List<MultipartFile> files) {
 		this.files = files;
 	}
+	
 	public String getFullName() {
 		return fullName;
 	}
+	
 	public void setFullName(String fullName) {
 		this.fullName = fullName;
 	}
+	
 	public String getUrl() {
 		return url;
 	}
+	
 	public void setUrl(String url) {
 		this.url = url;
 	}
+	
     public Boolean getUpdate() {
         return update;
     }
+    
     public void setUpdate(Boolean update) {
         this.update = update;
     }
+    
     public String getStatus() {
         return status;
     }
+    
     public void setStatus(String status) {
         this.status = status;
     }
@@ -183,5 +213,13 @@ public class ServiceRequestDTO {
 
 	public void setInvoiceUrl(String invoiceUrl) {
 		this.invoiceUrl = invoiceUrl;
+	}
+	
+	public Date getPaidDate() {
+		return paidDate;
+	}
+
+	public void setPaidDate(Date paidDate) {
+		this.paidDate = paidDate;
 	}
 }

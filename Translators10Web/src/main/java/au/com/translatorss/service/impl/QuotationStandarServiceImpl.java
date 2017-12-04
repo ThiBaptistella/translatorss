@@ -24,8 +24,8 @@ public class QuotationStandarServiceImpl implements QuotationStandarService {
 	public void updateQuotes(String timeFrame, QuoteSettingDTO quoteDTO, Translator translator) {
 		List<QuotationStandar> list = quotationStandarDao.getByTimeFrame(timeFrame, quoteDTO.getTranslatorId());
 		for(QuotationStandar quotestandar:list ){
-			if(quotestandar.getCategory().getDescription().equals("Birth, Death or Marriage Certificate")){
-				quotestandar.setValue(new Integer(quoteDTO.getAcademicTranscript()));
+			if(quotestandar.getCategory().getDescription().equals("Birth Certificate")){
+				quotestandar.setValue(new Integer(quoteDTO.getBirthCertificate()));
 				if(translator.getStatus().equals("Active")){
 					quotestandar.setValid(true);
 				}else{
@@ -48,8 +48,8 @@ public class QuotationStandarServiceImpl implements QuotationStandarService {
 					quotestandar.setValid(false);
 				}
 			}
-			if(quotestandar.getCategory().getDescription().equals("Academic Records / Transcripts")){
-				quotestandar.setValue(new Integer(quoteDTO.getAcademicTranscript()));
+			if(quotestandar.getCategory().getDescription().equals("Marriage Certificate")){
+				quotestandar.setValue(new Integer(quoteDTO.getMarriageCertificate()));
 				if(translator.getStatus().equals("Active")){
 					quotestandar.setValid(true);
 				}else{

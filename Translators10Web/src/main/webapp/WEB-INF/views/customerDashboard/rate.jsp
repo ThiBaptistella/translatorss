@@ -245,31 +245,37 @@ License: You must have a valid license purchased only from themeforest(the above
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="portlet light ">
-                              				<h4>Rate Translator Job</h4>
-											<form:form action='submitRate' method="POST" commandName="rateTranslator">
+                              				<h4><b>Rate Translator Job</b></h4>
+
+											<form:form action='submitRate' name="myForm3" method="POST" onsubmit="return validateForm()" commandName="rateTranslator">
 												<table>
 												<tr>
-												<td>Translator Comunication : </td>
+												<td>On time delivery : </td>
 												<td>
-													<form:radiobuttons path="translatorComunication" items="${numberList1}"  /> 
+													<form:radiobuttons onclick="onclickCleanField('timeDeliveryValueerror')" name="timeDelivery" path="timeDelivery" items="${numberList1}"  /> 
+													<p id="timeDeliveryValueerror" style="color:red"></p>
+												</td>
+												
+												</tr>
+												<tr>
+												<td>Quality of the Translated Document : </td>
+												<td>
+													<form:radiobuttons onclick="onclickCleanField('qualityValueerror')" name="quality" path="quality" items="${numberList2}" />
+													<p id="qualityValueerror" style="color:red"></p> 
 												</td>
 												</tr>
 												<tr>
-												<td>Service Described : </td>
-												<td>
-													<form:radiobuttons path="serviceDescribed" items="${numberList2}" /> 
-												</td>
-												</tr>
-												<tr>
-													<td>Would Recomend : </td>
+													<td>Customer Service : </td>
 													<td>
-														<form:radiobuttons path="wouldRecomend" items="${numberList3}" /> 
+														<form:radiobuttons onclick="onclickCleanField('serviceValueerror')" name="service" path="service" items="${numberList3}" />
+														<p id="serviceValueerror" style="color:red"></p> 
 													</td>
 												</tr>
 												<tr>
 													<td>Feedback : </td>
 													<td>
-														<form:textarea path="feedback" rows="5" cols="30" maxlength="50" class="form-control " id="feedback" placeholder="feedback"/>
+														<form:textarea onclick="onclickCleanField('feedbackerror')" path="feedback" rows="15" cols="30" maxlength="150" class="form-control " id="feedback" placeholder="Max 150"/>
+														<p id="feedbackerror" style="color:red"></p>
 													</td>
 												</tr>
 												<tr>
@@ -279,7 +285,9 @@ License: You must have a valid license purchased only from themeforest(the above
 												</td>
 												</tr>
 												<tr>
-													<td colspan="3"><input type="submit" value=Evaluate /></td>
+													<td colspan="3">
+														<button name="serviceRequestCreate" id="mySubmitButton" value="Rate Translator" class="btn btn-primary btn-bMember">Submitt Feedback</button>
+													</td>
 												</tr>
 												</table>
 											</form:form>
@@ -358,6 +366,71 @@ License: You must have a valid license purchased only from themeforest(the above
 			      }
 			  </script>
 
+			<script type="text/javascript">
+			
+				function onclickCleanField(idfield){
+	                document.getElementById(idfield).style.display="none";
+	            }
+			
+				function validateForm() {
+					
+					var timeDelivery = document.getElementsByName("timeDelivery");
+				    var sizeTimeDelivery = timeDelivery.length;
+					var timeDeliveryValue = 0;
+				    for (i=0; i < sizeTimeDelivery; i++) {
+				            if (timeDelivery[i].checked==true) {
+				            timeDeliveryValue=timeDelivery[i].value
+				        }
+				    }
+					
+					var quality = document.getElementsByName("quality");
+				    var sizeQuality = quality.length;
+					var qualityValue = 0;
+				    for (i=0; i < sizeQuality; i++) {
+				            if (quality[i].checked==true) {
+				            qualityValue = quality[i].value;
+				        }
+				    }
+				    
+					var service = document.getElementsByName("service");
+				    var sizeService = service.length;
+					var serviceValue = 0;
+				    for (i=0; i < sizeService; i++) {
+				            if (service[i].checked==true) {
+				            serviceValue=service[i].value;
+				        }
+				    }
+				    
+	                var feedback = document.forms["myForm3"]["feedback"].value;
+
+				    
+				    //alert("Time: "+timeDeliveryValue+"- Service: "+serviceValue+"- Quality:"+ qualityValue+ "- feedback: "+feedback);
+				    
+				    if(timeDeliveryValue==0 || timeDeliveryValue ==null){
+	                    document.getElementById("timeDeliveryValueerror").innerHTML = "Select a value";
+				        return false;
+				    }
+				    
+				    if(qualityValue==0 || qualityValue ==null){
+	                    document.getElementById("qualityValueerror").innerHTML = "Select a value";
+				        return false;
+				    }
+				    
+				    if(serviceValue==0 || serviceValue ==null){
+	                    document.getElementById("serviceValueerror").innerHTML = "Select a value";
+				        return false;
+				    }
+				    
+				    if(feedback=="" || feedback ==null){
+	                    document.getElementById("feedbackerror").innerHTML = "Select a Decription";
+				        return false;
+				    }
+				    
+	                document.getElementById("mySubmitButton").disabled = true;
+
+				}
+	
+			</script>
 			
     </body>
 </html>

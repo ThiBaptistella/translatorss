@@ -28,12 +28,18 @@ public class QuotationServiceImpl implements TranslatorQuotationService {
     @Autowired
     private QuotationDao quotationDao;
 
+    /*@Autowired
+    private QuotationService quotationService;*/
+    
     @Autowired
     private TranslatorDao translatorImplDao;
 
     @Autowired
-    private EmailService emailService;
+    private EmailService2 emailService2;
 
+    @Autowired
+    private EmailService emailService;
+    
     @Autowired
     private CustomerServiceRequestService serviceRequestService;
     
@@ -57,7 +63,7 @@ public class QuotationServiceImpl implements TranslatorQuotationService {
     
     @Override
     public void saveOrUpdate(Quotation quotation) {
-        quotationDao.saveOrUpdate(quotation);
+        quotationDao.saveOrUpdateQuotation(quotation);
     }
 
     @Override
@@ -74,9 +80,9 @@ public class QuotationServiceImpl implements TranslatorQuotationService {
         	}else{
         		quotation.setIsValid(false);
         	}
-            quotationDao.saveOrUpdate(quotation);
+        	saveOrUpdate(quotation);
         }else{
-            quotationDao.saveOrUpdate(quotationUpdate);
+        	quotationDao.saveOrUpdate(quotationUpdate);
         }
     }
 
@@ -95,7 +101,7 @@ public class QuotationServiceImpl implements TranslatorQuotationService {
     	List<Quotation> quotationList = quotationDao.getStandarQuotes(translatorid, timeFrame);
         for (Quotation quotation : quotationList) {
         	 quotation.setIsValid(false);
-        	 quotationDao.saveOrUpdate(quotation);
+        	 saveOrUpdate(quotation);
              //generateNewQuotations(translator);
         }
 
@@ -112,8 +118,7 @@ public class QuotationServiceImpl implements TranslatorQuotationService {
     	List<Quotation> quotationList = quotationDao.getStandarQuotes(translatorid, timeFrame);
         for (Quotation quotation : quotationList) {
 	       	 quotation.setIsValid(true);
-	       	 quotationDao.saveOrUpdate(quotation);
-            //generateNewQuotations(translator);
+	       	 saveOrUpdate(quotation);
         }
         
         List<QuotationStandar> list =quotesStandarService.getByTimeFrame(timeFrame, translatorid);
@@ -121,6 +126,9 @@ public class QuotationServiceImpl implements TranslatorQuotationService {
         	quote.setValid(true);
         	quotesStandarService.saveOrUpdate(quote);
         }
+        
+      	Translator translator = this.translatorService.getTranslatorById(translatorid);
+        generateNewQuotations(translator,timeFrame);
 	}
 
     
@@ -133,25 +141,25 @@ public class QuotationServiceImpl implements TranslatorQuotationService {
             if (serviceRequest.getServiceRequestCategory().getDescription().equals("Drivers License")) {
                  quotation.setValue(new BigDecimal(quoteSetting.getDriverLic()));
                  quotation.setIsAutomatic(true);
-            } else if (serviceRequest.getServiceRequestCategory().getDescription().equals("Academic Records / Transcripts")) {
-                 quotation.setValue(new BigDecimal(quoteSetting.getAcademicTranscript()));
+            } else if (serviceRequest.getServiceRequestCategory().getDescription().equals("Marriage Certificate")) {
+                 quotation.setValue(new BigDecimal(quoteSetting.getMarriageCertificate()));
                  quotation.setIsAutomatic(true);
-            } else if (serviceRequest.getServiceRequestCategory().getDescription().equals("Birth, Death or Marriage Certificate")) {
-                 quotation.setValue(new BigDecimal(quoteSetting.getBirthDeath()));
+            } else if (serviceRequest.getServiceRequestCategory().getDescription().equals("Birth Certificate")) {
+                 quotation.setValue(new BigDecimal(quoteSetting.getBirthCertificate()));
                  quotation.setIsAutomatic(true);
             } else if (serviceRequest.getServiceRequestCategory().getDescription().equals("Passport")){  
                  quotation.setValue(new BigDecimal(quoteSetting.getPassport()));
                  quotation.setIsAutomatic(true);
             }
-         quotationDao.saveOrUpdate(quotation);
+            saveOrUpdate(quotation);
         }
-        generateNewQuotations(translator);
+        generateNewQuotations(translator,timeFrame);
     }
 
-    private void generateNewQuotations(Translator translator) {
-        //Quiero todos los serviceRequest que en sus quotations no este el translator
+    public void generateNewQuotations(Translator translator,String timeFrame) {
+        //Quiero todos los serviceRequest que en sus quotations no este este translator
     	List<QuotationStandar> quotes=quotesStandarService.getAllByTranslator(translator.getId());
-        List<ServiceRequest> serviceRequestList = serviceRequestService.getServiceRequestStandartWithoutQuote(translator);
+        List<ServiceRequest> serviceRequestList = serviceRequestService.getServiceRequestStandartWithoutQuote(translator,timeFrame);
         for(ServiceRequest serviceRequest :serviceRequestList){
             Quotation quotation = new Quotation();
             quotation.setTranslator(translator);
@@ -163,7 +171,8 @@ public class QuotationServiceImpl implements TranslatorQuotationService {
                   quotation.setValue(new BigDecimal(quote.getValue()));
             	}
             }
-            quotationDao.saveOrUpdate(quotation);   
+            this.emailService2.sendEmailNewQuoteFromTranslator(serviceRequest.getCustomer().getUser().getEmail(), serviceRequest.getCustomer().getFullname(), translator.getFullname(), quotation.getValue().toString(), serviceRequest.getId().toString());
+            saveOrUpdate(quotation);   
         }
     }
 
@@ -193,7 +202,7 @@ public class QuotationServiceImpl implements TranslatorQuotationService {
                 quotation.setIsValid(true);
                 quotation.setIsAutomatic(true);
                 quotation.setValue(getQuotation(translator, serviceRequest.getServiceRequestCategory().getDescription(),serviceRequest.getTimeFrame().getDescription()));
-                quotationDao.saveOrUpdate(quotation);
+                saveOrUpdate(quotation);
                 quotations.add(quotation);
             }
         }
@@ -220,10 +229,18 @@ public class QuotationServiceImpl implements TranslatorQuotationService {
     }
 
     @Override
-    public List<Quotation> getQuotationListFromTranslator(long translatorid, boolean status) {
-        return quotationDao.getListByTranslatorId(translatorid, status);
+    public List<Quotation> getValidQuotesFromSRQuoted(Long translatorid) {
+       // return quotationDao.getListByTranslatorId(translatorid, status);
+    	return quotationDao.getValidQuotesFromSRQuoted(translatorid);
     }
 
+    @Override
+    public List<Quotation> getInValidQuotesFromSRUnquotedOrQuoted(Long translatorid){
+    	return quotationDao.getInValidQuotesFromSRUnquotedOrQuoted(translatorid);
+
+    }
+
+    
 	@Override
 	public List<TranslatorQuotationDTO> getQuotationArrayDTO(ServiceRequestDTO serviceRequestDTO) throws IllegalStateException, IOException {
 		 List<Translator> translatorList = quotesStandarService.getAvailableTranslatorsByLanguages(mapServiceRequestFromDTO(serviceRequestDTO));
@@ -322,6 +339,12 @@ public class QuotationServiceImpl implements TranslatorQuotationService {
 	@Override
 	public List<Quotation> getQuotesFromServiceRequestQuotedAndUnquoted() {
 		return quotationDao.getQuotesFromServiceRequestQuotedAndUnquoted();
+	}
+
+	@Override
+	public List<Quotation> getQuotationListFromTranslator(long translatorid, boolean status) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
   

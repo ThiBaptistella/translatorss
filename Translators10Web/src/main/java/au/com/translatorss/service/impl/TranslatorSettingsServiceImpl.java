@@ -10,6 +10,7 @@ import au.com.translatorss.dao.TranslatorDao;
 import au.com.translatorss.service.EmailService2;
 import au.com.translatorss.service.PurchaseService;
 import au.com.translatorss.service.QuotationStandarService;
+import au.com.translatorss.service.ServiceRequestConfigurationService;
 import au.com.translatorss.service.TranslatorQuotationService;
 import au.com.translatorss.service.TranslatorSettingsService;
 import org.slf4j.Logger;
@@ -38,7 +39,7 @@ public class TranslatorSettingsServiceImpl implements TranslatorSettingsService 
 	private RateDao rateDao;
 	
     @Autowired
-    private EmailService2 emailService; 
+    private EmailService2 emailService2; 
     
     @Autowired
     private PurchaseService purchaseService;
@@ -54,32 +55,36 @@ public class TranslatorSettingsServiceImpl implements TranslatorSettingsService 
     
  	@Autowired
 	private QuotationStandarService quotationStandarService;
-    
+
+    @Autowired
+    private ServiceRequestConfigurationService serviceRequestConfigurationService;
+ 	
+
 	public void saveTranslator(Translator translator){
 		logger.info("Welcome TranslatorSettingsServiceImpl.");
 		List<ServiceRequestCategory> categoryList = serviceRequestCategoryDao.getAutomaticCategories();
 		List<TimeFrame> timeFrameList = timeFrameDao.getAll();
-		
-		for(ServiceRequestCategory category: categoryList){
-			for(TimeFrame timeFrame: timeFrameList){
-				QuotationStandar quotationStandar = new QuotationStandar();
-				quotationStandar.setCategory(category);
-				quotationStandar.setTimeFrame(timeFrame);
-				quotationStandar.setValue(0);
-				quotationStandar.setValid(false);
-				quotationStandar.setTranslator(translator);
-				quotationStandar.setUpdateDate(new Date());
-				translator.getStandarValuesList().add(quotationStandar);
+		ServiceRequestConfiguration conf=serviceRequestConfigurationService.getServiceRequestConfiguration();
+		if(translator.getId()==null){
+			for(ServiceRequestCategory category: categoryList){
+				for(TimeFrame timeFrame: timeFrameList){
+					QuotationStandar quotationStandar = new QuotationStandar();
+					quotationStandar.setCategory(category);
+					quotationStandar.setTimeFrame(timeFrame);
+					quotationStandar.setValue(conf.getStandarQuoteVealue());
+					quotationStandar.setValid(false);
+					quotationStandar.setTranslator(translator);
+					quotationStandar.setUpdateDate(new Date());
+					translator.getStandarValuesList().add(quotationStandar);
+				}
 			}
 		}
-		
 		this.translatorImplDao.saveOrUpdate(translator);
 	}
 
 	@Override
 	public void updateStandarQuote(Translator translator, QuoteSettingDTO QuoteSetting, String timeFrame) {
- 		 translatorImplDao.saveOrUpdate(translator);
- 		 quotationStandarService.updateQuotes(timeFrame, QuoteSetting, translator);
+		quotationStandarService.updateQuotes(timeFrame, QuoteSetting, translator);
 	}
 	
 	public List<Translator> getTranslators() {
@@ -129,11 +134,12 @@ public class TranslatorSettingsServiceImpl implements TranslatorSettingsService 
         translator.setStatus("Paused");
         translator.getTranslatorStatusFlags().setManualyPaused(true);
         translatorImplDao.saveOrUpdate(translator); 
-        List<Quotation> quotationList = quotationService.getQuotationListFromTranslator(translator.getId(), true);    
+        List<Quotation> quotationList = quotationService.getValidQuotesFromSRQuoted(translator.getId());    
         for(Quotation quotation: quotationList){
             quotation.setIsValid(false);
             quotationService.saveOrUpdate(quotation);
         }
+		this.emailService2.sendEmailToTranslatorStatusChange(translator.getUser().getEmail(), translator.getFullname(), "Paused");
         
     }
 	
@@ -161,13 +167,22 @@ public class TranslatorSettingsServiceImpl implements TranslatorSettingsService 
             translator.getTranslatorStatusFlags().setManualyPaused(false);
             translatorImplDao.saveOrUpdate(translator);
 
-            List<Quotation> quoteList= quotationService.getQuotationListFromTranslator(translator.getId(),false);
-            for(Quotation quotation: quoteList){
+            //List<Quotation> quoteList= quotationService.getQuotationListFromTranslator(translator.getId(),false);
+            List<Quotation> quotationList = quotationService.getInValidQuotesFromSRUnquotedOrQuoted(translator.getId());    
+
+            for(Quotation quotation: quotationList){
             	quotation.setIsValid(true);
             	quotationService.saveOrUpdate(quotation);
-                emailService.sendEmailNewQuoteFromTranslator(quotation.getServiceRequest().getCustomer().getUser().getEmail(),quotation.getServiceRequest().getCustomer().getUser().getName(), quotation.getValue().toString(), quotation.getServiceRequest().getId().toString());
+               // emailService.sendEmailNewQuoteFromTranslator(quotation.getServiceRequest().getCustomer().getUser().getEmail(),quotation.getServiceRequest().getCustomer().getUser().getName(), quotation.getValue().toString(), quotation.getServiceRequest().getId().toString());
             }
-        }   
+            
+            quotationService.generateNewQuotations(translator, "Urgent");
+            quotationService.generateNewQuotations(translator, "Medium");
+            quotationService.generateNewQuotations(translator, "Relaxed");
+
+            this.emailService2.sendEmailToTranslatorStatusChange(translator.getUser().getEmail(), translator.getFullname(), "Active");
+        }
+      
     }
 
     @Override

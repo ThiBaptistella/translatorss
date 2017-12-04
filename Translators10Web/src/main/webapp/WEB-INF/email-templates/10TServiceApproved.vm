@@ -19,8 +19,8 @@
             </tr>
             <tr>
              <td style="font-size: 12px; font-family: arial, sans-serif; color: #000000; text-align: left;">
-					Hello $customername,
-					I would like to let to inform that Job $servicerequestid completed was Approved with the followin rating Communication: $translatorCommunication, Service: $serviceAsDescribed, Would Recoment: $wouldRecommend.
+					Hello $translatorname,
+					I would like to let to inform that Job $servicerequestid completed was Approved with the following rating Time Delivery: $timedelivery, Service: $service, Quality: $quality.
 					Attached is a copy of the associated invoice sent to your client.
 					We will make the payment in the next xxx days.
 					If you have any question please contact us.

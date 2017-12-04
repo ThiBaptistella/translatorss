@@ -2,6 +2,8 @@ package au.com.translatorss.dao;
 
 import au.com.translatorss.bean.User;
 
+import java.util.List;
+
 public interface UserDao {
 
 	public void saveOrUpdate(User user);
@@ -15,4 +17,6 @@ public interface UserDao {
     boolean isExistEmail(String email);
 
     boolean isAvailableEmailAndExcludeUser(String email, Long id);
+
+    public List<User> findAll();
 }

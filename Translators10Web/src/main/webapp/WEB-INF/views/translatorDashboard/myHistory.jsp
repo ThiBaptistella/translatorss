@@ -269,6 +269,7 @@ License: You must have a valid license purchased only from themeforest(the above
                                         <thead class="flip-content">
                                             <tr>
 				                           		<th class="text-center">Assignment ID</th>
+                                                <th class="text-center">Status</th>
                                                 <th class="text-center">Quote Price</th>
                                                 <th class="text-center">Client Name</th>
                                                 <th class="text-center">Assignments Details</th>
@@ -288,6 +289,7 @@ License: You must have a valid license purchased only from themeforest(the above
                                             <c:forEach items="${serviceRequestList}" var="serviceRequest">
 			        							<tr class="active">
 			        								<td class="servicerequestid">${serviceRequest.id}</td>
+                                                    <td>${serviceRequest.status}</td>
                                                     <td>${serviceRequest.quote}</td>
                                                     <td>${serviceRequest.clientName}</td>
                                                     <td>
@@ -299,9 +301,9 @@ License: You must have a valid license purchased only from themeforest(the above
                                                     <td>${serviceRequest.hardcopy}</td>
 			            							<td>${serviceRequest.languagefrom}</td>
 										            <td>${serviceRequest.languageTo}</td>
-                                                    <td>${serviceRequest.rateDto.translatorComunication} </td>
-                                                    <td>${serviceRequest.rateDto.wouldRecomend} </td>
-                                                    <td>${serviceRequest.rateDto.serviceDescribed} </td>
+                                                    <td>${serviceRequest.rateDto.timeDelivery} </td>
+                                                    <td>${serviceRequest.rateDto.quality} </td>
+                                                    <td>${serviceRequest.rateDto.service} </td>
                                                     <td>${serviceRequest.rateDto.feedback}</td>
 			         							</tr>
 			                                   </c:forEach>  

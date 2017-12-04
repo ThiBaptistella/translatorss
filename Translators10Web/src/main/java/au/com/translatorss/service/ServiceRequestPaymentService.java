@@ -10,4 +10,6 @@ public interface ServiceRequestPaymentService {
 
 	public List<ServiceRequestPayment> getServiceRequestPaymentApproved();
 
+	public List<ServiceRequestPayment> getServiceRequestPaymentCancelled();
+
 }

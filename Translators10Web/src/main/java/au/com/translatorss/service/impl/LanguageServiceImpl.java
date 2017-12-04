@@ -44,4 +44,8 @@ public class LanguageServiceImpl implements LanguageService {
 		return languageImplDao.getAll();
 	}
 
+	public void save(Language language){
+		this.languageImplDao.saveOrUpdate(language);
+	}
+
 }

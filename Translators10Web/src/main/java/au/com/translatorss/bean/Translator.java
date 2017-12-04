@@ -4,10 +4,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Translator
@@ -24,7 +21,7 @@ public class Translator implements java.io.Serializable {
 	private String address;
 	private String status;
 	private Set<Rate> rates ;
-	private List<Language> languageList ;
+	private List<Language> languageList = new ArrayList<>(0);
 	private Set<Purchase> purchaseList = new HashSet<Purchase>(0);
 	private Set<Conversation> conversationList = new HashSet<Conversation>(0);
 	private Set<QuotationStandar> standarValuesList = new HashSet<QuotationStandar>(0);
@@ -236,5 +233,13 @@ public class Translator implements java.io.Serializable {
 	public void setStandarValuesList(Set<QuotationStandar> standarValuesList) {
 		this.standarValuesList = standarValuesList;
 	}
-	
+
+	@Column(name = "abn_address")
+	public String getAbn_address() {
+		return abn_address;
+	}
+
+	public void setAbn_address(String abn_address) {
+		this.abn_address = abn_address;
+	}
 }

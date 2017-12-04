@@ -12,8 +12,11 @@ public class ServiceRequestConfiguration {
     private Long id;
     private int minimumMarket;
     private int hoursLeft;
+    private int standarQuoteVealue;
     
-    public ServiceRequestConfiguration(){}
+   
+
+	public ServiceRequestConfiguration(){}
 
     @Id
     @Column(name = "id", unique = true, nullable = false)
@@ -43,4 +46,13 @@ public class ServiceRequestConfiguration {
         this.hoursLeft = hoursLeft;
     }
 
+    
+    @Column(name = "standar_quote_value", unique = true, nullable = false)
+    public int getStandarQuoteVealue() {
+		return standarQuoteVealue;
+	}
+
+	public void setStandarQuoteVealue(int standarQuoteVealue) {
+		this.standarQuoteVealue = standarQuoteVealue;
+	}
 }

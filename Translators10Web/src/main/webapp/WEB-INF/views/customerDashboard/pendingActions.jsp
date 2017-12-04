@@ -135,7 +135,7 @@ License: You must have a valid license purchased only from themeforest(the above
                             <li class="dropdown dropdown-user">
                                 <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
                                     <img alt="" class="img-circle" src="${photoUrl}" />
-                                    <span class="username username-hide-on-mobile"> ${businessUserFormName} </span>
+                                    <span class="username username-hide-on-mobile"> ${businessUserForm.fullname} </span>
                                     <i class="fa fa-angle-down"></i>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-default">
@@ -263,34 +263,42 @@ License: You must have a valid license purchased only from themeforest(the above
                                     <table class="table table-bordered table-striped table-condensed flip-content" id="datatables">
                                         <thead class="flip-content">
                                             <tr>
-                                                    <th class="text-center">ID</th>
-			                                        <th class="text-center">Remaining Time to select a candidate</th>
-			                                        <th class="text-center">Category</th>
-			                                        <th class="text-center">Timeframe</th>
-			                                        <th class="text-center">From</th>
-			                                        <th class="text-center">To</th>
-			                                        <th class="text-center">Hard copy?</th>
-			                                        <th class="text-center">Status</th>
-			                                        <th class="text-center">Delete</th>
-			                                        <th class="text-center">Quotations</th>
+                                                    <th class="text-center">Request ID</th>
+                                                    <th class="text-center">Request Status</th>
+                                                    <th class="text-center">Quotations</th>
+                                                    <th class="text-center">Document Category</th>
+                                                    <th class="text-center">Original Language</th>
+                                                    <th class="text-center">Language to be translated to</th>
+                                                    <th class="text-center">Description</th>
+                                                    <th class="text-center">Hard copy(Australia only)</th>
+                                                    <th class="text-center">Digital Copy Urgency</th>
+                                                    <th class="text-center">View uploaded files</th>
+                                                    <th class="text-center">Request Date</th>
+                                                    <th class="text-center">Remove Request</th>
+                                                    <th class="text-center">Remaining Time to select a candidate</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                            <c:forEach items="${serviceRequestList}" var="serviceRequest">
 	                                        <tr class="active">
 	                                            <td class="servicerequestid">${serviceRequest.id}</td>
-	                                            <td class="countdown bg_green" data-id="${serviceRequest.id}"></td>
+                                                <td>${serviceRequest.status}</td>
+                                                <td><a href="<c:url value='/quotationList/${serviceRequest.id}' />">Select a translator</a></td>
+                                                <td>${serviceRequest.serviceRequestCategory}</td>
+                                                <td>${serviceRequest.languagefrom}</td>
+                                                <td>${serviceRequest.languageTo}</td>
+                                                <td>${serviceRequest.description}</td>
+                                                <td>${serviceRequest.hardcopy}</td>
+                                                <td>${serviceRequest.timeFrame}</td>
+                                                <td>
+                                                    <c:forEach items="${serviceRequest.amazonList}" var="file">
+                                                        <li><a href="${file.url}" download="${file.fileName}">${file.fileName}</a></li>
+                                                    </c:forEach>
+                                                </td>
+                                                <td>${serviceRequest.createDate}</td>
+                                                <td><a href="<c:url value='/deleteServiceRequest/${serviceRequest.id}' />">Delete</a></td>
+                                                <td class="countdown bg_green" data-id="${serviceRequest.id}"></td>
 	                                            <td class="finishdate" hidden="true">${serviceRequest.finishQuoteDate}</td>
-	                                            <td>${serviceRequest.serviceRequestCategory}</td>
-	                                            <td>${serviceRequest.timeFrame}</td>
-	                                            <td>${serviceRequest.languagefrom}</td>
-	                                            <td>${serviceRequest.languageTo}</td>
-	                                            <td>${serviceRequest.hardcopy}</td>
-	                                            <td>${serviceRequest.status}</td>
-	                                            <td><a href="<c:url value='/deleteServiceRequest/${serviceRequest.id}' />">Delete</a>
-	                                            </td>
-	                                            <td><a href="<c:url value='/quotationList/${serviceRequest.id}' />">See
-	                                                Quotes</a></td>
 	                                        </tr>
 	                                    </c:forEach>
                                         </tbody>

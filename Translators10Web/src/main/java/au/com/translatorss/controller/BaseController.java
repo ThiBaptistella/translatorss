@@ -6,11 +6,15 @@ import au.com.translatorss.bean.dto.ChatMessageDTO;
 import au.com.translatorss.bean.dto.TranslatorQuotationDTO;
 import au.com.translatorss.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.ModelAndView;
 
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 public class BaseController {
 
@@ -23,13 +27,15 @@ public class BaseController {
     @Autowired
     private TranslatorQuotationService quoteService;
 
+ 
     protected BusinessUserDTO getBusinessUserDTO(BusinessUser businessUserLogger) {
         BusinessUserDTO dto= new BusinessUserDTO();
         dto.setAddress(businessUserLogger.getAddress());
         dto.setEmail(businessUserLogger.getUser().getEmail());
-        dto.setFullname(businessUserLogger.getUser().getName());
+        dto.setFullname(businessUserLogger.getFullname());
         dto.setPhone(businessUserLogger.getPhone());
         dto.setId(businessUserLogger.getUser().getId());
+        dto.setPreferedname(businessUserLogger.getUser().getName());
         return dto;
     }
 
@@ -43,11 +49,8 @@ public class BaseController {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
             String dateInString = simpleDateFormat.format(message.getDate());
 
-            try {
-                dto.setDate(simpleDateFormat.parse(dateInString));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+            dto.setDateFormat(dateInString);
+            dto.setDate(message.getDate());
             dto.setMessage(message.getMessage());
             dto.setSender(message.getSender());
             dto.setRead(message.getRead());
@@ -64,6 +67,18 @@ public class BaseController {
         Collections.sort(messageListDTO);
         return messageListDTO;
     }
+
+
+/*	@ExceptionHandler
+	public ModelAndView errorHandler(HttpServletRequest request, Exception exception) {
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("Exception", exception);
+		mav.addObject("headMessage", "System Unavailable.");
+		mav.addObject("bodyMessage", "There was an unexpected error, Please try login again or contact us!.");
+		mav.addObject("returnButtom", true);
+		mav.setViewName("errorPages/SystemDown");
+		return mav;
+	}*/
 
     protected void populateMediaRating(TranslatorQuotationDTO dto, Translator translator) {
         quoteService.populateMediaRating(dto, translator);

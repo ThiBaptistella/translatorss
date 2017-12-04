@@ -5,6 +5,10 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import au.com.translatorss.bean.ServiceRequest;
+import au.com.translatorss.bean.dto.ServiceRequestDTO;
 
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -36,9 +40,16 @@ public class CustomSimpleUrlAuthenticationFailureHandler extends SimpleUrlAuthen
 			saveException(request, authenticationException);
 		}
 		String username = request.getParameter(fromusernamekey);
-		String redirectUrl = url + "?"+request.getParameter("type")+"=" + username;
-		logger.info("Login Was Not Successful");
-		redirectStrategy.sendRedirect(request, response, redirectUrl);
+		HttpSession session = request.getSession();
+		ServiceRequestDTO  serviceRequest = (ServiceRequestDTO ) session.getAttribute("servcieRequestLead");
+		if(serviceRequest!=null){
+			String redirectURl = url + "businessUserForm";
+			redirectStrategy.sendRedirect(request,response,redirectURl);
+		}else {
+			String redirectUrl = url + "login";
+			logger.info("Login Was Not Successful");
+			redirectStrategy.sendRedirect(request, response, redirectUrl);
+		}
 	}
 
 	public String getUrl() {

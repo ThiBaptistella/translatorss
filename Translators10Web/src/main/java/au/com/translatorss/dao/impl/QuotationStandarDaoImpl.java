@@ -20,12 +20,13 @@ public class QuotationStandarDaoImpl extends GenericDaoImplementation<QuotationS
 		Criteria criteria = this.getSessionFactory().getCurrentSession().createCriteria(QuotationStandar.class);
 		criteria.createAlias("timeFrame", "timeFrame");
 		criteria.createAlias("category", "category");
+		criteria.createAlias("translator", "translator");
 	    criteria.createAlias("translator.languageList", "language");
         criteria.add(Restrictions.eq("language.description", serviceRequest.getLanguagefrom()));    
-	    
 	    criteria.add(Restrictions.eq("timeFrame", serviceRequest.getTimeFrame()));
 	    criteria.add(Restrictions.eq("category", serviceRequest.getServiceRequestCategory()));
 	    criteria.add(Restrictions.eq("valid",false));
+	    criteria.add(Restrictions.eq("translator.status","Active"));
        // criteria.setProjection(Projections.property("translator"));
 
 	    List<Translator> translatorList = new ArrayList<Translator>();
@@ -65,7 +66,9 @@ public class QuotationStandarDaoImpl extends GenericDaoImplementation<QuotationS
 		criteria.createAlias("timeFrame", "timeFrame");
 	    criteria.add(Restrictions.eq("timeFrame.description", timeFrame));
 		criteria.add(Restrictions.eq("translator.id", translatorId));
-		return criteria.list();
+		List<QuotationStandar> quoteationStandarList = criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).list();
+
+		return quoteationStandarList;
 	}
 
 	@Override

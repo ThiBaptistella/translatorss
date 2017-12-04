@@ -33,11 +33,9 @@ public class ServiceRequestApprovedRegisterDaoImpl extends GenericDaoImplementat
 
 	@Override
 	public List<ServiceRequestApprovedRegister> getApprovedSRByTranslator(Translator translator) {
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MONTH, -1);
-		Date date = cal.getTime();
-		
-		return null;
+		Query query = this.getSessionFactory().getCurrentSession().createQuery("from ServiceRequestApprovedRegister serviceRequestAproved where serviceRequest.translator.id="+translator.getId());
+		List<ServiceRequestApprovedRegister> serviceRequestApprovedRegister= query.list();
+		return serviceRequestApprovedRegister;
 	}
 	
 }

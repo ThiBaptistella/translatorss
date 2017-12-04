@@ -26,6 +26,10 @@ public class ServiceRequestPaymentServicieImpl implements ServiceRequestPaymentS
 	public List<ServiceRequestPayment> getServiceRequestPaymentApproved() {
 		return serviceRequestPaymentDao.serviceRequestListByState("Approved");
 	}
-	
-	
+
+	public List<ServiceRequestPayment> getServiceRequestPaymentCancelled(){
+		return serviceRequestPaymentDao.serviceRequestListByState("Cancelled");
+	}
+
+
 }

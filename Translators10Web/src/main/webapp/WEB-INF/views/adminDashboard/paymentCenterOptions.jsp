@@ -159,12 +159,15 @@
 					<div class="col-lg-6">
 					    <spring:url value="/paymentToTranslators" var="paymentToTranslators" />
 						<button class="btn btn-primary" onclick="location.href='${paymentToTranslators}'">Make Payment To Translators</button>
-							
-						<%-- <spring:url value="/refundToCustomers" var="refundToCustomers" />
+
+                         <spring:url value="/refundToCustomers" var="refundToCustomers" />
 						<button class="btn btn-primary" onclick="location.href='${refundToCustomers}'">Make Refund to Customers</button>
-						
-						<spring:url value="/refundToTranslators" var="refundToTranslators" />
-						<button class="btn btn-primary" onclick="location.href='${refundToTranslators}'">Make Refund to Translators</button> --%>
+
+						<!--  
+						<spring:url value="/paymentsHistory" var="refundToCustomers" />
+						<button class="btn btn-primary" onclick="location.href='${refundToCustomers}'">Payment History</button>
+						-->
+
 					</div>
             </div>
         </div>

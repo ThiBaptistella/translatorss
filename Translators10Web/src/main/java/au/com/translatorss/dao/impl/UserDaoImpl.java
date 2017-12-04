@@ -8,6 +8,8 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.StringType;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class UserDaoImpl extends GenericDaoImplementation<User, Long> implements UserDao {
 
@@ -52,6 +54,10 @@ public class UserDaoImpl extends GenericDaoImplementation<User, Long> implements
         criteria.add(Restrictions.not(Restrictions.eq("id", id)));
         User count = (User) criteria.uniqueResult();
         return (count==null);
+    }
+
+    public List<User> findAll(){
+        return getAll();
     }
 
 }

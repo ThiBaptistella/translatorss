@@ -148,21 +148,29 @@
                                 <table class="table table-bordered table-hover table-striped" id="datatables">
                                     <thead>
                                     <tr>
-                                         <th width="40">Name</th>
+                                         <th width="40">Full Name</th>
+										 <th width="40">Prefered Name</th>
                                          <th width="40">Email</th>
-									     <th width="40">Password</th>
-									     <th width="40">Address</th>
-									     <th width="40">Phone</th>
+										 <th width="40">Contact Number</th>
+									     <th width="40">Postal Address</th>
+										 <th width="40">Modify Password</th>
+                                         <th width="40">Observation</th>
                                     </tr>
                                     </thead>
                                     <tbody>
 		                                    <c:forEach items="${listCustomer}" var="customer">
 										        <tr>
-										        	<td>${customer.user.name}</td>
+										        	<td>${customer.fullname}</td>
+													<td>${customer.user.name}</td>
 										        	<td>${customer.user.email}</td>
-										            <td>${customer.user.password}</td>
-										            <td>${customer.address}</td>
-										            <td>${customer.phone}</td>
+													<td>${customer.phone}</td>
+													<td>${customer.address}</td>
+										            <td>
+                                                        <a href="<c:url value='/changeUserPassword/${customer.user.id}' />" >Change Password</a>
+                                                    </td>
+                                                    <td>
+                                                        <a href="<c:url value='/unlockUser/${customer.user.id}' />" >Reactivate Account</a>
+                                                    </td>
 										        </tr>
 										    </c:forEach>
                                     </tbody>

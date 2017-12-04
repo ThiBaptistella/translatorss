@@ -10,7 +10,10 @@ public class ServiceRequestCSDTO extends ServiceRequestDTO{
 	private String translatorStatus;
 	private Date creationDate;
 	private Date finishDate;
+	private Date paidDate;
 	private String description;
+
+
 	
 	public Long getTranslatorId() {
 		return translatorId;
@@ -58,5 +61,11 @@ public class ServiceRequestCSDTO extends ServiceRequestDTO{
 	@Override
 	public void setFinishDate(Date finishDate) {
 		this.finishDate = finishDate;
+	}
+	public Date getPaidDate() {
+		return paidDate;
+	}
+	public void setPaidDate(Date paidDate) {
+		this.paidDate = paidDate;
 	}
 }

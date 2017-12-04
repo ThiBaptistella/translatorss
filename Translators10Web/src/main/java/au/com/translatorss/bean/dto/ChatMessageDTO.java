@@ -9,7 +9,8 @@ public class ChatMessageDTO implements Comparable<ChatMessageDTO>{
     private String sender;
     private String message;
     private Date date;
-    private Long conversationid;
+    private String DateFormat;
+	private Long conversationid;
     private String photoUrl;
     private boolean isRead;
     
@@ -83,4 +84,13 @@ public class ChatMessageDTO implements Comparable<ChatMessageDTO>{
 	public void setPhotoUrl(String photoUrl) {
 		this.photoUrl = photoUrl;
 	}
+	
+	public String getDateFormat() {
+		return DateFormat;
+	}
+
+	public void setDateFormat(String dateFormat) {
+		DateFormat = dateFormat;
+	}
+
 }

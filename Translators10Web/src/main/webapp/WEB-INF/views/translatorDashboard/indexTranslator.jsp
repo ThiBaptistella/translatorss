@@ -259,9 +259,10 @@ License: You must have a valid license purchased only from themeforest(the above
                     </div>
                     <!-- END PAGE HEADER-->
                     <div class="row">
+                   
                         <div class="col-md-12">
 							<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                            <a class="dashboard-stat dashboard-stat-v2 blue" href="#">
+                            <a class="dashboard-stat dashboard-stat-v2 blue" href="<c:url value='/myJobInProgress'/>">
                                 <div class="visual">
                                     <i class="fa fa-comments"></i>
                                 </div>
@@ -272,10 +273,23 @@ License: You must have a valid license purchased only from themeforest(the above
                                     <div class="desc">My Assignments in progress</div>
                                 </div>
                             </a>
-                           
                         </div>
-                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                            <a class="dashboard-stat dashboard-stat-v2 red">
+
+                         <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" >
+                            <a class="dashboard-stat dashboard-stat-v2 green"">
+                                <div class="visual">
+                                    <i class="fa fa-bar-chart-o"></i>
+                                </div>
+                                <div class="details">
+                                    <div class="number">
+                                        <span data-counter="counterup" data-value="12,5">${totalRevenue}</span> </div>
+                                    <div class="desc">Total Earned</div>
+                                </div>
+                            </a>
+                        </div>
+                        
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" >
+                            <a class="dashboard-stat dashboard-stat-v2 red" href="<c:url value='/myPendingActions'/>">
                                 <div class="visual">
                                     <i class="fa fa-bar-chart-o"></i>
                                 </div>
@@ -287,14 +301,15 @@ License: You must have a valid license purchased only from themeforest(the above
                             </a>
                         </div>
                    
+                   		
                     </div>
                   </div>
                   <div class="row">
                          <%-- <div class="col-lg-6 col-xs-12 col-sm-12">
 							<img alt="Google Bar Chart" src="${barURL}">
                          </div> --%>
-                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                            <a class="dashboard-stat dashboard-stat-v2 green">
+                         <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" >
+                            <a class="dashboard-stat dashboard-stat-v2 green" href="<c:url value='/myPendingActions'/>">
                                 <div class="visual">
                                     <i class="fa fa-bar-chart-o"></i>
                                 </div>
@@ -306,7 +321,7 @@ License: You must have a valid license purchased only from themeforest(the above
                             </a>
                         </div>
                         <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                            <a class="dashboard-stat dashboard-stat-v2 blue">
+                            <a class="dashboard-stat dashboard-stat-v2 blue" href="<c:url value='/myHistory'/>">
                                 <div class="visual">
                                     <i class="fa fa-bar-chart-o"></i>
                                 </div>
@@ -324,53 +339,7 @@ License: You must have a valid license purchased only from themeforest(the above
                         My Ratings:
 	                        <p>
 	                        	<div class="stars"> 
-	                        		<!-- <span class="star on"></span>
-	                        		<span class="star on"></span>
-	                        		<span class="star on"></span>
-									<span class="star half"></span>
-									<span class="star"></span>
-									<span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span class="star on"></span>
-	                        		<span class="star on"></span>
-	                        		<span class="star on"></span>
-									<span class="star half"></span>
-									<span class="star"></span>
-									<span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span>&nbsp;</span>
-		                            <span class="star on"></span>
-	                        		<span class="star on"></span>
-	                        		<span class="star on"></span>
-									<span class="star half"></span>
-									<span class="star"></span> -->
+
 									<c:if test="${OnTimeDelivery =='5'}">
 		                                                    <i class="star on"></i>
 		                                                    <i class="star on"></i>

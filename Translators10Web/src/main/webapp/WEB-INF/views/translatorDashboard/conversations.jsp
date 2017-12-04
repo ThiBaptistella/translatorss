@@ -240,11 +240,6 @@ License: You must have a valid license purchased only from themeforest(the above
                 <div class="page-content">
                     <!-- BEGIN PAGE HEADER-->
                     <!-- BEGIN THEME PANEL -->
-                   
-                    <!-- END THEME PANEL -->
-                    <h1 class="page-title"> Inbox
-                        <small>user inbox</small>
-                    </h1>
                     <div class="page-bar">
                         <ul class="page-breadcrumb">
                             <li>
@@ -260,13 +255,8 @@ License: You must have a valid license purchased only from themeforest(the above
                     <!-- END PAGE HEADER-->
                     <div class="inbox">
                         <div class="row">
-                   
                             <div class="col-md-10">
                                 <div class="inbox-body">
-                                    <div class="inbox-header">
-                                        <h1 class="pull-left">Inbox</h1>
-                                       
-                                    </div>
                                     <div class="inbox-content">
                                     	<table class="table table-striped table-advance table-hover">
                                     			<thead>

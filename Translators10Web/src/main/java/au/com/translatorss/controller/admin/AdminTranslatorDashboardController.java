@@ -14,9 +14,11 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.ResourceUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
@@ -25,6 +27,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.supercsv.io.CsvBeanWriter;
 import org.supercsv.io.ICsvBeanWriter;
 import org.supercsv.prefs.CsvPreference;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -32,10 +35,19 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Controller
@@ -92,17 +104,23 @@ public class AdminTranslatorDashboardController extends BaseController{
     private AmazonService amazonService;
 
     @Autowired
+    private AmazonCSVFileService amazonCSVFileService;
+    
+    @Autowired
 	private BusinessUserService businessUserService;
     
     @Autowired
     private UserService userService;
     
     @Autowired
-	private AmazonFilePhotoService amazonFilePhotoService;
+	private AmazonFilePhotoService amazonFiePhotoService;
     
     @Autowired
     private TranslatorQuotationService quoteService;
-     
+
+    @Value("${payment.directory}")
+	private String directory;
+
     @InitBinder("translatorFormAdmin")
     public void initBinder2(WebDataBinder binder) {
 		binder.addValidators(translatorDTOValidator);
@@ -144,12 +162,16 @@ public class AdminTranslatorDashboardController extends BaseController{
 	@RequestMapping("/activateTranslator/{id}")
 	public String verifyTranslator(@PathVariable("id") long id){
 		this.translatorService.verifyTranslator(id);
+		Translator translator = this.translatorService.getTranslatorById(id);
+		this.emailService2.sendEmailToTranslatorStatusChange(translator.getUser().getEmail(), translator.getFullname(), "Active");
 		return "redirect:/translators";
 	}
 	
 	@RequestMapping("/pauseTranslator/{id}")
 	public String pauseTranslator(@PathVariable("id") long id){
 		this.translatorService.pauseTranslator(id);
+		Translator translator = this.translatorService.getTranslatorById(id);
+		this.emailService2.sendEmailToTranslatorStatusChange(translator.getUser().getEmail(), translator.getFullname(), "Paused");
 		return "redirect:/translators";
 	}
 	
@@ -222,15 +244,13 @@ public class AdminTranslatorDashboardController extends BaseController{
         session.setAttribute("translatorFormMessage", "Translator "+translatordto.getName()+" was manually paused");
         return "redirect:/translatorForm";
     }
-    
+
     @RequestMapping(value = "/manuallyUnpause", method = RequestMethod.GET)
     public String manuallyUnpause(HttpSession session) {
         logger.info("Welcome AdminTranslatorDashboardCntroller: manuallyUnPause");
         TranslatorDTO translatordto = (TranslatorDTO) session.getAttribute("translatorFormAdmin");
         Translator translator = translatorService.getTranslatorById(translatordto.getId());
         translatorService.manuallyUnPauseTranslator(translator);
-//        translatordto.setStatus("Active")
-//        translatordto.setManualyPaused(false);
         if(translatordto.getNatyExpiration().before(new Date())){
             translatordto.setNatyExtiryDate(true);
             translatordto.setStatus("Paused");
@@ -277,18 +297,19 @@ public class AdminTranslatorDashboardController extends BaseController{
     	ServiceReqConfigDTO conf=new ServiceReqConfigDTO();
     	conf.setMinquote(serviceReqConf.getMinimumMarket());
     	conf.setTimeper(serviceReqConf.getHoursLeft());
+    	conf.setQuoteValue(serviceReqConf.getStandarQuoteVealue());
     	model.addAttribute("serviceRequestConfDTO", conf);
 		model.addAttribute("loggedInAdmin",session.getAttribute("loggedInAdmin"));
     	session.setAttribute("serviceReqConf", serviceReqConf);
         return "adminDashboard/serviceRequestConfiguration";
     }
-
     
     @RequestMapping(value="/updateServiceRequestConfig", method = RequestMethod.POST)
     public String updateServiceRequestConfig(HttpSession session,@ModelAttribute("serviceRequestConfDTO") ServiceReqConfigDTO serviceReqConfigDTO){
     	ServiceRequestConfiguration serviceReqConf=(ServiceRequestConfiguration) session.getAttribute("serviceReqConf");
     	serviceReqConf.setHoursLeft(serviceReqConfigDTO.getTimeper());
     	serviceReqConf.setMinimumMarket(serviceReqConfigDTO.getMinquote());
+    	serviceReqConf.setStandarQuoteVealue(serviceReqConfigDTO.getQuoteValue());
     	serviceRequestConfigurationService.saveOrUpdate(serviceReqConf);
     	return "redirect:/serviceRequestConfiguration";
     }
@@ -302,7 +323,7 @@ public class AdminTranslatorDashboardController extends BaseController{
     }
     
     @RequestMapping(value="/customerList", method = RequestMethod.GET)
-    public String customerList(Model model,HttpSession session,@ModelAttribute("serviceRequestConfDTO") ServiceReqConfigDTO serviceReqConfigDTO){
+    public String customerList(Model model,HttpSession session){
         model.addAttribute("listCustomer",businessUserService.getAll());
         model.addAttribute("loggedInAdmin",session.getAttribute("loggedInAdmin"));
     	model.addAttribute("translatorListMessage", "All Customer Registered");
@@ -313,13 +334,15 @@ public class AdminTranslatorDashboardController extends BaseController{
     	
     	List<ServiceRequest> openServiceList=serviceRequestService.getServiceRequestByState("OpenService");
     	List<ServiceRequest> approvedList=serviceRequestService.getServiceRequestByState("Approved");
-    	List<ServiceRequest> paiedList=serviceRequestService.getServiceRequestByState("Paied");
-        List<ServiceRequest> cancelList=serviceRequestService.getServiceRequestByState("Canceled");
+    	List<ServiceRequest> paiedList=serviceRequestService.getServiceRequestByState("Paid");
+        List<ServiceRequest> cancelList=serviceRequestService.getServiceRequestByState("Cancelled");
+        List<ServiceRequest> refundedList=serviceRequestService.getServiceRequestByState("Refunded");
 
-    	
+
     	openServiceList.addAll(approvedList);
     	openServiceList.addAll(paiedList);
     	openServiceList.addAll(cancelList);
+    	openServiceList.addAll(refundedList);
 
     	List<ServiceRequestCSDTO> dtoList= serviceRequestToServiceRequestCSDTOMap(openServiceList);
     	model.addAttribute("dtoList", dtoList);
@@ -327,39 +350,6 @@ public class AdminTranslatorDashboardController extends BaseController{
     	model.addAttribute("message", "");
     	return "adminDashboard/caseResolution";
     }
-
-    private List<ServiceRequestCSDTO> serviceRequestToServiceRequestCSDTOMap(List<ServiceRequest> serviceRequestList) {
-    	List<ServiceRequestCSDTO> list = new ArrayList<>();
-    	for( ServiceRequest sr: serviceRequestList){
-    		ServiceRequestCSDTO dto = getServiceRequestCSDTO(sr);
-    		list.add(dto);
-    	}
-		return list;
-	}
-
-	private ServiceRequestCSDTO getServiceRequestCSDTO(ServiceRequest sr) {
-		ServiceRequestCSDTO dto = new ServiceRequestCSDTO();
-		dto.setCustomerId(sr.getCustomer().getId());
-		dto.setClientName(sr.getCustomer().getUser().getName());
-		if(sr.getTranslator()!=null){
-			dto.setTranslatorId(sr.getTranslator().getId());
-			dto.setTranslatorName(sr.getTranslator().getUser().getName());
-			dto.setTranslatorStatus(sr.getTranslator().getStatus());
-			dto.setQuote(BigDecimal.TEN);
-		}
-		
-		dto.setStatus(sr.getServiceRequestStatus().getDescription());
-		dto.setCreationDate(sr.getCreationDate());
-		dto.setId(sr.getId());
-		dto.setServiceRequestCategory(sr.getServiceRequestCategory().getDescription());
-		dto.setDescription(sr.getDescription());
-		dto.setHardcopy(sr.getHardcopy());
-		dto.setTimeFrame(sr.getTimeFrame().getDescription());
-		dto.setLanguagefrom(sr.getLanguagefrom());
-		dto.setLanguageTo("English");
-		dto.setFinishDate(sr.getFinishDate());
-		return dto;
-	}
 
 	@RequestMapping(value="/paymentCenter")
     public String paymentCenter(){
@@ -369,16 +359,39 @@ public class AdminTranslatorDashboardController extends BaseController{
     
     @RequestMapping(value="/paymentToTranslators", method = RequestMethod.GET)
     public String paymentToTranslators(Model model,HttpSession session){
-    	model.addAttribute("paymentList", getServiceRequestPaymentDTOList(serviceRequestPaymentService.getServiceRequestPaymentApproved()));
+    	model.addAttribute("paymentList", getServiceRequestPaymentDTOList(serviceRequestPaymentService.getServiceRequestPaymentApproved(),"Paid"));
     	model.addAttribute("loggedInAdmin",session.getAttribute("loggedInAdmin"));
     	return "adminDashboard/paymentCenter";
     }
-    
-    @RequestMapping(value = "/downloadCSV", method = RequestMethod.GET)
-    public String downloadCSV(HttpServletResponse response) throws IOException {
 
-        String csvFileName = "PaymentsToTranslators.csv";
- 
+    @RequestMapping(value="/refundToCustomers", method = RequestMethod.GET)
+    public String refundToCustomers(Model model,HttpSession session){
+        model.addAttribute("paymentList", getServiceRequestPaymentDTOList(serviceRequestPaymentService.getServiceRequestPaymentCancelled(),"Refunded"));
+        model.addAttribute("loggedInAdmin",session.getAttribute("loggedInAdmin"));
+        return "adminDashboard/refundPaymentCenter";
+    }
+
+    @RequestMapping(value = "/downloadPaymentTranslatorsCSV/{type}", method = RequestMethod.GET)
+    public void downloadCSV(@PathVariable("type") String type, HttpServletResponse response) throws IOException {
+    
+    	List<ServiceRequestPayment> paymentList ;
+    	String csvFileName;
+        String state;
+        BigInteger nextValue;
+        
+        if(type.equals("payment")){
+            paymentList = serviceRequestPaymentService.getServiceRequestPaymentApproved();
+            state="Paid";
+            csvFileName = "Payment";
+            nextValue = amazonCSVFileService.getPaymentNextSecuence();
+        }else{
+            paymentList = serviceRequestPaymentService.getServiceRequestPaymentCancelled();
+            state="Refunded";
+            csvFileName = "Refund";
+            nextValue = amazonCSVFileService.getRefundNextSecuence();
+        }
+
+   	    csvFileName = csvFileName.concat("-"+nextValue.toString()+".csv");
         response.setContentType("text/csv");
  
         // creates mock data
@@ -386,34 +399,83 @@ public class AdminTranslatorDashboardController extends BaseController{
         String headerValue = String.format("attachment; filename=\"%s\"",csvFileName);
         response.setHeader(headerKey, headerValue);
 
-        List<ServiceRequestPayment> approvedPaymentList = serviceRequestPaymentService.getServiceRequestPaymentApproved();
-        List<ServiceRequestPaymentDTO> paymentDTOList = getServiceRequestPaymentDTOList(approvedPaymentList);
+        
+
+        List<ServiceRequestPaymentDTO> paymentDTOList = getServiceRequestPaymentDTOList(paymentList, state);
  
         // uses the Super CSV API to generate CSV data from the model data
         ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(),CsvPreference.STANDARD_PREFERENCE);
  
-        String[] header = { "paypalTransaction", "serviceRequestId", "amount","customer","translator"};
+        String[] header = { "paypalId", "amount", "currency","user","serviceRequestId"};
         csvWriter.writeHeader(header);
         for (ServiceRequestPaymentDTO payment : paymentDTOList) {
             csvWriter.write(payment,header);
         }
         
-        for(ServiceRequestPayment serviceRequestPayment :approvedPaymentList ){
+        for(ServiceRequestPayment serviceRequestPayment :paymentList ){
         	ServiceRequest serviceRequest = serviceRequestPayment.getServiceRequest();
-            serviceRequest.setServiceRequestStatus(serviceRequestStatusDao.findByDescription("Paied"));
+            serviceRequest.setServiceRequestStatus(serviceRequestStatusDao.findByDescription(state));
+            serviceRequest.setPaidDate(new Date());
             serviceRequestService.saveOrUpdate(serviceRequest);
         }
+        
+      //  persisteCSV(paymentDTOList,csvFileName,state);
         csvWriter.close();
         
-        return "redirect:paymentCenter";
     }
     
-    @RequestMapping(value="/paymentsHistory", method = RequestMethod.GET)
-    public String paymentsHistory(){
+    private void persisteCSV(List<ServiceRequestPaymentDTO> paymentDTOList, String csvFile, String type) throws IOException {
+    	
+    	 File file=null;
+	
+    	 Path newFilePath = Paths.get("/var/log/tomcat8/"+csvFile);
+		 Files.createDirectories(newFilePath.getParent());
+	     Files.createFile(newFilePath);
+		 file = new File(newFilePath.getFileName().toString());
+
+    	 FileWriter writer = new FileWriter(file);
+         CSVUtils.writeLine(writer, Arrays.asList("paypalId", "amount", "currency","user","serviceRequestId"));
+         for (ServiceRequestPaymentDTO payment : paymentDTOList) {
+             List<String> list = new ArrayList<>();
+             list.add(payment.getPaypalId());
+             list.add(payment.getAmount().toString());
+             list.add(payment.getCurrency());
+             list.add(payment.getUser());
+             list.add(payment.getServiceRequestId().toString());
+             CSVUtils.writeLine(writer, list);
+         }
+         writer.flush();
+         writer.close();
+         
+         InputStream targetStream = FileUtils.openInputStream(file);
+         amazonCSVFileService.saveCSV(this.userService.getCurrentUser(), csvFile, targetStream, type);
+         file.delete();
+	}
+
+	@RequestMapping(value="/paymentsHistory", method = RequestMethod.GET)
+    public String paymentsHistory(Model model){
+		List<AmazonFileCSV> fileList = amazonCSVFileService.getAll();
+		List<AmazonFileCSV> paymentFileList = getFilesByType("PAYMENT_TRANSLATOR_FILE",fileList);
+		List<AmazonFileCSV> refundFileList = getFilesByType("REFUND_CUSTOMER_FILE",fileList);
+
+		model.addAttribute("paymentFilelist", paymentFileList);
+		model.addAttribute("refundFilelist", refundFileList);
+
     	return "adminDashboard/paymentsHistory";
     }
 
-    @RequestMapping(value = "/downloadFile2/{id}/{option}", method = RequestMethod.GET)
+    private List<AmazonFileCSV> getFilesByType(String string, List<AmazonFileCSV> fileList) {
+		// TODO Auto-generated method stub
+    	List<AmazonFileCSV> fileList2 = new ArrayList<AmazonFileCSV>();
+    	for(AmazonFileCSV file : fileList) {
+    		if(file.getFileType().name().equals(string)) {
+    			fileList2.add(file);
+    		}
+    	}
+		return fileList2;
+	}
+
+	@RequestMapping(value = "/downloadFile2/{id}/{option}", method = RequestMethod.GET)
     public void downloadFile(HttpServletResponse response, @PathVariable("id") long id,@PathVariable("option") String option, HttpServletRequest request) throws IOException {
         logger.info("Welcome BusinessUserDashboardController: downloadFiles2");
 
@@ -427,67 +489,64 @@ public class AdminTranslatorDashboardController extends BaseController{
         
     }
     
-	@RequestMapping(value = "/submitMessageAdmin", method = RequestMethod.POST)
-    public String submitMessage(@ModelAttribute("message") ChatMessageDTO message, HttpSession session, Model model) throws Exception {
-        logger.info("Welcome BusinessUserDashboardController: submitMessage");
-        ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setSender(message.getSender());
-        Date date = new Date();
-        chatMessage.setDate(new Timestamp(date.getTime()));
-        chatMessage.setMessage(message.getMessage());
-        Conversation conversation = conversationService.get(message.getConversationid());
-        chatMessage.setConversation(conversation);
-        chatMessageService.saveOrUpdate(chatMessage);
-        conversation.getMessageList().add(chatMessage);
-        session.setAttribute("conversation", conversation);
-
-        Set<AmazonFile> amazonFiles = new HashSet<>();
-        amazonFiles.addAll(amazonService.findByServiceRequestIdAndType(conversation.getServiceRequest().getId(), FileType.SERVICE_REQUEST));
-        amazonFiles.addAll(amazonService.findByServiceResponseIdAndType(conversation.getServiceResponse().getId(), FileType.SERVICE_RESPONSE));
-        ChatMessageDTO message2 = new ChatMessageDTO();
-        message2.setConversationid(conversation.getId());
-        message2.setSender("Admin");
-        model.addAttribute("message", message2);
-    	model.addAttribute("messageList", getMessagesDTO(conversation.getMessageList()));
-    	List<ServiceRequest> list= new ArrayList<>();
-    	list.add(conversation.getServiceRequest());
-    	model.addAttribute("serviceRequestList", list);
-        model.addAttribute("fileList", convertToDto(amazonFiles));
-    	session.setAttribute("serviceRequest", conversation.getServiceRequest());
-    	return "adminDashboard/serviceRequestInformation"; 
-    }
-
     @RequestMapping(value = "/adminApproveSR", method = RequestMethod.GET)
-    public String adminApproveSR(HttpSession session){
+    public String adminApproveSR(HttpSession session) throws IOException {
     	ServiceRequest serviceRequest = (ServiceRequest) session.getAttribute("serviceRequest");
     	serviceRequest.setServiceRequestStatus(this.serviceRequestStatusDao.findByDescription("Approved"));
+		serviceRequest.setPaidDate(new Date());
+
     	serviceRequestService.saveOrUpdate(serviceRequest);
+        Quotation quotation = quoteService.getQuoteFromServiceRequestAndTranslator(serviceRequest.getId(),serviceRequest.getTranslator().getId());
+        emailService2.sendEmailToCustomerServiceRequestAppoved(serviceRequest, 
+				serviceRequest.getCustomer().getFullname(),
+				serviceRequest.getTranslator().getFullname(),
+				serviceRequest.getCustomer().getUser().getEmail(),
+				serviceRequest.getTranslator().getUser().getEmail(),
+				serviceRequest.getTranslator().getAbn_name(),
+				serviceRequest.getTranslator().getAbn_number(),
+				quotation);
+
 		return "adminDashboard/indexAdmin";
     }
 
-    @RequestMapping(value = "/adminCancelSR/{id}", method = RequestMethod.GET)
-    public String adminCancelSR(@PathVariable("id") long id){
-        ServiceRequest serviceRequest = serviceRequestService.find(id);
-    	serviceRequest.setServiceRequestStatus(this.serviceRequestStatusDao.findByDescription("Canceled"));
+    @RequestMapping(value = "/adminCancelSR", method = RequestMethod.GET)
+    public String adminCancelSR(HttpSession session){
+        ServiceRequest serviceRequest = (ServiceRequest) session.getAttribute("serviceRequest");
+        serviceRequest.setServiceRequestStatus(this.serviceRequestStatusDao.findByDescription("Cancelled"));
+		serviceRequest.setPaidDate(new Date());
     	serviceRequestService.saveOrUpdate(serviceRequest);
-        return "redirect:/caseResolution";
+    	
+    	this.emailService2.sendEmailtoCustomerServiceRequestCancel(
+    			serviceRequest.getCustomer().getUser().getEmail(),
+    			serviceRequest.getCustomer().getFullname(),
+    			serviceRequest.getId().toString());
+    	
+    	
+    	
+    	this.emailService2.sendEmailtoTranslatorServiceRequestCancel(
+    			serviceRequest.getTranslator().getUser().getEmail(),
+    			serviceRequest.getTranslator().getFullname(),
+    			serviceRequest.getId().toString());
+    	
+        return "adminDashboard/indexAdmin";
     }
+
 
     @RequestMapping(value = "/translatorSuscription", method = RequestMethod.GET)
     public String translatorSuscription(HttpSession session, Model model){
-    	Translator translator = new Translator();
-		model.addAttribute("translatorForm", translator);	
-		model.addAttribute("languageList", initializeProfiles());
+        Translator translator = new Translator();
+        model.addAttribute("translatorForm", translator);
+        model.addAttribute("languageList", initializeProfiles());
 
         String newmessage= (String)session.getAttribute("translatorRegistrationMessage2");
-		if(newmessage != null){
-			session.setAttribute("translatorRegistrationMessage", newmessage);
-		}else{
-			session.setAttribute("translatorRegistrationMessage", "Register a new Translator");
-		}
+        if(newmessage != null){
+            session.setAttribute("translatorRegistrationMessage", newmessage);
+        }else{
+            session.setAttribute("translatorRegistrationMessage", "Register a new Translator");
+        }
         return "adminDashboard/translatorSuscription";
     }
-    
+
     @RequestMapping("/translatorAdminEdit")
     public String updateTranslator(@ModelAttribute("translatorFormAdmin")@Validated TranslatorDTO translatordto,BindingResult result,Model model,HttpSession session)throws Exception {
         logger.info("Welcome BusinessUserDashboardController: translatorAdminEdit");
@@ -549,7 +608,7 @@ public class AdminTranslatorDashboardController extends BaseController{
 	public String registerTranslator(HttpSession session, @ModelAttribute("translatorForm") @Validated Translator translator,BindingResult result, Model model) {
 		logger.info("Welcome RegisterController: processTranslator");
 		if (result.hasErrors()) {
-			model.addAttribute("translatorForm", translator);	
+			model.addAttribute("translatorForm", translator);
 			model.addAttribute("languageList", initializeProfiles());
 			return"adminDashboard/translatorSuscription";
 		}
@@ -594,70 +653,11 @@ public class AdminTranslatorDashboardController extends BaseController{
 
         session.setAttribute("translatorRegistrationMessage2", "Translator "+translator.getUser().getName()+" Subscribed successfully");
 		translator.setTranslatorStatusFlags(flags);
-		
-		
+
 		translatorService.saveTranslator(translator);
         purchaseService.savePurchase(purchase);
         emailService2.sendEmailWelcomeTranslator(translator.getUser().getEmail(), translator.getUser().getName(), translator.getUser().getPassword());
 		return "redirect:translatorSuscription";
-	}
-    
-	
-	@RequestMapping(value = "/serviceRequestExpiration", method = RequestMethod.GET)
-	public String serviceRequestExpiration(Model model) {
-		List<Quotation> list = quoteService.getQuotesFromServiceRequestQuotedAndUnquoted();
-		List<ServiceRequest> list2= serviceRequestService.getServiceRequestByState("Unquoted");
-		
-		
-		List<ServiceRequestQuoteDTO> dtolist1= mapServiceRequestQuoteDTO(list);
-		List<ServiceRequestQuoteDTO> dtolist2= mapServiceRequestQuoteFromSR(list2);
-		dtolist1.addAll(dtolist2);
-		model.addAttribute("dtoList",dtolist1);
-		return "adminDashboard/serviceRequestExpiration";
-	}
-
-	private List<ServiceRequestQuoteDTO> mapServiceRequestQuoteFromSR(List<ServiceRequest> list2) {
-		List<ServiceRequestQuoteDTO> dtolist= new ArrayList<>();
-		for(ServiceRequest sr: list2){
-			ServiceRequestQuoteDTO dto= new ServiceRequestQuoteDTO();
-			dto.setCategory(sr.getServiceRequestCategory().getDescription());
-			dto.setCustomerID(sr.getCustomer().getId());
-			dto.setCustomerName(sr.getCustomer().getUser().getName());
-			dto.setDate(sr.getCreationDate());
-			dto.setHardcopy(sr.getHardcopy());
-			dto.setOrigenLanguage(sr.getLanguagefrom());
-			dto.setServiceRequestID(sr.getId());
-			dto.setServiceRequestStatus(sr.getServiceRequestStatus().getDescription());
-			dto.setTimeFrame(sr.getTimeFrame().getDescription());
-			dto.setTimeLeftCloseQuote(sr.getFinishQuoteSelection());
-			
-			dtolist.add(dto);
-		}
-		return dtolist;
-	}
-
-	private List<ServiceRequestQuoteDTO> mapServiceRequestQuoteDTO(List<Quotation> list) {
-		List<ServiceRequestQuoteDTO> dtolist= new ArrayList<>();
-		for(Quotation quote: list){
-			ServiceRequestQuoteDTO dto= new ServiceRequestQuoteDTO();
-			dto.setCategory(quote.getServiceRequest().getServiceRequestCategory().getDescription());
-			dto.setCustomerID(quote.getServiceRequest().getCustomer().getId());
-			dto.setCustomerName(quote.getServiceRequest().getCustomer().getUser().getName());
-			dto.setDate(quote.getServiceRequest().getCreationDate());
-			dto.setHardcopy(quote.getServiceRequest().getHardcopy());
-			dto.setOrigenLanguage(quote.getServiceRequest().getLanguagefrom());
-			dto.setQuote(quote.getValue());
-			dto.setServiceRequestID(quote.getServiceRequest().getId());
-			dto.setServiceRequestStatus(quote.getServiceRequest().getServiceRequestStatus().getDescription());
-			dto.setTimeFrame(quote.getServiceRequest().getTimeFrame().getDescription());
-			dto.setTimeLeftCloseQuote(quote.getServiceRequest().getFinishQuoteSelection());
-			dto.setTimeLefToFinishAssignment(quote.getServiceRequest().getFinishDate());
-			dto.setTranslatorid(quote.getTranslator().getId());
-			dto.setTranslatorName(quote.getTranslator().getUser().getName());
-			dto.setTranslatorStatus(quote.getTranslator().getStatus());
-			dtolist.add(dto);
-		}
-		return dtolist;
 	}
 
 	@RequestMapping(value = "/expireServiceRequest2/{id}", method = RequestMethod.GET)
@@ -670,8 +670,50 @@ public class AdminTranslatorDashboardController extends BaseController{
 		model.addAttribute("listServiceRequest", quotedServiceRequestList);
 		return "redirect:/serviceRequestExpiration";
 	}
-	
-	
+
+    @RequestMapping(value = "/serviceRequestExpiration", method = RequestMethod.GET)
+    public String serviceRequestExpiration(Model model) {
+        List<Quotation> list = quoteService.getQuotesFromServiceRequestQuotedAndUnquoted();
+        List<ServiceRequest> list2= serviceRequestService.getServiceRequestByState("Unquoted");
+        List<ServiceRequestQuoteDTO> dtolist1= mapServiceRequestQuoteDTO(list);
+        List<ServiceRequestQuoteDTO> dtolist2= mapServiceRequestQuoteFromSR(list2);
+        dtolist1.addAll(dtolist2);
+        model.addAttribute("dtoList",dtolist1);
+        return "adminDashboard/serviceRequestExpiration";
+    }
+
+    @RequestMapping(value = "/changeUserPassword/{userid}", method = RequestMethod.GET)
+    public String changeUserPassword(@PathVariable("userid") long userid, Model model,HttpSession session ) {
+        PasswordDTO password = new PasswordDTO();
+        User user = userService.getById(userid);
+        password.setEmail(user.getEmail());
+        session.setAttribute("password",password);
+        session.setAttribute("user",user);
+        session.setAttribute("userPasswordChangeMessage","Password Change for Client: "+user.getName());
+        return "redirect:/changeUserPassword";
+    }
+
+    @RequestMapping(value = "/updateBusinessUserPasswordAdmin", method = RequestMethod.POST)
+    public String updateBusinessUserPasswordAdmin(@ModelAttribute("passwordDTOForm") @Validated PasswordDTO password, HttpSession session) {
+        User user = userService.getByEmail(password.getEmail());
+        user.setPassword(password.getNewPassword());
+        userService.saveOrUpdate(user);
+        session.setAttribute("userPasswordChangeMessage","Password Changed Correctly for Client: "+user.getName());
+
+        return "redirect:/changeUserPassword";
+    }
+
+    @RequestMapping(value = "/changeUserPassword", method = RequestMethod.GET)
+    public String changeUserPassword2(Model model, HttpSession session) {
+        PasswordDTO password = (PasswordDTO)session.getAttribute("password");
+        User user = (User) session.getAttribute("user");
+        String message = (String)session.getAttribute("userPasswordChangeMessage");
+        password.setEmail(user.getEmail());
+        model.addAttribute("passwordDTOForm", password);
+        model.addAttribute("userPasswordChangeMessage",message);
+        return "adminDashboard/userPasswordChange";
+    }
+
 	@RequestMapping("/seeServiceRequestDetials/{serviceRequestid}")
 	public String seeServiceRequestDetials(@PathVariable("serviceRequestid") long serviceRequestid,HttpSession session){
 		logger.info("Welcome TranslatorDashboardController: seeServiceRequestDetials");
@@ -682,15 +724,50 @@ public class AdminTranslatorDashboardController extends BaseController{
 		return "redirect:/srDetails";
 	}
 
-	@RequestMapping("/seeServiceRequestDetials2/{serviceRequestid}/{translatorid}")
-	public String seeServiceRequestDetials2(@PathVariable("serviceRequestid") long serviceRequestid,@PathVariable("translatorid") long translatorid, Model model, HttpSession session){
+	@RequestMapping("/seeServiceRequestDetials2/{serviceRequestid}/{conversationid}")
+	public String seeServiceRequestDetials2(@PathVariable("serviceRequestid") long serviceRequestid,@PathVariable("conversationid") long conversationid, Model model, HttpSession session){
 		logger.info("Welcome TranslatorDashboardController: seeServiceRequestDetials");
 		ServiceRequest sr=(ServiceRequest)serviceRequestService.find(serviceRequestid);
-		Conversation conversation = conversationService.getConversationFromServiceRequestIdAndTranslatorId(serviceRequestid, translatorid);
+		//Conversation conversation = conversationService.getConversationFromServiceRequestIdAndTranslatorId(serviceRequestid, translatorid);
+        Conversation conversation = conversationService.get(conversationid);
 		session.setAttribute("conversation", conversation);
 		session.setAttribute("sr", sr);
 		return "redirect:/srDetails";
 	}
+	
+	@RequestMapping(value = "/submitMessageAdmin", method = RequestMethod.POST)
+    public String submitMessage(@ModelAttribute("message") ChatMessageDTO message, HttpSession session, Model model) throws Exception {
+        logger.info("Welcome BusinessUserDashboardController: submitMessage");
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.setSender(message.getSender());
+        Date date = new Date();
+        chatMessage.setDate(new Timestamp(date.getTime()));
+        chatMessage.setMessage(message.getMessage());
+        Conversation conversation = conversationService.get(message.getConversationid());
+        chatMessage.setConversation(conversation);
+        chatMessageService.saveOrUpdate(chatMessage);
+        conversation.getMessageList().add(chatMessage);
+        session.setAttribute("conversation", conversation);
+
+        Set<AmazonFile> amazonFiles = new HashSet<>();
+        amazonFiles.addAll(amazonService.findByServiceRequestIdAndType(conversation.getServiceRequest().getId(), FileType.SERVICE_REQUEST));
+        amazonFiles.addAll(amazonService.findByServiceResponseIdAndType(conversation.getServiceResponse().getId(), FileType.SERVICE_RESPONSE));
+        ChatMessageDTO message2 = new ChatMessageDTO();
+        message2.setConversationid(conversation.getId());
+        message2.setSender("Admin");
+        model.addAttribute("message", message2);
+    	model.addAttribute("messageList", getMessagesDTO(conversation.getMessageList()));
+    	List<ServiceRequest> list= new ArrayList<>();
+    	list.add(conversation.getServiceRequest());
+    	model.addAttribute("serviceRequestList", list);
+    	model.addAttribute("serviceRequestStatus",conversation.getServiceRequest().getServiceRequestStatus().getDescription());
+
+        model.addAttribute("fileList", convertToDto(amazonFiles));
+    	session.setAttribute("sr", conversation.getServiceRequest());
+    	//return "adminDashboard/serviceRequestInformation2"; 
+    	return "redirect:/srDetails";
+    }
+	
 	
 	 @RequestMapping("/srDetails")
 	 public String srDetails(HttpSession session, Model model) throws Exception {
@@ -711,11 +788,15 @@ public class AdminTranslatorDashboardController extends BaseController{
 	        ServiceResponse serviceResponse = conversation.getServiceResponse();
 	    	Set<AmazonFile> amazonFiles = new HashSet<AmazonFile>();
 	        amazonFiles.addAll(amazonService.findByServiceRequestIdAndType(serviceRequest.getId(), FileType.SERVICE_REQUEST));
-	        amazonFiles.addAll(amazonService.findByServiceResponseIdAndType(serviceResponse.getId(), FileType.SERVICE_RESPONSE));
+	        if(serviceResponse!=null){
+                amazonFiles.addAll(amazonService.findByServiceResponseIdAndType(serviceResponse.getId(), FileType.SERVICE_RESPONSE));
+
+            }
 	    	model.addAttribute("fileList", convertToDto(amazonFiles));
 	    	
-	        model.addAttribute("messageList", getMessagesDTO(conversation.getMessageList()));
+	       // model.addAttribute("messageList", getMessagesDTO(conversation.getMessageList()));
 
+	        session.setAttribute("messageList", getMessagesDTO(conversation.getMessageList()));
 	    	session.setAttribute("serviceRequest", conversation.getServiceRequest()); 
 	    return "adminDashboard/serviceRequestInformation2";
 	 }
@@ -724,7 +805,58 @@ public class AdminTranslatorDashboardController extends BaseController{
 		List<Language> languageList = languageService.getAllLanguages();
         return languageList;
     }
- 
+
+    private List<ServiceRequestQuoteDTO> mapServiceRequestQuoteFromSR(List<ServiceRequest> list2) {
+        List<ServiceRequestQuoteDTO> dtolist= new ArrayList<>();
+        for(ServiceRequest sr: list2){
+            ServiceRequestQuoteDTO dto= new ServiceRequestQuoteDTO();
+            dto.setDescription(sr.getDescription());
+
+            dto.setCategory(sr.getServiceRequestCategory().getDescription());
+            dto.setCustomerID(sr.getCustomer().getId());
+            dto.setCustomerName(sr.getCustomer().getFullname());
+            dto.setDate(sr.getCreationDate());
+            dto.setHardcopy(sr.getHardcopy());
+            dto.setOrigenLanguage(sr.getLanguagefrom());
+            dto.setServiceRequestID(sr.getId());
+            dto.setServiceRequestStatus(sr.getServiceRequestStatus().getDescription());
+            dto.setTimeFrame(sr.getTimeFrame().getDescription());
+            dto.setTimeLeftCloseQuote(sr.getFinishQuoteSelection());
+
+            dtolist.add(dto);
+        }
+        return dtolist;
+    }
+
+    private List<ServiceRequestQuoteDTO> mapServiceRequestQuoteDTO(List<Quotation> list) {
+        List<ServiceRequestQuoteDTO> dtolist= new ArrayList<>();
+        for(Quotation quote: list){
+            ServiceRequestQuoteDTO dto= new ServiceRequestQuoteDTO();
+            dto.setDescription(quote.getServiceRequest().getDescription());
+            dto.setCategory(quote.getServiceRequest().getServiceRequestCategory().getDescription());
+            dto.setCustomerID(quote.getServiceRequest().getCustomer().getId());
+            dto.setCustomerName(quote.getServiceRequest().getCustomer().getFullname());
+            dto.setDate(quote.getServiceRequest().getCreationDate());
+            dto.setHardcopy(quote.getServiceRequest().getHardcopy());
+            dto.setOrigenLanguage(quote.getServiceRequest().getLanguagefrom());
+            dto.setQuote(quote.getValue());
+            dto.setServiceRequestID(quote.getServiceRequest().getId());
+            dto.setServiceRequestStatus(quote.getServiceRequest().getServiceRequestStatus().getDescription());
+            dto.setTimeFrame(quote.getServiceRequest().getTimeFrame().getDescription());
+            dto.setTimeLeftCloseQuote(quote.getServiceRequest().getFinishQuoteSelection());
+            dto.setTimeLefToFinishAssignment(quote.getServiceRequest().getFinishDate());
+            dto.setTranslatorid(quote.getTranslator().getId());
+            dto.setTranslatorName(quote.getTranslator().getUser().getName());
+            dto.setTranslatorStatus(quote.getTranslator().getStatus());
+            Conversation conv = conversationService.getConversationFromServiceRequestIdAndTranslatorId(dto.getServiceRequestID(), dto.getTranslatorid());
+            if(conv!=null){
+                dto.setConversationid(conv.getId());
+            }
+            dtolist.add(dto);
+        }
+        return dtolist;
+    }
+
     private List<TranslatorDTO> getTranslatorsList(List<Translator> translatorList){
     	List<TranslatorDTO> dtoList= new ArrayList<TranslatorDTO>();
     	for(Translator translator: translatorList){
@@ -744,7 +876,8 @@ public class AdminTranslatorDashboardController extends BaseController{
         translatordto.setNatyExpiration(translator.getNatyExpiration());
         translatordto.setPassword(translator.getUser().getPassword());
         translatordto.setPhone(translator.getPhone());
-        translatordto.setName(translator.getUser().getName());
+        translatordto.setName(translator.getFullname());
+        translatordto.setPreferedName(translator.getUser().getName());
         translatordto.setStatus(translator.getStatus());
         translatordto.setLanguage(translator.getLanguageList().get(0).getDescription());
         translatordto.setRemainingDays(translator.getRemaininDays());
@@ -756,42 +889,29 @@ public class AdminTranslatorDashboardController extends BaseController{
         translatordto.setValidSuscription(translator.getTranslatorStatusFlags().getValidSuscription());
         translatordto.setAbn_name(translator.getAbn_name());
         translatordto.setAbn_number(translator.getAbn_number());
+        translatordto.setAbn_address(translator.getAbn_address());
+        translatordto.setNatyVerified(translator.getTranslatorStatusFlags().getNatyVerified());
+        translatordto.setNatyExtiryDate(translator.getTranslatorStatusFlags().getNatyExtiryDate());
+        translatordto.setManualyPaused(translator.getTranslatorStatusFlags().getManualyPaused());
+        translatordto.setValidSuscription(translator.getTranslatorStatusFlags().getValidSuscription());
         return translatordto;
     }
 
-//	private List<ChatMessageDTO> getMessagesDTO(Set<ChatMessage> messageList) {
-//		 List<ChatMessageDTO> messageListDTO = new ArrayList<ChatMessageDTO>();
-//	        for (ChatMessage message : messageList) {
-//				ChatMessageDTO dto = new ChatMessageDTO();
-//				dto.setId(message.getId());
-//				dto.setDate(message.getDate());
-//				dto.setMessage(message.getMessage());
-//				dto.setSender(message.getSender());
-//				dto.setRead(message.getRead());
-//				dto.setConversationid(message.getConversation().getId());
-//				User user= userService.getById(message.getSenderId());
-//				AmazonFilePhoto photo=amazonFilePhotoService.getAmazonFilePhotoByUserId(user);
-//				if(photo!=null){
-//					dto.setPhotoUrl(photo.getUrl());
-//				}else{
-//					dto.setPhotoUrl("resources/assets/layouts/layout2/img/avatar.png");
-//				}
-//
-//				messageListDTO.add(dto);
-//			}
-//	        Collections.sort(messageListDTO);
-//	        return messageListDTO;
-//    }
-
-    private List<ServiceRequestPaymentDTO> getServiceRequestPaymentDTOList(List<ServiceRequestPayment> all) {
+    private List<ServiceRequestPaymentDTO> getServiceRequestPaymentDTOList(List<ServiceRequestPayment> all, String state) {
     	List<ServiceRequestPaymentDTO> dtoList = new ArrayList<>();
     	for(ServiceRequestPayment servReqPay:all){
     		ServiceRequestPaymentDTO serviceRequestPaymentDTO = new ServiceRequestPaymentDTO();
     		serviceRequestPaymentDTO.setAmount(servReqPay.getValue());
-    		serviceRequestPaymentDTO.setCustomer(servReqPay.getServiceRequest().getCustomer().getUser().getName());
-    		serviceRequestPaymentDTO.setPaypalTransaction(servReqPay.getPaypalTransactionId());
-    		serviceRequestPaymentDTO.setTranslator(servReqPay.getServiceRequest().getTranslator().getUser().getName());
     		serviceRequestPaymentDTO.setServiceRequestId(servReqPay.getServiceRequest().getId());
+    		serviceRequestPaymentDTO.setCurrency("AUD");
+    		
+    		if("Paid".equals(state)) {
+    			serviceRequestPaymentDTO.setPaypalId(servReqPay.getServiceRequest().getTranslator().getPaypalClientId());
+        		serviceRequestPaymentDTO.setUser(servReqPay.getServiceRequest().getTranslator().getUser().getName());
+    		}else {
+	    		serviceRequestPaymentDTO.setPaypalId(servReqPay.getServiceRequest().getCustomer().getPaypalClientId());
+	    		serviceRequestPaymentDTO.setUser(servReqPay.getServiceRequest().getCustomer().getUser().getName());
+    		}
     		dtoList.add(serviceRequestPaymentDTO);
     	}
 		return dtoList;
@@ -821,41 +941,6 @@ public class AdminTranslatorDashboardController extends BaseController{
         }
         return listDTO;
     }
-
-//	private List<TranslatorQuotationDTO> getQuotationArrayDTO(List<Quotation> setQuotations) {
-//        List<TranslatorQuotationDTO> list = new ArrayList<>();
-//        for (Quotation quotation : setQuotations) {
-//            TranslatorQuotationDTO dto = new TranslatorQuotationDTO();
-//            dto.setServiceRequestId(quotation.getServiceRequest().getId());
-//            dto.setQuotationId(quotation.getId());
-//            dto.setNaati(true);
-//            dto.setName(quotation.getTranslator().getUser().getName());
-//            dto.setTranslatorId(quotation.getTranslator().getId());
-//            dto.setQuote(quotation.getValue().toString());
-//            populateMediaRating(dto,quotation.getTranslator());
-//            list.add(dto);
-//        }
-//        return list;
-//    }
-
-//    private void populateMediaRating(TranslatorQuotationDTO dto, Translator translator) {
-//        List<Rate> rateList = translatorService.getAllTranslatorRates(translator);
-//        int rateSize = rateList.size();
-//        if (rateSize == 0) {
-//            rateSize = 1;
-//        }
-//        int quality = 0;
-//        int serviceDescribed = 0;
-//        int time = 0;
-//        for (Rate rate : rateList) {
-//            quality += rate.getQuality();
-//            serviceDescribed += rate.getServiceAsDescribed();
-//            time += rate.getTimeDelivery();
-//        }
-//        dto.setTimeDelivery(time / rateSize);
-//        dto.setServiceDescribed(serviceDescribed / rateSize);
-//        dto.setQuality(quality / rateSize);
-//    }
 	 
 	 public void metodo(HttpServletRequest request, HttpServletResponse response, String url,byte[] file) throws IOException{
 	    	ServletContext context = request.getServletContext();
@@ -888,33 +973,39 @@ public class AdminTranslatorDashboardController extends BaseController{
 	        }
 	        inputStream.close();
 	        outStream.close();
-	    	
 	    }
-	 
-//	    private List<FileInfoDTO> getAllFiles(Conversation conversation) {
-//	    	List<FileInfoDTO> fileList= new ArrayList<>();
-//	    	ServiceRequest serviceRequest = conversation.getServiceRequest();
-//	    	for(ServiceRequestFiles file :serviceRequest.getServiceRequestFiles() ){
-//	    		FileInfoDTO fileInfoDTO = new FileInfoDTO();
-//	    		fileInfoDTO.setDate(file.getCreationDae());
-//	    		fileInfoDTO.setSender(serviceRequest.getCustomer().getUser().getName());
-//	    		fileInfoDTO.setName(file.getUrl());
-//	    		fileInfoDTO.setType("request");
-//	    		fileInfoDTO.setId(file.getId());
-//	    		fileList.add(fileInfoDTO);
-//	    	}
-//
-//	    	//ServiceResponse serviceResponse = serviceResponseService.getServiceResponseByServiceRequestId(serviceRequest.getId());
-//	    	ServiceResponse serviceResponse = conversation.getServiceResponse();
-//	    	for(ServiceResponseFiles file: serviceResponse.getServiceResponseFiles()){
-//	    		FileInfoDTO fileInfoDTO2 = new FileInfoDTO();
-//	    		fileInfoDTO2.setSender(serviceResponse.getTranslator().getUser().getName());
-//	    		fileInfoDTO2.setName(file.getUrl());
-//	    		fileInfoDTO2.setType("response");
-//	    		fileInfoDTO2.setDate(file.getCreationDate());
-//	    		fileInfoDTO2.setId(file.getId());
-//	    		fileList.add(fileInfoDTO2);
-//	    	}
-//	    	return fileList;
-//		}
+
+    private List<ServiceRequestCSDTO> serviceRequestToServiceRequestCSDTOMap(List<ServiceRequest> serviceRequestList) {
+        List<ServiceRequestCSDTO> list = new ArrayList<>();
+        for( ServiceRequest sr: serviceRequestList){
+            ServiceRequestCSDTO dto = getServiceRequestCSDTO(sr);
+            list.add(dto);
+        }
+        return list;
+    }
+
+    private ServiceRequestCSDTO getServiceRequestCSDTO(ServiceRequest sr) {
+        ServiceRequestCSDTO dto = new ServiceRequestCSDTO();
+        dto.setCustomerId(sr.getCustomer().getId());
+        dto.setClientName(sr.getCustomer().getFullname());
+        if(sr.getTranslator()!=null){
+            dto.setTranslatorId(sr.getTranslator().getId());
+            dto.setTranslatorName(sr.getTranslator().getUser().getName());
+            dto.setTranslatorStatus(sr.getTranslator().getStatus());
+            Quotation quotation=this.quoteService.getQuoteFromServiceRequestAndTranslator(sr.getId(), sr.getTranslator().getId());
+            dto.setQuote(quotation.getValue());
+        }
+        dto.setStatus(sr.getServiceRequestStatus().getDescription());
+        dto.setCreationDate(sr.getCreationDate());
+        dto.setId(sr.getId());
+        dto.setServiceRequestCategory(sr.getServiceRequestCategory().getDescription());
+        dto.setDescription(sr.getDescription());
+        dto.setHardcopy(sr.getHardcopy());
+        dto.setTimeFrame(sr.getTimeFrame().getDescription());
+        dto.setLanguagefrom(sr.getLanguagefrom());
+        dto.setLanguageTo("English");
+        dto.setFinishDate(sr.getFinishDate());
+        dto.setPaidDate(sr.getPaidDate());
+        return dto;
+    }
 }

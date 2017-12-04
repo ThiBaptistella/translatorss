@@ -51,7 +51,6 @@
                         <ul class="nav navbar-nav pull-right">
                            
                             <li class="dropdown dropdown-extended dropdown-inbox" id="header_inbox_bar">
-                            
                                 <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true" id="countUnreadMessages">
                                 </a>
                                 <c:if test="${not empty unreadMessageList}">
@@ -197,7 +196,7 @@
                     <!-- END PAGE HEADER-->
                     <div class="row">
                         <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                            <a class="dashboard-stat dashboard-stat-v2 blue" href="#">
+                            <a class="dashboard-stat dashboard-stat-v2 blue" href="<c:url value='pendingActions'/>">
                                 <div class="visual">
                                     <i class="fa fa-comments"></i>
                                 </div>
@@ -210,7 +209,7 @@
                             </a>
                         </div>
                         <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                            <a class="dashboard-stat dashboard-stat-v2 red">
+                            <a class="dashboard-stat dashboard-stat-v2 red" href="<c:url value='jobInProgress'/>">
                                 <div class="visual">
                                     <i class="fa fa-bar-chart-o"></i>
                                 </div>
@@ -222,7 +221,7 @@
                             </a>
                         </div>
                         <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                            <a class="dashboard-stat dashboard-stat-v2 green">
+                            <a class="dashboard-stat dashboard-stat-v2 green" href="<c:url value='history'/>">
                                 <div class="visual">
                                     <i class="fa fa-shopping-cart"></i>
                                 </div>

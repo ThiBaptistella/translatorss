@@ -257,24 +257,31 @@ License: You must have a valid license purchased only from themeforest(the above
                     <!-- END PAGE HEADER-->
                     <div class="row">
                         <div class="col-md-12">
+                        
+                            <c:if test="${messageDisplay != null}">
+                                <div id="note" class="note note-success">
+                                    <p> <b>${messageDisplay}</b> </p>
+                                </div>
+                            </c:if>
+                            
                            	<div class="profile-content">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <div class="portlet light ">
+                                        <div class="portlet light" onclick="onclickCleanMessage()">
                                             <div class="portlet-title tabbable-line">
                                                 <div class="caption caption-md">
                                                     <i class="icon-globe theme-font hide"></i>
                                                     <span class="caption-subject font-blue-madison bold uppercase">Profile Account</span>
                                                 </div>
                                                 <ul class="nav nav-tabs">
-                                                    <li class="active">
-                                                        <a href="#tab_1_1" data-toggle="tab">My details</a>
+                                                    <li class="active" id="personal">
+                                                        <a href="#tab_1_1" onclick="activePersonalInfo()" data-toggle="tab">My details</a>
                                                     </li>
-                                                    <li>
-                                                        <a href="#tab_1_2" data-toggle="tab">Update Avatar</a>
+                                                    <li id="avatar">
+                                                        <a href="#tab_1_2" onclick="activeAvatar()" data-toggle="tab">Update Avatar</a>
                                                     </li>
-                                                    <li>
-                                                        <a href="#tab_1_3" data-toggle="tab">Update Password</a>
+                                                    <li id="password">
+                                                        <a href="#tab_1_3" onclick="activePassword()" data-toggle="tab">Update Password</a>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -283,63 +290,87 @@ License: You must have a valid license purchased only from themeforest(the above
                                                     <!-- PERSONAL INFO TAB -->
                                                     <div class="tab-pane active" id="tab_1_1">
                                                         <form:form action='updateTranslator' name="myForm2" onsubmit="return validateFormDetails()" method="post" commandName="updateTranslatorForm">
-
                                                                 <div class="form-group">
                                                                     <form:input path="id" class="form-control " id="id" type="hidden"/>
                                                                 </div>
-
                                                                 <div class="form-group">
                                                                     <label>Translator State</label>
-                                                                    <form:input path="status" type="text" class="form-control " id="status" readonly="true"/>
+                                                                    <form:input path="status" type="text" class="form-control"   id="status" readonly="true"/>
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label>Nati Verified</label>
+                                                                    <form:input path="natyVerified" class="form-control" id="natyVerified" readonly="true"/>
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label>Nati Expiry Date</label>
+                                                                    <form:input path="natyExtiryDate" class="form-control" id="natyExtiryDate" readonly="true"/>
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label>Valid Suscription</label>
+                                                                    <form:input path="validSuscription" class="form-control" id="validSuscription" readonly="true"/>
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label>Manually Paused</label>
+                                                                    <form:input path="manualyPaused" class="form-control" id="manualyPaused" readonly="true"/>
                                                                 </div>
 
                                                                 <div class="form-group">
                                                                     <label>Full Name (for legal purposes)</label>
-                                                                    <form:input path="fullName" type="text" class="form-control " id="fullName"/>
-                                                                    <p id="nameerror" style="color:red"></p>
+                                                                    <form:input path="fullName" type="text" onclick="onclickCleanField('fullNameerror')" class="form-control " id="fullName"/>
+                                                                    <p id="fullNameerror" style="color:red"></p>
                                                                 </div>
 
                                                                 <div class="form-group">
                                                                     <label>Preferred Name (for communication purposes)</label>
-                                                                    <form:input path="preferedName" type="text" class="form-control " id="preferedName"/>
+                                                                    <form:input path="preferedName" type="text" onclick="onclickCleanField('preferednameerror')"  class="form-control " id="preferedName"/>
                                                                     <p id="preferednameerror" style="color:red"></p>
                                                                 </div>
 
 									                            <div class="form-group">
 									                                <label>E-mail</label>
-									                                <form:input path="email" type="text" class="form-control " id="email"/>
+									                                <form:input path="email" type="text"  onclick="onclickCleanField('emailerror')" class="form-control " id="email"/>
 									                                <b><form:errors path="email" class="control-label" style="color:red;"/></b>
 									                            	<p id="emailerror" style="color:red"></p>
 									                            </div>
 
                                                                 <div class="form-group">
                                                                     <label>Contact Number</label>
-                                                                    <form:input path="phone" type="text" class="form-control " id="phone"/>
+                                                                    <form:input path="phone" type="text" onclick="onclickCleanField('phoneerror')" class="form-control " id="phone"/>
                                                                     <p id="phoneerror" style="color:red"></p>
                                                                 </div>
 
                                                                 <div class="form-group">
                                                                     <label>Home Address</label>
-                                                                    <form:input path="address" type="text" class="form-control " id="address"/>
+                                                                    <form:input path="address" type="text" onclick="onclickCleanField('addresserror')" class="form-control " id="address"/>
                                                                     <p id="addresserror" style="color:red"></p>
                                                                 </div>
 
                                                                 <div class="form-group">
                                                                     <label>Paypal Client</label>
-                                                                    <form:input path="paypalClientId" type="text" class="form-control " id="paypalClientId"/>
+                                                                    <form:input path="paypalClientId" type="text" onclick="onclickCleanField('paypalclientiderror')" class="form-control " id="paypalClientId"/>
                                                                     <p id="paypalclientiderror" style="color:red"></p>
                                                                 </div>
 
                                                                 <div class="form-group">
                                                                     <label>ABN name</label>
-                                                                    <form:input path="abn_name" type="text" class="form-control " id="abn_name"/>
+                                                                    <form:input path="abn_name" type="text" onclick="onclickCleanField('abn_nameerror')" class="form-control " id="abn_name"/>
                                                                     <p id="abn_nameerror" style="color:red"></p>
                                                                 </div>
 
                                                                 <div class="form-group">
                                                                     <label>ABN Number</label>
-                                                                    <form:input path="abn_number" type="text" class="form-control " id="abn_number"/>
+                                                                    <form:input path="abn_number" type="text" onclick="onclickCleanField('abn_numbererror')" class="form-control " id="abn_number"/>
                                                                     <p id="abn_numbererror" style="color:red"></p>
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label>ABN Address</label>
+                                                                    <form:input path="abn_address" type="text" onclick="onclickCleanField('abn_addresserror')" class="form-control " id="abn_address"/>
+                                                                    <p id="abn_addresserror" style="color:red"></p>
                                                                 </div>
 
                                                                 <div class="form-group">
@@ -353,8 +384,13 @@ License: You must have a valid license purchased only from themeforest(the above
                                                                     <form:input path="naatiNumber" class="form-control" id="naatiNumber" readonly="true"/>
                                                                 </div>
 
+                                                                <div class="form-group">
+                                                                    <label>Language</label>
+                                                                    <form:input path="language" class="form-control" id="language" readonly="true"/>
+                                                                </div>
+
                                                                 <div class="form-group input-group">
-                                                                    <button name="updateTranslator" value="updateTranslator" class="btn-lg btn-primary pull-right">Save my Details</button>
+                                                                        <button name="updateTranslator" value="updateTranslator" id="mySubmitButton" class="btn-lg btn-primary pull-right">Save my Details</button>
                                                                 </div>
 									                        </form:form>    
                                                     </div>
@@ -370,20 +406,23 @@ License: You must have a valid license purchased only from themeforest(the above
                                                     <!-- END CHANGE AVATAR TAB -->
                                                     <!-- CHANGE PASSWORD TAB -->
                                                     <div class="tab-pane" id="tab_1_3">
+                                                        <div class="panel-heading">
+                                                            <h6>Minimum 8 max 25 characters alphanumeric, no special characters, at least one uppercase letter, at least one lowercase letter, at least one number </h6>
+                                                        </div>
                                                          <form:form action='updateTranslatorPassword' name="myForm3" onsubmit="return validatePassword()" method="post" commandName="passwordDTOForm">
 												              	<form:input path="email" type="hidden" class="form-control " id="email" />
-												                <form:input path="type" type="hidden" class="form-control " id="type" value="translator"/>
+												                <form:input path="type" type="hidden" class="form-control"  id="type" value="translator"/>
 												              	
 												                <div class="form-group">
 												                  <label>Current Password</label>
-												                  	<form:input path="currentPassword" class="form-control " id="currentPassword" type="password" placeholder="Current Password" />
+												                  	<form:input path="currentPassword" class="form-control"  id="currentPassword" type="password" placeholder="Current Password" />
 																	<form:errors path="currentPassword" class="control-label" style="color:red"/>
 																	<p id="currentPassworderror" style="color:red"></p>
 												                </div> 
 												
 												                <div class="form-group">
 												                  	<label>New Password</label>
-												                  	<form:input path="newPassword" class="form-control " id="newPassword" type="password" placeholder="New Password" />
+												                  	<form:input path="newPassword" class="form-control"   id="newPassword" type="password" placeholder="New Password" />
 																	<form:errors path="newPassword" class="control-label" style="color:red" />
 																	<p id="newPassworderror" style="color:red"></p>
 												                </div>
@@ -477,14 +516,152 @@ License: You must have a valid license purchased only from themeforest(the above
 		                  subscribeUnreadMessages
 		              ];
 		              connect(funcs);
+		              
+		              var field = ${info};
+				    	
+			    	   if(field==100){
+			    		  $('#tab_1_1').show();
+			    		  $('#tab_1_2').hide();
+			    		  $('#tab_1_3').hide();
+			    		  document.getElementById("personal").classList.add('active');
+			    		  document.getElementById("avatar").classList.remove('active');
+			    		  document.getElementById("password").classList.remove('active');
+		    	       }
+			    	  
+			    	   if(field==200){
+				    		  $('#tab_1_1').hide();
+				    		  $('#tab_1_2').show();
+				    		  $('#tab_1_3').hide();
+				    		  document.getElementById("personal").classList.remove('active');
+				    		  document.getElementById("avatar").classList.add('active');
+				    		  document.getElementById("password").classList.remove('active');
+			    	   }
+			    	   
+			    	   if(field==300){
+				    		  $('#tab_1_1').hide();
+				    		  $('#tab_1_2').hide();
+				    		  $('#tab_1_3').show();
+				    		  document.getElementById("personal").classList.remove('active');
+				    		  document.getElementById("avatar").classList.remove('active');
+				    		  document.getElementById("password").classList.add('active');
+				    	}
 		          }
 		    </script>
 
         <script>
-            function resetpasswordErrorValues() {
-                $('#currentPassworderror').hide();
-                $('#newPassworderror').hide();
-                $('#confirmPassworderror').hide();
+        
+        function activePersonalInfo(){
+    		$('#tab_1_1').show();
+    		  $('#tab_1_2').hide();
+    		  $('#tab_1_3').hide();
+    		  document.getElementById("personal").classList.add('active');
+    		  document.getElementById("avatar").classList.remove('active');
+    		  document.getElementById("password").classList.remove('active');
+    	}
+    
+    	function activeAvatar(){
+    		  $('#tab_1_1').hide();
+    		  $('#tab_1_2').show();
+    		  $('#tab_1_3').hide();
+    		  document.getElementById("personal").classList.remove('active');
+    		  document.getElementById("avatar").classList.add('active');
+    		  document.getElementById("password").classList.remove('active');
+    	}
+    	
+    	function activePassword(){
+  		      $('#tab_1_1').hide();
+    		  $('#tab_1_2').hide();
+    		  $('#tab_1_3').show();
+    		  document.getElementById("personal").classList.remove('active');
+    		  document.getElementById("avatar").classList.remove('active');
+    		  document.getElementById("password").classList.add('active');
+  	    }
+        
+    	function onclickCleanMessage(){
+			document.getElementById("note").style.display="none";
+		} 
+    	
+            function validateEmail(email) {
+                var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(email);
+            }
+
+            function onclickCleanField(idfield){
+                document.getElementById(idfield).style.display="none";
+            }
+
+            function validateFormDetails(){
+                var text;
+                var fullName = document.forms["myForm2"]["fullName"].value;
+                if(fullName ==null || fullName==""){
+                    document.getElementById("fullNameerror").innerHTML = "Incorrect Format";
+                    $('#fullNameerror').show();
+                    return false;
+                }
+
+                var preferedName = document.forms["myForm2"]["preferedName"].value;
+                if(preferedName ==null || preferedName==""){
+                    document.getElementById("preferednameerror").innerHTML = "Incorrect Format";
+                    $('#preferednameerror').show();
+                    return false;
+                }
+
+                var email = document.forms["myForm2"]["email"].value;
+                if (!validateEmail(email)) {
+                    document.getElementById("emailerror").innerHTML = "Email format incorrect";
+                    $('#emailerror').show();
+                    return false;
+                }
+
+                var phone = document.forms["myForm2"]["phone"].value;
+                if (phone == null || phone == "") {
+                    text = "Phone needs to be selected!";
+                    document.getElementById("phoneerror").innerHTML = text;
+                    $('#phoneerror').show();
+                    return false;
+                }
+
+                var address = document.forms["myForm2"]["address"].value;
+                if(address== null || address==""){
+                    text = "Address needs to be selected";
+                    document.getElementById("addresserror").innerHTML = text;
+                    $('#addresserror').show();
+                    return false;
+                }
+
+                var paypalClientId = document.forms["myForm2"]["paypalClientId"].value;
+                if(!validateEmail(paypalClientId)){
+                    text = "Incorrect Email Format";
+                    document.getElementById("paypalclientiderror").innerHTML = text;
+                    $('#paypalclientiderror').show();
+                    return false;
+                }
+
+                var abn_nameText = "The ABN Name needs to be selected!";
+                var abn_name = document.forms["myForm2"]["abn_name"].value;
+                if (abn_name == null || abn_name == "") {
+                    document.getElementById("abn_nameerror").innerHTML = abn_nameText;
+                    $('#abn_nameerror').show();
+                    return false;
+                }
+
+                var abn_numberText = "The ABN Number needs to be selected!";
+                var abn_number = document.forms["myForm2"]["abn_number"].value;
+                if (abn_number == null || abn_number == "") {
+                    document.getElementById("abn_numbererror").innerHTML = abn_numberText;
+                    $('#abn_numbererror').show();
+                    return false;
+                }
+
+                var abn_addressText = "The ABN address needs to be selected!";
+                var abn_address = document.forms["myForm2"]["abn_address"].value;
+                if (abn_address == null || abn_address == "") {
+                    document.getElementById("abn_addresserror").innerHTML = abn_addressText;
+                    $('#abn_addresserror').show();
+                    return false;
+                }
+                
+                document.getElementById("mySubmitButton").disabled = true;
             }
 
             function validatePassword(){

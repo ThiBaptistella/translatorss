@@ -1,15 +1,6 @@
 package au.com.translatorss.service.impl;
 
-import java.util.Properties;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,8 +10,11 @@ import au.com.translatorss.service.EmailService;
 @Transactional
 public class EmailServiceImpl implements EmailService {
 
-	private String username="translatorss10@gmail.com";
-	private String password="Translatorss2016";
+	   @Value("${java.mail.username}")
+	   private String emailFrom;
+	     
+	   @Value("${java.mail.password}")
+	   private String password;
 	
 	@Override
 	public void sendMessage(String subject,String messageContent, String destination) {

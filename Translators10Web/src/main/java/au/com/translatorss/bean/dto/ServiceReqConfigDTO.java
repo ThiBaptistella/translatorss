@@ -2,6 +2,10 @@ package au.com.translatorss.bean.dto;
 
 public class ServiceReqConfigDTO {
 
+	private int minquote;
+	private int timeper;
+	private int quoteValue;
+
 	public int getMinquote() {
 		return minquote;
 	}
@@ -18,6 +22,12 @@ public class ServiceReqConfigDTO {
 	public void setTimeper(int timeper) {
 		this.timeper = timeper;
 	}
-	private int minquote;
-	private int timeper;
+	
+	public int getQuoteValue() {
+		return quoteValue;
+	}
+
+	public void setQuoteValue(int quoteValue) {
+		this.quoteValue = quoteValue;
+	}
 }

@@ -1,6 +1,7 @@
 package au.com.translatorss.service;
 
 import au.com.translatorss.bean.User;
+import java.util.List;
 
 public interface UserService {
 
@@ -21,4 +22,6 @@ public interface UserService {
 	boolean isExistEmail(String email);
 
 	boolean isAvailableEmailAndExcludeUser(String email, Long id);
+
+	List<User> findAll();
 }

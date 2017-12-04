@@ -24,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -64,6 +65,9 @@ public class TranslatorDashboardController extends BaseController{
 
     private static final int BUFFER_SIZE = 4096;
 
+    @Autowired
+    private RateService rateService;
+    
     @Autowired
     private TranslatorSettingsService translatorService;
 
@@ -135,11 +139,10 @@ public class TranslatorDashboardController extends BaseController{
 
     @RequestMapping(value = "/dashboard")
     public String dashboard(HttpSession session,Model model) {
-        logger.info("Welcome TranslatorDashboardController: dashboard");
-    	Translator translator = (Translator) session.getAttribute("loggedInUser");
+        Translator translator = (Translator) session.getAttribute("loggedInUser");
         AmazonFilePhoto photoView =amazonFilePhotoService.getAmazonFilePhotoByUserId(translator.getUser());
-
-		List<ChatMessage> messageList= chatMessageService.getUnreadMessageByCustomerId(translator.getUser().getId());
+		
+        List<ChatMessage> messageList= chatMessageService.getUnreadMessageByCustomerId(translator.getUser().getId());
 		List<ChatMessageDTO> dtoList = getMessagesDTO(new HashSet(messageList));
 
 		model.addAttribute("unreadMessageList", dtoList);
@@ -149,6 +152,7 @@ public class TranslatorDashboardController extends BaseController{
         int specialAssignmentsUnquoted = serviceRequestService.getServiceRequestAvailableForTranslator(translator).size();
         int myAutomaticQuotedAssignments= serviceRequestService.getServiceRequestQuotedFromTranslator(translator, "Quoted").size();
         int myTotalApprovedAssignments=serviceRequestService.getServiceRequestFromTranslator(translator.getId(), "Approved").size();
+        int totalRevenue = serviceRequestApprovedRegisterService.getTotalRevenue(translator.getId());
         
         if(photoView ==null){
 			model.addAttribute("photoUrl", "resources/assets/layouts/layout2/img/avatar.png");
@@ -159,6 +163,8 @@ public class TranslatorDashboardController extends BaseController{
         model.addAttribute("specialAssignmentsUnquoted", specialAssignmentsUnquoted);
         model.addAttribute("myAutomaticQuotedAssignments", myAutomaticQuotedAssignments);
         model.addAttribute("myTotalApprovedAssignments", myTotalApprovedAssignments);
+        model.addAttribute("totalRevenue", totalRevenue);
+
         if(translator.getStatus().equals("Active")){
             model.addAttribute("translatorStatus","Active");
         }else{
@@ -173,29 +179,8 @@ public class TranslatorDashboardController extends BaseController{
         model.addAttribute("Quality", dto.getQuality());
 
         return "translatorDashboard/indexTranslator";
-    }
-    
-//    private void populateMediaRating(TranslatorQuotationDTO dto, Translator translator) {
-//		List<Rate> rateList = translatorService.getAllTranslatorRates(translator);
-//		int rateSize = rateList.size();
-//		if (rateSize == 0) {
-//			rateSize = 1;
-//		}
-//		int quality = 0;
-//		int serviceDescribed = 0;
-//		int time = 0;
-//		for (Rate rate : rateList) {
-//            quality += rate.getQuality();
-//			serviceDescribed += rate.getServiceAsDescribed();
-//			time += rate.getTimeDelivery();
-//		}
-//		dto.setTimeDelivery(time / rateSize);
-//		dto.setServiceDescribed(serviceDescribed / rateSize);
-//		dto.setQuality(quality / rateSize);
-//	}
-    
-    
-    
+    } 
+  
     private BarChart getBarChart(){
 		String[] months = new String[4];
 		months[0]="14/5 - 21/5";
@@ -263,8 +248,9 @@ public class TranslatorDashboardController extends BaseController{
     public String myTask(HttpSession session, Model model) {
         logger.info("Welcome TranslatorDashboardController: job in progress");
         Translator translatorloged = (Translator) session.getAttribute("loggedInUser");
+
         List<ServiceRequest> serviceRequestList = serviceRequestService.getServiceRequestFromTanslator(translatorloged.getId(), "OpenService");
-        List<ServiceRequestDTO> serviceRequestDTOList = getServiceRequestArrayDTO(serviceRequestList);
+        List<ServiceRequestDTO> serviceRequestDTOList = getServiceRequestArrayDTO(serviceRequestList, translatorloged.getId());
         model.addAttribute("serviceRequestList", serviceRequestDTOList);
         model.addAttribute("translatorName", translatorloged.getUser().getName());
         
@@ -287,10 +273,17 @@ public class TranslatorDashboardController extends BaseController{
     public String myHistory(HttpSession session,Model model) {
         logger.info("Welcome TranslatorDashboardController: myHistory");
         Translator translatorloged = (Translator) session.getAttribute("loggedInUser");
-        List<ServiceRequest> serviceRequestListUnquoted = serviceRequestService.getServiceRequestFromTranslator(translatorloged.getId(), "Approved");
-        List<ServiceRequest> serviceRequestListExpired = serviceRequestService.getServiceRequestFromTranslator(translatorloged.getId(), "Expired");
-        List<ServiceRequestDTO> serviceRequestDTOList = getServiceRequestArrayDTO(serviceRequestListUnquoted);
-        serviceRequestListUnquoted.addAll(serviceRequestListExpired);
+
+        List<String> statusList = new ArrayList<String>();
+		statusList.add("Approved");
+		statusList.add("Expired");
+		statusList.add("Paid");
+		statusList.add("Refunded");
+		statusList.add("Cancelled");
+        
+		List<ServiceRequest> list = serviceRequestService.getServiceRequestFromTranslator(translatorloged, statusList);
+        List<ServiceRequestDTO> serviceRequestDTOList = getServiceRequestArrayDTO(list, translatorloged.getId());
+
         model.addAttribute("serviceRequestList", serviceRequestDTOList);
         model.addAttribute("translatorName", translatorloged.getUser().getName());
         
@@ -309,6 +302,9 @@ public class TranslatorDashboardController extends BaseController{
         return "/translatorDashboard/myHistory";
     }
 
+
+
+
     //REVISED PENDING ACTION
     @RequestMapping(value = "/myPendingActions")
     public String pendingActions(HttpSession session,Model model) {
@@ -324,8 +320,8 @@ public class TranslatorDashboardController extends BaseController{
         List<ServiceRequest> serviceRequestForManuallyQuoteList = serviceRequestService.getServiceRequestAvailableForTranslator(translatorloged);
         List<ServiceRequest> serviceRequestAutomaticQuotedList = serviceRequestService.getServiceRequestQuotedFromTranslator(translatorloged, "Quoted");
         model.addAttribute("translatorName", translatorloged.getUser().getName());
-        model.addAttribute("serviceRequestList", getServiceRequestArrayDTO(serviceRequestForManuallyQuoteList));
-        model.addAttribute("serviceRequestQuotedList", getServiceRequestArrayDTO(serviceRequestAutomaticQuotedList));
+        model.addAttribute("serviceRequestList", getServiceRequestArrayDTO(serviceRequestForManuallyQuoteList, translatorloged.getId()));
+        model.addAttribute("serviceRequestQuotedList", getServiceRequestArrayDTO(serviceRequestAutomaticQuotedList, translatorloged.getId()));
         model.addAttribute("message", "Jobs Available");
         
 		List<ChatMessage> messageList= chatMessageService.getUnreadMessageByCustomerId(translatorloged.getUser().getId());
@@ -355,6 +351,7 @@ public class TranslatorDashboardController extends BaseController{
         quotation.setIsValid(true);
         quotation.setIsAutomatic(false);
         translatorQuotationService.update(quotation);
+        emailService2.sendEmailNewQuoteFromTranslator(serviceRequest.getCustomer().getUser().getEmail(), serviceRequest.getCustomer().getFullname(), translatorloged.getFullname(), value.toString(), serviceRequest.getId().toString());
         model.addAttribute("translatorForm", translatorloged);
         if (serviceRequest.getServiceRequestStatus().getDescription().equals("Unquoted")) {
             serviceRequest.setServiceRequestStatus(serviceRequestStatusDao.findByDescription("Quoted"));
@@ -363,19 +360,28 @@ public class TranslatorDashboardController extends BaseController{
         return "redirect:/myPendingActions";
     }
 
-//    //TODO: Ver en detalle
-//    @RequestMapping("/conversationWithCustomer/{id}")
-//    public String conversationWithCustomer(@PathVariable("id") long id, HttpSession session, Model model)throws Exception {
-//    	logger.info("Welcome BusinessUserDashboardController: conversationWithCustomer");
-//    	ServiceRequest serviceRequest = serviceRequestService.find(id);
-//        Translator trans = (Translator) session.getAttribute("loggedInUser");
-//
-//    	Conversation conversation = serviceRequest.getConversationList().iterator().next();
-//
-//        session.setAttribute("serviceRequest", serviceRequest);
-//    	session.setAttribute("conversationid", conversation.getId());
-//        return "redirect:/messagesWithCustomer";
-//    }
+    @RequestMapping("/conversationWithCustomer/{id}")
+    public String conversationWithCustomer(@PathVariable("id") long id, HttpSession session, Model model)throws Exception {
+    	logger.info("Welcome BusinessUserDashboardController: conversationWithCustomer");
+    	ServiceRequest serviceRequest = serviceRequestService.find(id);
+        Translator trans = (Translator) session.getAttribute("loggedInUser");
+        Conversation conversation = conversationService.getConversationFromServiceRequestIdAndTranslatorId(serviceRequest.getId(), trans.getId());
+        session.setAttribute("serviceRequest", serviceRequest);
+    	session.setAttribute("conversationid", conversation.getId());
+        return "redirect:/messagesWithCustomer";
+    }
+
+
+ /*   @RequestMapping({"/conversationWithTranslator/{id}"})
+    Taken from customer to compare logic
+    public String conversation(@PathVariable("id") long id, HttpSession session, Model model, RedirectAttributes redirectAttributes) throws Exception {
+        logger.info("Welcome BusinessUserDashboardController: conversation");
+        ServiceRequest serviceRequest = serviceRequestService.find(id);
+        Conversation conversation = conversationService.getConversationFromServiceRequestIdAndTranslatorId(serviceRequest.getId(), serviceRequest.getTranslator().getId());
+        session.setAttribute("serviceRequest", serviceRequest);
+        session.setAttribute("conversation", conversation);
+        return "redirect:/messages";
+    }*/
 
     @RequestMapping("/seeMyConversation/{id}")
     public String seeMyConversation(@PathVariable("id") Long id, Model model,HttpSession session)
@@ -423,7 +429,11 @@ public class TranslatorDashboardController extends BaseController{
         AmazonFilePhoto photo=this.amazonFilePhotoService.getAmazonFilePhotoByUserId(user);
 
         ChatMessageDTO message = new ChatMessageDTO();
-        message.setPhotoUrl(photo.getUrl());
+        if(photo ==null){
+            message.setPhotoUrl("resources/assets/layouts/layout2/img/avatar.png");
+        }else {
+            message.setPhotoUrl(photo.getUrl());
+        }
         message.setConversationid(conversation.getId());
         message.setSender(translatorloged.getUser().getName());
         model.addAttribute("message", message);
@@ -481,10 +491,9 @@ public class TranslatorDashboardController extends BaseController{
         return dtos;
     }
 
-    @Autowired
-    private RateService rateService;
+ 
 
-    private List<ServiceRequestDTO> getServiceRequestArrayDTO(List<ServiceRequest> serviceRequestList) {
+    private List<ServiceRequestDTO> getServiceRequestArrayDTO(List<ServiceRequest> serviceRequestList, Long translatorid) {
         List<ServiceRequestDTO> listDTO = new ArrayList<>();
         Long userId = userService.getUserIdByRole(userService.getCurrentUser());
         for (ServiceRequest serviceRequest : serviceRequestList) {
@@ -499,7 +508,8 @@ public class TranslatorDashboardController extends BaseController{
             dto.setFinishDate(serviceRequest.getFinishDate());
             dto.setId(serviceRequest.getId());
             dto.setDescription(serviceRequest.getDescription());
-            Quotation quote = this.translatorQuotationService.getQuoteFromServiceRequestAndTranslator(serviceRequest.getId(),userId );
+
+            Quotation quote = this.translatorQuotationService.getQuoteFromServiceRequestAndTranslator(serviceRequest.getId(),translatorid );
             if(quote!=null){
             	dto.setQuote(quote.getValue());
             }else{
@@ -510,20 +520,19 @@ public class TranslatorDashboardController extends BaseController{
                 dto.setInvoiceUrl(invoice.getFile().getUrl());
             dto.setCountOfUnreadMessages(getCountOfUnreadMessage(serviceRequest.getConversationList(), userId));
             dto.setFinishQuoteDate(getRemainingDateToSelectQuote(serviceRequest.getFinishQuoteSelection()));
-            dto.setClientName(serviceRequest.getCustomer().getUser().getName());
+            dto.setClientName(serviceRequest.getCustomer().getFullname());
             
             Set<AmazonFile> amazonFiles = new HashSet<AmazonFile>();
             amazonFiles.addAll(amazonService.findByServiceRequestIdAndType(serviceRequest.getId(), FileType.SERVICE_REQUEST));
             dto.setAmazonList(convertToDto(amazonFiles));
 
             Rate rate = rateService.getRateByServiceRequest(serviceRequest);
-
             if(rate!=null){
                 RateDTO rateDto = new RateDTO();
                 rateDto.setFeedback(rate.getFeedback());
-                rateDto.setServiceDescribed(rate.getServiceAsDescribed());
-                rateDto.setTranslatorComunication(rate.getTimeDelivery());
-                rateDto.setWouldRecomend(rate.getQuality());
+                rateDto.setService(rate.getServiceAsDescribed());
+                rateDto.setTimeDelivery(rate.getTimeDelivery());
+                rateDto.setQuality(rate.getQuality());
                 dto.setRateDto(rateDto);
             }
 
@@ -531,7 +540,6 @@ public class TranslatorDashboardController extends BaseController{
         }
         return listDTO;
     }
-    
     
     
     @RequestMapping(value = "/submitMessageToCustomer", method = RequestMethod.POST)
@@ -622,10 +630,14 @@ public class TranslatorDashboardController extends BaseController{
         translator.setPreferedName(translatorloged.getUser().getName());
         translator.setAbn_name(translatorloged.getAbn_name() );
         translator.setAbn_number(translatorloged.getAbn_number());
-
+        translator.setAbn_address(translatorloged.getAbn_address());
         translator.setNaatiNumber(translatorloged.getNaatiNumber());
         translator.setNatyExpiration(translatorloged.getNatyExpiration());
         translator.setLanguage(translatorloged.getLanguageList().get(0).getDescription());
+        translator.setNatyExtiryDate(translatorloged.getTranslatorStatusFlags().getNatyExtiryDate());
+        translator.setValidSuscription(translatorloged.getTranslatorStatusFlags().getValidSuscription());
+        translator.setManualyPaused(translatorloged.getTranslatorStatusFlags().getManualyPaused());
+        translator.setNatyVerified(translatorloged.getTranslatorStatusFlags().getNatyVerified());
 
         PasswordDTO password = new PasswordDTO();
         password.setEmail(translator.getEmail());
@@ -640,6 +652,17 @@ public class TranslatorDashboardController extends BaseController{
 		model.addAttribute("unreadMessageList", dtoList);
 		model.addAttribute("newMessagesNumber", messageList.size());
         
+		Integer info = (Integer) session.getAttribute("info");
+		if(info==null) {
+			model.addAttribute("info",100);
+			String messageDisplay = (String) session.getAttribute("messageDisplay");
+			//model.addAttribute("messageDisplay", messageDisplay);
+		}else {
+			model.addAttribute("info",info);
+			String messageDisplay = (String) session.getAttribute("messageDisplay");
+			model.addAttribute("messageDisplay", messageDisplay);
+		}
+		
         AmazonFilePhoto photoView =amazonFilePhotoService.getAmazonFilePhotoByUserId(translatorloged.getUser());
         if(photoView ==null){
 			model.addAttribute("photoUrl", "resources/assets/layouts/layout2/img/avatar.png");
@@ -784,9 +807,15 @@ public class TranslatorDashboardController extends BaseController{
 	        Translator translator = (Translator) session.getAttribute("loggedInUser");
 			amazonFilePhotoService.savePhoto(translator.getUser(), file.getOriginalFilename(), file.getInputStream(), file.getContentType());
 		} 
+		
+		session.setAttribute("info", 200);
+		session.setAttribute("messageDisplay", "Your photo have been uploaded");
 		return "redirect:/settings";
 	}
     
+	
+
+	
     private String getRemainingDateToSelectQuote(Date finishDate) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Calendar c = Calendar.getInstance();

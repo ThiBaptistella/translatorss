@@ -16,10 +16,10 @@ public class QuoteSettingDTOValidationImpl implements QuotationDTOValidator{
 	public void validate(Object target, Errors errors) {
 		QuoteSettingDTO quoteSettingDTO = (QuoteSettingDTO) target;
 
-		 if (!StringUtils.isNotBlank(quoteSettingDTO.getAcademicTranscript())) {
+		 if (!StringUtils.isNotBlank(quoteSettingDTO.getMarriageCertificate())) {
 	            errors.rejectValue("fullname", "fieldEmpty");
 	     }
-		 if (!StringUtils.isNotBlank(quoteSettingDTO.getBirthDeath())) {
+		 if (!StringUtils.isNotBlank(quoteSettingDTO.getBirthCertificate())) {
 	            errors.rejectValue("fullname", "fieldEmpty");
 	     }
 		 

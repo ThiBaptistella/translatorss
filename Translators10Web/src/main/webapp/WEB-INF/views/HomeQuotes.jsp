@@ -331,9 +331,9 @@
                                             <div class="modal-body">
                                                 <div class="row">
                                                     <div class="col-md-12">
-                                                        <form id="checkoutContainer" method="post" action='chose' enctype="application/x-www-form-urlencoded">
-                                                             <input id="quotationId" name="quotationId" type="hidden">
-                                                             <input id="isDonation" type="checkbox" name="isDonation" aria-labelledby="isDonationLabel">
+                                                        <form id="checkoutContainer" method="post" action='choseHP' enctype="application/x-www-form-urlencoded">
+                                                            <input id="quotationId" name="quotationId" type="hidden">
+                                                            <input id="isDonation" type="checkbox" name="isDonation" aria-labelledby="isDonationLabel">
                                                             <label id="isDonationLabel" for="isDonation">Would you like to make a donation $${donationValue}?</label>
                                                             <br/>
                                                             <input id="isReadTerms" type="checkbox">
@@ -406,8 +406,7 @@
 	<script src="resources/vendor/jquery.appear.js"></script>
 	<script src="resources/vendor/jquery.stellar.min.js"></script>
 	<script src="resources/vendor/snap.svg-min.js"></script>
-	<script
-		src="resources/vendor/mediaelement/mediaelement-and-player.min.js"></script>
+	<script src="resources/vendor/mediaelement/mediaelement-and-player.min.js"></script>
 	<script src="resources/vendor/circliful/js/jquery.circliful.min.js"></script>
 	<script src="resources/vendor/jquery.easing.1.3.js"></script>
 	<script src="resources/vendor/jquery.scrollTo.min.js"></script>
@@ -437,18 +436,8 @@
 		src="resources/vendor/rs-plugin/js/jquery.themepunch.revolution.min.js"></script>
 
 	<!-- plug in datatable -->
-	<script type="text/javascript" charset="utf8"
-		src="//cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
 	<script src="resources/js/datatable.js"></script>
-
-
-	<!-- Contact Form -->
-	<script src="resources/vendor/jquery.validate.js"></script>
-	<script src="resources/js/contact.js"></script>
-
-	<!-- Google Map -->
-	<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
-	<script src="resources/vendor/jquery.gmap3.min.js"></script>
 
 <script type="text/javascript">
     resetPayModal();
@@ -481,166 +470,8 @@
             container: 'checkoutContainer'
         });
     };
-
-    var eventSource = new EventSource("/translatorss/checkQuoteUpdated/${serviceRequestid}/" + guid());
-    var onMessageListener = function (event) {
-
-        var data = event.data;
-        var dataChunks = data.split('|');
-
-        var q_name = dataChunks[0].split(':')[1];
-        var q_wr = dataChunks[1].split(':')[1];
-        var q_sd = dataChunks[2].split(':')[1];
-        var q_com = dataChunks[3].split(':')[1];
-
-        var q_id = dataChunks[4].split(':')[1];
-        var q_val = dataChunks[5].split(':')[1];
-        var q_valid = dataChunks[6].split(':')[1];
-        var q_is_insert = dataChunks[7].split(':')[1];
-//        alert("Id:" + q_id + " name:" + q_name + "Value:" + q_val + " q_com:" + q_com + " q_sd:" + q_sd + " q_wr:" + q_wr + " q_is_insert:" + q_is_insert);
-
-        $('#messageDiv').show();
-
-        // New quote to be inserted into table
-        if (q_is_insert === "true") {
-            $('#datatables').find('.dataTables_empty').parent().remove();
-            $('#datatables > tbody:last-child').append(
-                '<tr class="active odd" role="row">'+
-                '<td class="text-center sorting_1">'+q_name+'</td>'+
-                '<td class="text-center" data-quote-id="'+q_id+'">'+q_val+'</td>'+
-                createStarTDAsString(q_wr)+
-                createStarTDAsString(q_com)+
-                createStarTDAsString(q_sd)+
-                '<td><a href="#" onclick="showPayModal('+q_id+');"><img src="https://paypal.com/en_US/i/btn/btn_xpressCheckout.gif"></a>'+
-                '</td>'+
-                '</tr>');
-            $('#messageLine').html("Translator "+q_name+" created a new quote: "+q_val);
-        }
-        // Current quote to be updated in table
-        else {
-            var quoteElem = $('[data-quote-id="' + q_id + '"]');
-            if (q_valid === 'false') {
-                quoteElem.parent().hide();
-            } else {
-                quoteElem.parent().show();
-            }
-            quoteElem.text(q_val);
-            $('#messageLine').html("Translator: "+q_name+" modified the quote: "+q_val);
-        }
-    };
-    eventSource.addEventListener("message", onMessageListener);
-
-    function createStarTDAsString(val) {
-        var td = '<td class="text-center">';
-        for (i=1;i<=5;i++) {
-            td+='<i class="fa fa-star'+((val<i)?'-o':'')+'"></i>'
-        }
-        td+='</td>';
-        return td;
-    }
-
-    function guid() {
-        function s4() {
-            return Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1);
-        }
-
-        return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-            s4() + '-' + s4() + s4() + s4();
-    }
-
 </script>
-
 <script src="//www.paypalobjects.com/api/checkout.js" async></script>
-
-
-	<script>
-		jQuery(document).ready(function() {
-
-			// Revolution Slider
-			jQuery('.tp-banner').revolution({
-				dottedOverlay : "twoxtwo-custom",
-				delay : 6000,
-				startwidth : 1140,
-				startheight : 556,
-				hideThumbs : 10,
-				fullWidth : "off",
-				forceFullWidth : "off",
-				fullScreen : "on",
-				fullScreenOffsetContainer : "",
-				hideCaptionAtLimit : 480,
-				//navigationType: "none",
-				soloArrowLeftHOffset : 20,
-				soloArrowRightHOffset : 20,
-				navigationType : "bullet",
-				navigationArrows : "solo", // nexttobullets, solo (old name verticalcentered), none
-				navigationStyle : "round" // round, square, navbar, round-old, square-old, navbar-old
-			});
-
-			// Google Map Init
-			jQuery('#map_canvas').gmap3({
-				marker : {
-					address : '40.717599,-74.005136'
-				},
-				map : {
-					options : {
-						zoom : 17,
-						scrollwheel : false,
-						streetViewControl : true
-					}
-				}
-			});
-		});
-
-		$(function() {
-			'use strict';
-			// Change this to the location of your server-side upload handler:
-			//	    var url = window.location.hostname === 'blueimp.github.io' ?
-			//             '//jquery-file-upload.appspot.com/' : 'server/php/';
-
-			var url = 'http://jquery-file-upload.appspot.com/';
-			$('#fileupload').fileupload(
-					{
-						url : url,
-						dataType : 'json',
-						done : function(e, data) {
-							$.each(data.result.files, function(index, file) {
-								$('<p/>').text(file.name).appendTo('#files');
-							});
-						},
-						progressall : function(e, data) {
-							var progress = parseInt(data.loaded / data.total
-									* 100, 10);
-							$('#progress .progress-bar').css('width',
-									progress + '%');
-						}
-					}).prop('disabled', !$.support.fileInput).parent()
-					.addClass($.support.fileInput ? undefined : 'disabled');
-		});
-	</script>
-	<!--  POPUP LOST PASSWORD -->
-	<script type="text/javascript">
-		var link;
-		var element;
-		function openPopUp(url) {
-			link = url;
-			element = document.getElementById("background");
-			element.style.display = "block";
-			element = document.getElementById("popup");
-			element.style.display = "block";
-
-		}
-
-		function closePopUp() {
-			element = document.getElementById("popup");
-			element.style.display = "none";
-			element = document.getElementById("background");
-			element.style.display = "none";
-		}
-	</script>
-
-
 </body>
 </html>
 

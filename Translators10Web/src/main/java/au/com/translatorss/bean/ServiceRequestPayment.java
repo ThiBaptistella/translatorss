@@ -30,7 +30,7 @@ public class ServiceRequestPayment implements java.io.Serializable {
 	private ServiceRequest serviceRequest;
 	private String paypalTransactionId;
 	private BigDecimal value;
-	
+
 	@Id
     @GenericGenerator(name = "generator", strategy = "increment")
     @GeneratedValue(generator = "generator")
@@ -71,6 +71,5 @@ public class ServiceRequestPayment implements java.io.Serializable {
 	public void setValue(BigDecimal value) {
 		this.value = value;
 	}
-
 
 }

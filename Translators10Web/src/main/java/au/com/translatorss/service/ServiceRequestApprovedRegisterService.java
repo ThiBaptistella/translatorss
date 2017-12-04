@@ -16,4 +16,6 @@ public interface ServiceRequestApprovedRegisterService extends GenericService<Se
 
 	public List<ServiceRequestApprovedDTO> getApprovedSRByTranslator(Translator translator);
 
+	public int getTotalRevenue(Long translatorid);
+
 }

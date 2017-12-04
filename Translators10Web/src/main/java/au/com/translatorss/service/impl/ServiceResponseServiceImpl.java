@@ -3,6 +3,7 @@ package au.com.translatorss.service.impl;
 import au.com.translatorss.bean.AmazonFile;
 import au.com.translatorss.bean.ServiceResponse;
 import au.com.translatorss.bean.ServiceResponseFiles;
+import au.com.translatorss.bean.User;
 import au.com.translatorss.dao.AmazonFileDao;
 import au.com.translatorss.dao.ServiceResponseDao;
 import au.com.translatorss.dao.ServiceResponseFilesDao;
@@ -70,11 +71,12 @@ public class ServiceResponseServiceImpl implements ServiceResponseService {
     @Override
     public List<AmazonFile> saveFiles(ServiceResponse serviceResponse, List<MultipartFile> files) {
         List<AmazonFile> amazonFiles = new ArrayList<AmazonFile>();
+        User user = userService.getCurrentUser();
         for (MultipartFile file : files) {
             if (file == null || file.isEmpty()) continue;
 
             try {
-                amazonService.saveServiceResponseFile(serviceResponse, file.getOriginalFilename(), file.getInputStream(), file.getContentType());
+                amazonService.saveServiceResponseFile(serviceResponse,user,  file.getOriginalFilename(), file.getInputStream(), file.getContentType());
             } catch (IOException e) {
                 e.printStackTrace();
             }

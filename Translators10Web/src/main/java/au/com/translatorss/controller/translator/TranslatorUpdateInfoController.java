@@ -12,6 +12,7 @@ import au.com.translatorss.service.AmazonFilePhotoService;
 import au.com.translatorss.service.ChatMessageService;
 import au.com.translatorss.service.TranslatorSettingsService;
 import au.com.translatorss.service.UserService;
+import au.com.translatorss.validation.PasswordChangeRequestValidator;
 import au.com.translatorss.validation.TranslatorValidatorSettings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -46,6 +47,9 @@ public class TranslatorUpdateInfoController {
     private TranslatorValidatorSettings translatorValidatorSettings;
 
     @Autowired
+    private PasswordChangeRequestValidator passwordChangeRequestValidator;
+    
+    @Autowired
     private AmazonFilePhotoService amazonFilePhotoService;
 
     @InitBinder("updateTranslatorForm")
@@ -53,6 +57,10 @@ public class TranslatorUpdateInfoController {
         binder.addValidators(translatorValidatorSettings);
     }
 
+    @InitBinder("passwordDTOForm")
+    protected void initPasswordBinder(WebDataBinder binder){
+     binder.addValidators(passwordChangeRequestValidator);
+    }
 
     @RequestMapping(value = "/updateTranslator")
     public String updateTranslator(HttpSession session, Model model, @ModelAttribute("updateTranslatorForm") @Validated TranslatorDTO translatorDTO, BindingResult result, RedirectAttributes redirectAttributes) {
@@ -68,6 +76,8 @@ public class TranslatorUpdateInfoController {
 
             model.addAttribute("unreadMessageList", dtoList);
             model.addAttribute("newMessagesNumber", messageList.size());
+			model.addAttribute("info",100);
+
             return "translatorDashboard/settings";
         }
 
@@ -80,6 +90,9 @@ public class TranslatorUpdateInfoController {
         translatorloged.setAbn_number(translatorDTO.getAbn_number());
         translatorloged.setAddress(translatorDTO.getAddress());
         translatorService.saveTranslator(translatorloged);
+    	session.setAttribute("messageDisplay", "Data Changed Successfuly.");
+		session.setAttribute("info",100);
+		
         redirectAttributes.addFlashAttribute("message", "Your Personal Details have been updated");
         return "redirect:/settings";
     }
@@ -104,6 +117,8 @@ public class TranslatorUpdateInfoController {
 
             model.addAttribute("unreadMessageList", messageList);
             model.addAttribute("newMessagesNumber", messageList.size());
+			model.addAttribute("info",300);
+
             return "translatorDashboard/settings";
         }
         Translator translator = translatorService.getTranslatorByEmail(passwordDTO.getEmail(), passwordDTO.getCurrentPassword());
@@ -119,7 +134,8 @@ public class TranslatorUpdateInfoController {
         PasswordDTO password = new PasswordDTO();
         password.setEmail(translator.getUser().getEmail());
         model.addAttribute("passwordDTOForm", password);
-
+        session.setAttribute("messageDisplay", "Password Changed Successfuly.");
+		session.setAttribute("info", 300);
         return "redirect:/settings";
     }
 

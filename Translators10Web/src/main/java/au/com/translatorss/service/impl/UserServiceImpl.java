@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.List;
 
 @Service
 @Transactional
@@ -119,4 +120,9 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     public boolean isAvailableEmailAndExcludeUser(String email, Long id) {
         return userDao.isAvailableEmailAndExcludeUser(email, id);
     }
+
+    public List<User> findAll(){
+        return userDao.findAll();
+    }
+
 }

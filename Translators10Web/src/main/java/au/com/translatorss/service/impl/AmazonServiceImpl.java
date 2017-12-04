@@ -63,14 +63,6 @@ public class AmazonServiceImpl implements AmazonService {
         return dao.findByServiceResponseIdAndType(serviceResponseId, type);
     }
 
-//    public AmazonServiceImpl() {
-//        BUCKET_NAME = "translatorss-storage-files"; 
-//        AWSCredentials credentials = new BasicAWSCredentials("AKIAIVXDJDOPB7WBWBJQ", "oKKkULGcwXdbhkJnRkJ3W7wypFOYwrjyAahkqGYT");
-//		AmazonS3 s3client = new AmazonS3Client(credentials);
-//        if (!amazonS3.doesBucketExist(BUCKET_NAME)) createBucket(BUCKET_NAME);
-//        checkAndCreateFolders();
-//    }
-
     @Inject
     public AmazonServiceImpl(@Value("${aws.s3.bucket}") String bucketName, AmazonS3 amazonS3) {
         this.amazonS3 = amazonS3;
@@ -104,7 +96,7 @@ public class AmazonServiceImpl implements AmazonService {
    
     
     @Override
-    public AmazonFile saveServiceResponseFile(ServiceResponse serviceResponse, final String fileName, InputStream is, String contentType) {
+    public AmazonFile saveServiceResponseFile(ServiceResponse serviceResponse,User user, final String fileName, InputStream is, String contentType) {
         FileType type = FileType.SERVICE_RESPONSE;
         List<String> fileNameBySerReqId = dao.findFileNameBySerRespId(fileName, serviceResponse.getId());
         String newFileName = fileName;
@@ -116,7 +108,7 @@ public class AmazonServiceImpl implements AmazonService {
         checkAndCreateFolder(type, serviceResponse.getId());
         String url = saveFileOnAmazon(is, contentType, key);
 
-        AmazonFile amazonFile = new AmazonFile(newFileName, key, type, url, serviceResponse.getTranslator().getUser());
+        AmazonFile amazonFile = new AmazonFile(newFileName, key, type, url, user);
         amazonFile.setServiceResponse(serviceResponse);
 
         return dao.save(amazonFile);
@@ -146,6 +138,7 @@ public class AmazonServiceImpl implements AmazonService {
 
     @Override
     public void deleteFile(AmazonFile amazonFile) {
+    //	dao.remove(amazonFile);
         amazonS3.deleteObject(new DeleteObjectRequest(BUCKET_NAME, amazonFile.getKey()));
     }
 
@@ -211,6 +204,16 @@ public class AmazonServiceImpl implements AmazonService {
     private void createBucket(String bucketName) {
         amazonS3.createBucket(bucketName);
     }
+
+	@Override
+	public List<AmazonFile> getAll() {
+		return dao.getAll();
+	}
+
+	@Override
+	public List<AmazonFile> getAllExpiredFiles() {
+		return dao.getAllExpiredFiles();
+	}
 
 	
 }

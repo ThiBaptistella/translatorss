@@ -170,90 +170,91 @@
               	<div class="panel panel-info">
 				 <div class="panel-body">
 					<form:form action='registerTranslator' onsubmit="return validateForm()" name="myForm" method="post" commandName="translatorForm" enctype="multipart/form-data" role="form">
-								<div class="form-group">
-                        	        <label>Full Name:</label>
-                        	        <form:input path="user.name" id="name" type="text" class="form-control" placeholder="Name" />
-									<form:errors path="user.name" class="control-label" />
-									<p id="nameerror" style="color:red"></p>
-                            	</div>
-                            	
-                            	<div class="form-group">
-                        	        <label>Password:</label>
-                        	        <form:input path="user.password" id="password" class="form-control" placeholder="password" />
-                                    <p><h6>Minimum 8 max 25 characters alphanumeric,no special characters, at least one uppercase letter, at least one lowercase letter, at least one number</h6></p>
-									<form:errors path="user.password" class="control-label" />
-									<p id="passworderror" style="color:red"></p>
-                            	</div>
-                            	
-                            	<div class="form-group">
-                        	        <label>Phone:</label>
-                        	        <form:input path="phone" id="phone" type="text" class="form-control" placeholder="phone" />
-									<form:errors path="phone" class="control-label" />
-									<p id="phoneerror" style="color:red"></p>
-                            	</div>
-								
-								<div class="form-group">
-                        	        <label>Email:</label>
-                        	        <form:input path="user.email" id="email" type="email" class="form-control" placeholder="email" />
-									<form:errors path="user.email" class="control-label" style="color:red"/>
-									<p id="emailerror" style="color:red"></p>
-                            	</div>
-
-								<div class="form-group">
-                        	        <label>Address:</label>
-                        	        <form:input path="address" id="address" type="text" class="form-control" placeholder="Address" />
-									<form:errors path="address" class="control-label" />
-									<p id="addresserror" style="color:red"></p>
-                            	</div>
-
-								<div class="form-group">
-                        	        <label>ABN Name:</label>
-                        	        <form:input path="abn_name" id="address" type="text" class="form-control" placeholder="ABN Name" />
-									<form:errors path="abn_name" class="control-label" />
-									<p id="abnnameerror" style="color:red"></p>
-                            	</div>
-                            	
-                            	<div class="form-group">
-                        	        <label>ABN Number:</label>
-                        	        <form:input path="abn_number" id="abn_name" type="text" class="form-control" placeholder="ABN Number" />
-									<form:errors path="abn_number" class="control-label" />
-									<p id="abnnumbererror" style="color:red"></p>
-                            	</div>
-
-								<div class="form-group">
-                        	        <label>Naati Registration:</label>
-                        	        <form:input path="naatiNumber" id="naatinumber" type="text" class="form-control" placeholder="naatiNumber" />
-									<form:errors path="naatiNumber" class="control-label" style="color:red"/>
-									<p id="naatinumbererror" style="color:red"></p>
-                            	</div>
- 
- 								<div class="form-group">
- 									<label>Naati Expiration:</label>
-									<form:input path="natyExpiration" type="date" class="form-control" id="natyExpiration" placeholder="natyExpiration" />					
-									<form:errors path="natyExpiration" class="control-label" style="color:red"/>
-									<p id="natyExpirationerror" style="color:red"></p>
-								</div>
- 
-                            	<div class="form-group">
-                        	        <label>Paypal Client Id:</label>
-                        	        <form:input path="paypalClientId" id="paypalclientid" type="text" class="form-control " placeholder="paypalClientId" />
-									<form:errors path="paypalClientId" class="control-label" />
-									<p id="paypalclientiderror" style="color:red"></p>
-                            	</div>
-                            	
-                            	<div class="form-group">
-                        	        <label>Languages to Translate:</label>
-                        	        <form:select path="languageList" id="languagelist" items="${languageList}" itemValue="id" itemLabel="description" multiple="true" size="15" class="form-control" />
-									<form:errors path="languageList" class="control-label" />
-									<p id="languagelisterror" style="color:red"></p>
-                            	</div>
-                            	
-								<div class="form-group">
-									<div class="col-sm-10 btnRegister">
-										<button name="translatorsave" value="translatorSaveAdmin" class="btn-lg btn-primary pull-right">Register</button>
-									</div>
-									<div class="col-sm-2"></div>
-								</div>
+                        <div class="form-group">
+                            <label>Full Name:</label>
+                            <form:input path="fullname" id="fullname" onclick="onclickCleanField('fullnameerror')" type="text" class="form-control" placeholder="Full Name" />
+                            <form:errors path="fullname" class="control-label" />
+                            <p id="fullnameerror" style="color:red"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Preferred Name:</label>
+                            <form:input path="user.name" id="preferedname" onclick="onclickCleanField('preferednameerror')" type="text" class="form-control" placeholder="Preferred Name" />
+                            <form:errors path="user.name" class="control-label" />
+                            <p id="preferednameerror" style="color:red"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <form:input path="user.email" id="email" onclick="onclickCleanField('emailerror')" type="email" class="form-control" placeholder="email" />
+                            <form:errors path="user.email" class="control-label" style="color:red"/>
+                            <p id="emailerror" style="color:red"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Password:</label>
+                            <form:input path="user.password" id="password" onclick="onclickCleanField('passworderror')" class="form-control" placeholder="password" />
+                            <p><h6>Minimum 8 max 25 characters alphanumeric,no special characters, at least one uppercase letter, at least one lowercase letter, at least one number</h6></p>
+                            <form:errors path="user.password" class="control-label" />
+                            <p id="passworderror" style="color:red"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Number:</label>
+                            <form:input path="phone" id="phone" type="text" onclick="onclickCleanField('phoneerror')" class="form-control" placeholder="Phone" />
+                            <form:errors path="phone" class="control-label" />
+                            <p id="phoneerror" style="color:red"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Home Address:</label>
+                            <form:input path="address" id="address2" type="text" onclick="onclickCleanField('addresserror')" class="form-control" placeholder="Home Address" />
+                            <form:errors path="address" class="control-label" />
+                            <p id="addresserror" style="color:red"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Paypal Client Id:</label>
+                            <form:input path="paypalClientId" id="paypalclientid" onclick="onclickCleanField('paypalclientiderror')" type="text" class="form-control " placeholder="paypalClientId" />
+                            <form:errors path="paypalClientId" class="control-label" />
+                            <p id="paypalclientiderror" style="color:red"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>ABN Name:</label>
+                            <form:input path="abn_name" id="abn_name" onclick="onclickCleanField('abn_nameerror')" type="text" class="form-control" placeholder="ABN Name" />
+                            <form:errors path="abn_name" class="control-label" />
+                            <p id="abn_nameerror" style="color:red"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>ABN Number:</label>
+                            <form:input path="abn_number" id="abn_number" onclick="onclickCleanField('abn_numbererror')" type="text" class="form-control" placeholder="ABN Number" />
+                            <form:errors path="abn_number" class="control-label" />
+                            <p id="abn_numbererror" style="color:red"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>ABN Addess:</label>
+                            <form:input path="abn_address" id="abn_address" onclick="onclickCleanField('abn_addresserror')" type="text" class="form-control" placeholder="ABN Address" />
+                            <form:errors path="abn_address" class="control-label" />
+                            <p id="abn_addresserror" style="color:red"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Nati Number:</label>
+                            <form:input path="naatiNumber" id="naatinumber" onclick="onclickCleanField('naatinumbererror')" type="text" class="form-control" placeholder="naatiNumber" />
+                            <form:errors path="naatiNumber" class="control-label" style="color:red"/>
+                            <p id="naatinumbererror" style="color:red"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Nati expiry date:</label>
+                            <form:input path="natyExpiration" type="date" class="form-control" id="natyExpiration" onclick="onclickCleanField('natyExpirationerror')" placeholder="natyExpiration" />
+                            <form:errors path="natyExpiration" class="control-label" style="color:red"/>
+                            <p id="natyExpirationerror" style="color:red"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Languages to Translate:</label>
+                            <form:select path="languageList" id="languagelist" onclick="onclickCleanField('languagelisterror')" items="${languageList}" itemValue="id" itemLabel="description" multiple="false" size="15" class="form-control" />
+                            <form:errors path="languageList" class="control-label" />
+                            <p id="languagelisterror" style="color:red"></p>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-10 btnRegister">
+                                <button name="translatorsave" value="translatorSaveAdmin" class="btn-lg btn-primary pull-right">Register</button>
+                            </div>
+                            <div class="col-sm-2"></div>
+                        </div>
 					</form:form>
 				</div>
             </div>
@@ -265,77 +266,116 @@
   </div>
 </div>
 	<script>
-	
-	   function resetPayModal() {
-	        $('#nameerror').hide();
-	        $('#passworderror').hide();
-	        $('#phoneerror').hide();
-	        $('#emailerror').hide();
-	        $('#addresserror').hide();
-	        $('#naatinumbererror').hide();
-	        $('#paypalclientiderror').hide();
-	        $('#languagelisterror').hide();
-	    }
-	
+
+
+        function onclickCleanField(idfield){
+            document.getElementById(idfield).style.display="none";
+        }
+
 		function validateForm() {
 
-			resetPayModal();
-
-			var text;
-		    var name = document.forms["myForm"]["name"].value;
+			var nameEmptyText = "Full Name was not selected!";
+		    var name = document.forms["myForm"]["fullname"].value;
 		    if (name == null || name == "") {
-		    	text = "The Name was not selected!";
-		    	document.getElementById("nameerror").innerHTML = text;
-		    	$('#nameerror').show();
+		    	document.getElementById("fullnameerror").innerHTML = nameEmptyText;
+		    	$('#fullnameerror').show();
 		        return false;
 		    }
-		    
-		    var password = document.forms["myForm"]["password"].value;
-		    if (password == null || password == "") {
-		    	text = "A password is needed!";
-		    	document.getElementById("passworderror").innerHTML = text;
-		    	$('#passworderror').show();
-		        return false;
-		    }
-		    
-		    var phone = document.forms["myForm"]["phone"].value;
-		    if (phone == null || phone == "") {
-		    	text = "The phone needs to be selected!";
-		    	document.getElementById("phoneerror").innerHTML = text;
-		    	$('#phoneerror').show();
-		        return false;
-		    }
-		    
-		    var email = document.forms["myForm"]["email"].value;
-		    if (email == null || email == "") {
-		    	text = "The email needs to be selected!";
-		    	document.getElementById("emailerror").innerHTML = text;
-		    	$('#emailerror').show();
-		        return false;
-		    }
-		    
-		    /* var address = document.forms["myForm"]["address"].value;
-		    if (address == null || address == "") {
-		    	text = "The address needs to be selected!";
-		    	document.getElementById("addresserror").innerHTML = text;
+
+            var preferednameEmptyText = "Prefered Name was not Selected!";
+            var preferedname = document.forms["myForm"]["preferedname"].value;
+            if (preferedname == null || preferedname == "") {
+                text = "A password is needed!";
+                document.getElementById("preferednameerror").innerHTML = preferednameEmptyText;
+                $('#preferednameerror').show();
+                return false;
+            }
+
+            var email = document.forms["myForm"]["email"].value;
+            if (!validateEmail(email)) {
+                document.getElementById("emailerror").innerHTML = "Email format incorrect";
+                $('#emailerror').show();
+                return false;
+            }
+
+            var passwordEmptyText = "Password was not Selected!";
+            var password = document.forms["myForm"]["password"].value;
+            if (password == null || password == "") {
+                document.getElementById("passworderror").innerHTML = passwordEmptyText;
+                $('#passworderror').show();
+                return false;
+            }else{
+                var text = checkPwd(password);
+                if(text!=null){
+                    document.getElementById("passworderror").innerHTML = text;
+                    $('#passworderror').show();
+                    return false;
+                }
+            }
+
+            var phoneEmptyText = "Phone was not selected";
+            var phone = document.forms["myForm"]["phone"].value;
+            if (phone == null || phone == "") {
+                document.getElementById("phoneerror").innerHTML = phoneEmptyText;
+                $('#phoneerror').show();
+                return false;
+            }
+
+            var addressEmptyText = "Address was not selected";
+            var address2= document.getElementById("address2").value;
+		    if (address2 == null || address2 == "") {
+		    	document.getElementById("addresserror").innerHTML = addressEmptyText;
 		    	$('#addresserror').show();
 		        return false;
-		    } */
-		    											
+		    }
+
+            var paypalclientid = document.forms["myForm"]["paypalclientid"].value;
+            if (!validateEmail(paypalclientid)) {
+                document.getElementById("paypalclientiderror").innerHTML = "Email format incorrect";
+                $('#paypalclientiderror').show();
+                return false;
+            }
+
+            var abn_nameText = "The ABN Name needs to be selected!";
+            var abn_name = document.forms["myForm"]["abn_name"].value;
+            if (abn_name == null || abn_name == "") {
+                document.getElementById("abn_nameerror").innerHTML = abn_nameText;
+                $('#abn_nameerror').show();
+                return false;
+            }
+
+            var abn_numberText = "The ABN Number needs to be selected!";
+            var abn_number = document.forms["myForm"]["abn_number"].value;
+            if (abn_number == null || abn_number == "") {
+                document.getElementById("abn_numbererror").innerHTML = abn_numberText;
+                $('#abn_numbererror').show();
+                return false;
+            }
+
+            var abn_addressText = "The ABN address needs to be selected!";
+            var abn_address = document.forms["myForm"]["abn_address"].value;
+            if (abn_address == null || abn_address == "") {
+                document.getElementById("abn_addresserror").innerHTML = abn_addressText;
+                $('#abn_addresserror').show();
+                return false;
+            }
+
+            var naatinumberEmptyText = "Nati number was not selected";
 	        var naatinumber = document.forms["myForm"]["naatinumber"].value;
 		    if (naatinumber == null || naatinumber == "") {
-		    	text = "The naatinumber needs to be selected!";
-		    	document.getElementById("naatinumbererror").innerHTML = text;
+		    	document.getElementById("naatinumbererror").innerHTML = naatinumberEmptyText;
 		    	$('#naatinumbererror').show();
 		        return false;
 		    }
-		    var paypalclientid = document.forms["myForm"]["paypalclientid"].value;
-		    if (paypalclientid == null || paypalclientid == "") {
-		    	text = "The paypalclientid needs to be selected!";
-		    	document.getElementById("paypalclientiderror").innerHTML = text;
-		    	$('#paypalclientiderror').show();
-		        return false;
-		    }
+
+            var natyExpirationEmptyText = "Nati number was not selected";
+            var natyExpiration = document.forms["myForm"]["natyExpiration"].value;
+            if (natyExpiration == null || natyExpiration == "") {
+                document.getElementById("natyExpirationerror").innerHTML = natyExpirationEmptyText;
+                $('#natyExpirationerror').show();
+                return false;
+            }
+
 		    var languagelist = document.forms["myForm"]["languagelist"].value;
 		    if (languagelist == null || languagelist == "") {
 		    	text = "The languagelist needs to be selected!";
@@ -344,6 +384,30 @@
 		        return false;
 		    }
 		}
+
+        function checkPwd(str) {
+            if (str.length < 6) {
+                return "Password needs Minimum 6 characteres";
+            } else if (str.length > 25) {
+                return "Password needs Maximum 25 characteres";
+            } else if (str.search(/\d/) == -1) {
+                return "Password needs a number";
+            } else if (str.search(/[a-z]/) == -1) {
+                return "Password needs a lowercase Letter";
+            } else if (str.search(/[A-Z]/) == -1) {
+                return "Password needs a Uppercase Letter";
+            }else if(!(str.search(/[$@$!%*?&\_]/)== -1)){
+                return "No Allow Special Character($@$!%*?&\_) in password ";
+            } else if (str.search(/[^a-zA-Z0-9\!\@\$\%\?\&\*\(\)\_\+]/) != -1) {
+                return "Incorect Format";
+            }
+            return null;
+        }
+
+        function validateEmail(email) {
+            var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
+        }
 	</script>
 
 

@@ -13,5 +13,7 @@ public interface LanguageService {
 	public List<Language> getAvailableLanguages();
 	
 	public Language find(Long key) ;
+
+	public void save(Language language);
 	
 }

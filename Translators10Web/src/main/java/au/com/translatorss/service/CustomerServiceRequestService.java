@@ -29,6 +29,9 @@ public interface CustomerServiceRequestService {
     /*History*/	
     public List<ServiceRequest> getServiceRequestFromBusinessUser(BusinessUser businessUSer, String string);
     public List<ServiceRequest> getServiceRequestFromTranslator(Long translatorid, String string);
+    
+    public List<ServiceRequest> getServiceRequestFromBusinessUser(BusinessUser businessUser, List<String> statusList);
+    public List<ServiceRequest> getServiceRequestFromTranslator(Translator translator, List<String> statusList) ;
     /**/
     
     public List<ServiceRequest> getServiceRequestAvailableForTranslator(Translator translatorloged);
@@ -37,7 +40,7 @@ public interface CustomerServiceRequestService {
 
     public List<ServiceRequest> getServiceRequestQuotedFromTranslator(Translator translatorloged, String status);
 
-    public List<ServiceRequest> getServiceRequestStandartWithoutQuote(Translator translator);
+    public List<ServiceRequest> getServiceRequestStandartWithoutQuote(Translator translator, String timeFrame);
     
     public List<ServiceRequest> getServiceRequestByState(String status);
     
@@ -46,4 +49,5 @@ public interface CustomerServiceRequestService {
     public void saveServiceRequestFile(ServiceRequestFiles serviceRequestFile);
 
     void saveWithoutFiles(ServiceRequest serviceRequest, ServiceRequestDTO serviceRequestDTO);
+
 }

@@ -76,7 +76,7 @@ public class QuoteSettingsController extends BaseController{
 				List<ChatMessageDTO> dtoList = getMessagesDTO(new HashSet(messageList));
 
 
-			model.addAttribute("unreadMessageList", dtoList);
+				model.addAttribute("unreadMessageList", dtoList);
 	    		model.addAttribute("newMessagesNumber", messageList.size());
 	            
 	            
@@ -89,39 +89,17 @@ public class QuoteSettingsController extends BaseController{
 	            return "/translatorDashboard/quoteSettings";
 	    }
 
-	    private QuoteSettingDTO getCategoryValues(List<QuotationStandar> urgentList) {
-        	QuoteSettingDTO quote =new QuoteSettingDTO();
-
-	    	for(QuotationStandar quoteStandar:urgentList){
-        		if(quoteStandar.getCategory().getDescription().equals("Birth, Death or Marriage Certificate")){
-        			quote.setBirthDeath(quoteStandar.getValue().toString());
-        		}else if(quoteStandar.getCategory().getDescription().equals("Passport")){
-        			quote.setPassport(quoteStandar.getValue().toString());
-        		}else if(quoteStandar.getCategory().getDescription().equals("Academic Records / Transcripts")){
-        			quote.setAcademicTranscript(quoteStandar.getValue().toString());
-        		}else if(quoteStandar.getCategory().getDescription().equals("Drivers License")){
-        			quote.setDriverLic(quoteStandar.getValue().toString());
-        		}
-    			quote.setValid(quoteStandar.getValid());
-	    	}
-	    	
-	    	return quote;
-	 	}
-
-	 
-
 		@RequestMapping(value = "/disableValue/{timeFrame}", method = RequestMethod.GET)
-	   	public String disableUrgentValue( @PathVariable("timeFrame") String timeFrame,HttpSession session) {
+	   	public void disableUrgentValue( @PathVariable("timeFrame") String timeFrame,HttpSession session) {
 	        Translator translatorloged = (Translator) session.getAttribute("loggedInUser");
 	        translatorQuotationService.disableStandarQuotations(translatorloged.getId(),timeFrame);
-	   		return "redirect:quoteSettings";
+	   		//return "redirect:quoteSettings";
 	   	}
 	    
 	    @RequestMapping(value = "/enableValue/{timeFrame}", method = RequestMethod.GET)
-	   	public String enableUrgentValue(@PathVariable("timeFrame") String timeFrame,HttpSession session) {
+	   	public void enableUrgentValue(@PathVariable("timeFrame") String timeFrame,HttpSession session) {
 	        Translator translatorloged = (Translator) session.getAttribute("loggedInUser");
 	        translatorQuotationService.enableStandarQuotations(translatorloged.getId(),timeFrame);
-	   		return "redirect:quoteSettings";
 	   	}
 	    
 	    @RequestMapping(value = "/urgentUpdateQuotationConfig", method = RequestMethod.POST)
@@ -130,12 +108,18 @@ public class QuoteSettingsController extends BaseController{
 	            quoteSetting.setTranslatorId(translatorloged.getId());
 	            translatorService.updateStandarQuote(translatorloged, quoteSetting, "Urgent");
 	            translatorQuotationService.updateQuotations(translatorloged, quoteSetting,"Urgent");	
-	            List<QuotationStandar> urgentList=quotesStandarService.getByTimeFrame("Urgent", translatorloged.getId());
-	        	QuoteSettingDTO urgent =getCategoryValues(urgentList);
-	        	
+	            List<QuotationStandar> urgentList =quotesStandarService.getByTimeFrame("Urgent", translatorloged.getId());
+	            List<QuotationStandar> relaxedList = quotesStandarService.getByTimeFrame("Relaxed", translatorloged.getId());
+	            List<QuotationStandar> mediumList = quotesStandarService.getByTimeFrame("Medium",translatorloged.getId());
+	        	QuoteSettingDTO urgent = getCategoryValues(urgentList);
+	        	QuoteSettingDTO medium = getCategoryValues(mediumList);
+	        	QuoteSettingDTO relaxed = getCategoryValues(relaxedList);
+
 	            model.addAttribute("urgentQuoteForm", urgent);
-	            model.addAttribute("mediumQuoteForm", new QuoteSettingDTO());
-	            model.addAttribute("relaxedQuoteForm", new QuoteSettingDTO());
+	            model.addAttribute("urgentvalid",urgent.getValid());
+	            model.addAttribute("mediumQuoteForm", medium);
+	            model.addAttribute("relaxedQuoteForm", relaxed);
+
 	            model.addAttribute("translatorid", translatorloged.getId());
 	            AmazonFilePhoto photoView = amazonFilePhotoService.getAmazonFilePhotoByUserId(translatorloged.getUser());
 	            if(photoView ==null){
@@ -154,12 +138,23 @@ public class QuoteSettingsController extends BaseController{
 	    public String mediumQuotationConf(HttpSession session,@ModelAttribute("mediumQuoteForm") QuoteSettingDTO quoteSetting, BindingResult result, Model model) {
 	        Translator translatorloged = (Translator) session.getAttribute("loggedInUser");
 	        quoteSetting.setTranslatorId(translatorloged.getId());
+
             translatorService.updateStandarQuote(translatorloged, quoteSetting, "Medium");
             translatorQuotationService.updateQuotations(translatorloged,quoteSetting,"Medium");
-	        	
-	        model.addAttribute("urgentQuoteForm", new QuoteSettingDTO());
-	        model.addAttribute("mediumQuoteForm", new QuoteSettingDTO());
-	        model.addAttribute("relaxedQuoteForm", new QuoteSettingDTO());
+
+			List<QuotationStandar> urgentList =quotesStandarService.getByTimeFrame("Urgent", translatorloged.getId());
+			List<QuotationStandar> relaxedList = quotesStandarService.getByTimeFrame("Relaxed", translatorloged.getId());
+			List<QuotationStandar> mediumList = quotesStandarService.getByTimeFrame("Medium",translatorloged.getId());
+			QuoteSettingDTO urgent = getCategoryValues(urgentList);
+			QuoteSettingDTO medium = getCategoryValues(mediumList);
+			QuoteSettingDTO relaxed = getCategoryValues(relaxedList);
+
+			model.addAttribute("urgentQuoteForm", urgent);
+			model.addAttribute("urgentvalid",urgent.getValid());
+
+			model.addAttribute("mediumQuoteForm", medium);
+			model.addAttribute("relaxedQuoteForm", relaxed);
+
 	        AmazonFilePhoto photoView = amazonFilePhotoService.getAmazonFilePhotoByUserId(translatorloged.getUser());
             if(photoView ==null){
     			model.addAttribute("photoUrl", "resources/assets/layouts/layout2/img/avatar.png");
@@ -170,8 +165,9 @@ public class QuoteSettingsController extends BaseController{
             List<ChatMessage> messageList= chatMessageService.getUnreadMessageByCustomerId(translatorloged.getId());
     		model.addAttribute("unreadMessageList", messageList);
     		model.addAttribute("newMessagesNumber", messageList.size());
-	        return "translatorDashboard/quoteSettings";
-	    }
+	       // return "translatorDashboard/quoteSettings";
+	    return "redirect:quoteSettings";
+        }
 	    
 	    @RequestMapping(value = "/relaxedUpdateQuotationConfig", method = RequestMethod.POST)
 	    public String relaxedQuotationConf(HttpSession session,@ModelAttribute("relaxedQuoteForm") QuoteSettingDTO quoteSetting, BindingResult result, Model model) {
@@ -179,11 +175,21 @@ public class QuoteSettingsController extends BaseController{
 	         quoteSetting.setTranslatorId(translatorloged.getId());
 	         translatorService.updateStandarQuote(translatorloged, quoteSetting, "Relaxed");
 	         translatorQuotationService.updateQuotations(translatorloged,quoteSetting,"Relaxed");
-	        	
-	         model.addAttribute("urgentQuoteForm", new QuoteSettingDTO());
-	         model.addAttribute("mediumQuoteForm", new QuoteSettingDTO());
-	         model.addAttribute("relaxedQuoteForm", new QuoteSettingDTO());
+
 	         Translator translator = (Translator) session.getAttribute("loggedInUser");
+
+			 List<QuotationStandar> urgentList =quotesStandarService.getByTimeFrame("Urgent", translatorloged.getId());
+			 List<QuotationStandar> relaxedList = quotesStandarService.getByTimeFrame("Relaxed", translatorloged.getId());
+			 List<QuotationStandar> mediumList = quotesStandarService.getByTimeFrame("Medium",translatorloged.getId());
+			 QuoteSettingDTO urgent = getCategoryValues(urgentList);
+			 QuoteSettingDTO medium = getCategoryValues(mediumList);
+			 QuoteSettingDTO relaxed = getCategoryValues(relaxedList);
+
+			 model.addAttribute("urgentQuoteForm", urgent);
+			 model.addAttribute("urgentvalid",urgent.getValid());
+
+			 model.addAttribute("mediumQuoteForm", medium);
+			 model.addAttribute("relaxedQuoteForm", relaxed);
 	         model.addAttribute("translatorName", translator.getUser().getName());
 	         AmazonFilePhoto photoView = amazonFilePhotoService.getAmazonFilePhotoByUserId(translatorloged.getUser());
 	            if(photoView ==null){
@@ -196,6 +202,25 @@ public class QuoteSettingsController extends BaseController{
 	    		model.addAttribute("newMessagesNumber", messageList.size());
 	         return "translatorDashboard/quoteSettings";
 	    }
+
+		private QuoteSettingDTO getCategoryValues(List<QuotationStandar> urgentList) {
+			QuoteSettingDTO quote =new QuoteSettingDTO();
+
+			for(QuotationStandar quoteStandar:urgentList){
+				if(quoteStandar.getCategory().getDescription().equals("Birth Certificate")){
+					quote.setBirthCertificate(quoteStandar.getValue().toString());
+				}else if(quoteStandar.getCategory().getDescription().equals("Passport")){
+					quote.setPassport(quoteStandar.getValue().toString());
+				}else if(quoteStandar.getCategory().getDescription().equals("Marriage Certificate")){
+					quote.setMarriageCertificate(quoteStandar.getValue().toString());
+				}else if(quoteStandar.getCategory().getDescription().equals("Drivers License")){
+					quote.setDriverLic(quoteStandar.getValue().toString());
+				}
+				quote.setValid(quoteStandar.getValid());
+			}
+
+			return quote;
+		}
 
 //	private List<ChatMessageDTO> getMessagesDTO(Set<ChatMessage> messageList) {
 //		List<ChatMessageDTO> messageListDTO = new ArrayList<ChatMessageDTO>();

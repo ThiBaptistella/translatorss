@@ -17,4 +17,8 @@ public interface AmazonFileDao extends GenericDao<AmazonFile, Long> {
     List findFileNameBySerReqId(String fileName, Long serReqId);
 
     List<String> findFileNameBySerRespId(String fileName, Long serRespId);
+
+	List<AmazonFile> getAllExpiredFiles();
+	
+	
 }

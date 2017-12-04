@@ -1,11 +1,11 @@
-<%@ page session="true"%>
 <%@ page import="au.com.translatorss.bean.Conversation" %>
+<%@ page import="au.com.translatorss.bean.ServiceRequest" %>
 <%@ page import="au.com.translatorss.utils.ConversationUtils" %>
+<%@ page session="true"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<html lang="en">
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%><html lang="en">
 
 <head>
 
@@ -170,7 +170,7 @@
                 </div>
 
                 <div class="row">
-  				<%-- <div class="panel panel-primary">
+  			    <div class="panel panel-primary">
 				  <div class="panel-heading">
 				    <h3 class="panel-title">Messages</h3>
 				  </div>
@@ -188,7 +188,8 @@
                                    </c:forEach>  
                                 </tbody>
                             </table>
-                            <c:if test="${serviceRequestStatus == 'OpenService'}">
+                            
+                           <c:if test="${serviceRequestStatus == 'OpenService'}">
                             <form:form name="myForm" action='submitMessageAdmin' method="post" onsubmit="return validateForm()" commandName="message">
                            		<div class="conv-write">
                            			 <div class="write-wrap">
@@ -215,7 +216,7 @@
                         </div>
                     </div>
                    </div>
-                 </div> --%>
+                 </div>
                  
                  <c:if test="${serviceRequestStatus == 'OpenService'}">
 	                 <div class="col-lg-6">

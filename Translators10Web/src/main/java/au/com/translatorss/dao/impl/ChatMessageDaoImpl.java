@@ -19,4 +19,8 @@ public class ChatMessageDaoImpl extends GenericDaoImplementation<ChatMessage, Lo
         criteria.add(Restrictions.eq("receiverId",id));
         return  criteria.list();
 	}
+
+    public void persistMessage(ChatMessage message){
+	    this.getSessionFactory().getCurrentSession().saveOrUpdate(message);
+    }
 }

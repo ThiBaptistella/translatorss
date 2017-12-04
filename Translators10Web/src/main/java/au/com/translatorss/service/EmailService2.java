@@ -7,6 +7,9 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import au.com.translatorss.bean.Quotation;
+import au.com.translatorss.bean.ServiceRequest;
+
 public interface EmailService2 {
 
 	public void sendEmailToCustomerAndUnquotedTranslatorsAferSRCreated(String customerEmail, String serviceRequestid, String customername);
@@ -33,7 +36,20 @@ public interface EmailService2 {
 
 	public void sendEmailToTranslatorServiceRequestApproved(String servicerequestid, String translatorname, String translatorEmail, String translatorCommunication,String serviceAsDescribed, String wouldRecommend, String abname, String abnumber, String quote);
 
-	public void sendEmailToCustomerServiceRequestAppoved(String servicerequestid, String customername,String customerEmail, String abname, String abnumber, String quote);
+	public void sendEmailToCustomerServiceRequestAppoved(ServiceRequest servicerequest, String customername,String translatorname,String customerEmail,String translatorEmail, String abname, String abnumber, Quotation quote);
 
-    void sendInvoice(byte[] bytes, String translator, String customer);
+	public void sendEmailNewQuoteFromTranslator(String customerEmail, String customername, String translatorname, String quote,String servicerequestid);
+
+	void sendEmailToCustomerMessageSentByTranslator(String customerEmail, String customername, String translatorName,
+			String message, String servicerequestid);
+
+	void sendEmailToTranslatorMessageSentByCustomer(String translatorEmail, String translatorname, String customername,
+			String message, String servicerequestid);
+	
+	public void sendEmailtoTranslatorServiceRequestCancel(String translatorEmail, String translatorname,String servicerequestid);
+	
+	public void sendEmailtoCustomerServiceRequestCancel(String customerEmail, String customername,String servicerequestid);
+
+	void sendEmailToTranslatorStatusChange(String translatoremail, String translatorname, String translatorstatus);
+
 }

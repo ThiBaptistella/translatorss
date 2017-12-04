@@ -1,6 +1,5 @@
 function onMessageSubmit() {
     var xhr = new XMLHttpRequest();
-
     var body = {
         "sender": document.getElementById("sender").value,
         "conversationid": document.getElementById("conversationid").value,

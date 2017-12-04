@@ -43,7 +43,7 @@ public class ServiceRequestFiles implements java.io.Serializable {
 		this.id = id;
 	}
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne
 	@JoinColumn(name = "serviceRequestid", nullable = false)
 	public ServiceRequest getServiceRequest() {
 		return this.serviceRequest;

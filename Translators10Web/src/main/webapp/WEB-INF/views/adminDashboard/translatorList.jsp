@@ -148,21 +148,22 @@
                                 <table class="table table-bordered table-hover table-striped" id="datatables">
                                     <thead>
                                     <tr>
-                                    	 <th width="40">ID</th>
+                                    	 <th width="40">Translator ID</th>
+										 <th width="40">Translator State</th>
+										 <th width="40">Flags</th>
                                          <th width="40">Full Name</th>
                                          <th width="40">Prefered Name</th>
                                          <th width="40">Email</th>
+										 <th width="40">Contact Number</th>
 									     <th width="40">Home Address</th>
 									     <th width="40">Paypal client Id</th>
 									     <th width="120">ABN Name</th>
 									     <th width="120">ABN Number</th>
 									     <th width="120">ABN Address</th>
-									     <th width="40">Contact Number</th>
-									     <th width="40">Language</th>
-                                         <th width="40">Remaining Days</th>
 									     <th width="40">Nati Number</th>
 									     <th width="40">Nati Expiry Date</th>
-									     <th width="40">Status</th>
+                                         <th width="40">Number of days Subscription</th>
+									     <th width="40">Language</th>
 									     <th width="40">Rating Table</th>
 									     <th width="40">Action</th>
                                     </tr>
@@ -171,20 +172,29 @@
 		                                    <c:forEach items="${listTranslators}" var="translator">
 										        <tr>
 										        	<td>${translator.id}</td>
+													<td>${translator.status}</td>
+													<td>
+                                                        <b>Nati Verified:</b>    ${translator.natyVerified}
+                                                        <br>
+                                                        <b>Nati Expire Date:</b> ${translator.natyExtiryDate}
+                                                        <br>
+                                                        <b>Valid Subscription:</b> ${translator.validSuscription}
+                                                        <br>
+                                                        <b>Manually Paused:</b>    ${translator.manualyPaused}
+                                                    </td>
 										        	<td>${translator.name}</td>
-										        	<td>Prefered name</td>
+										        	<td>${translator.preferedName}</td>
 										        	<td>${translator.email}</td>
+												    <td>${translator.phone}</td>
 										            <td>${translator.address}</td>
 										            <td>${translator.paypalClientId}</td>
 										            <td>${translator.abn_name}</td>
 										            <td>${translator.abn_number}</td>
 										            <td>${translator.abn_address}</td>
-										            <td>${translator.phone}</td>
+													<td>${translator.naatiNumber}</td>
+													<td>${translator.natyExpiration}</td>
+													<td>${translator.remainingDays}</td>
 										            <td>${translator.language}</td>
-                                                    <td>${translator.remainingDays}</td>
-										            <td>${translator.naatiNumber}</td>
-										            <td>${translator.natyExpiration}</td>
-										            <td>${translator.status}</td>
 										            <td>
                                                         <a href="<c:url value='/translatorRateInformation/${translator.id}' />" >See Rate</a>
                                                     </td>

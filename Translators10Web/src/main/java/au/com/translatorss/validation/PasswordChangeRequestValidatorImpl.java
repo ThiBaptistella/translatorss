@@ -41,8 +41,8 @@ public class PasswordChangeRequestValidatorImpl implements PasswordChangeRequest
         User user = userService.getCurrentUserOrNull();
         
         if(!user.getPassword().equals(passwordDTO.getCurrentPassword())){
-        	errors.rejectValue("currentPassword", "incorrectPassword");
-        }
+        	errors.rejectValue("currentPassword", "currentPassword");
+        }		   
 //        if(!StringUtils.isNotBlank(passwordDTO.getCurrentPassword())){
 //            errors.rejectValue("currentPassword", "fieldEmpty");
 //        }

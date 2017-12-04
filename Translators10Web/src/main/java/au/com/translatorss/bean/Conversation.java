@@ -81,7 +81,7 @@ public class Conversation implements java.io.Serializable{
         this.updated = updated;
     }
     
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "conversation")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "conversation", orphanRemoval=true)
     public Set<ChatMessage> getMessageList() {
         return messageList;
     }
@@ -90,7 +90,7 @@ public class Conversation implements java.io.Serializable{
         this.messageList = messageList;
     }
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
 	@JoinColumn(name = "serviceRequestid", nullable = false)
     public ServiceRequest getServiceRequest() {
         return serviceRequest;

@@ -18,12 +18,18 @@ public interface AmazonService {
 
     AmazonFile saveServiceRequestFile(ServiceRequest serviceRequest, String fileName, InputStream inputStream, String contentType);
 
-    AmazonFile saveServiceResponseFile(ServiceResponse serviceResponse, String fileName, InputStream is, String contentType);
+    AmazonFile saveServiceResponseFile(ServiceResponse serviceResponse,User user, String fileName, InputStream is, String contentType);
 
     AmazonFile saveInvoice(ServiceRequest sr, User createdBy, String fileName, InputStream is);
     
     void deleteFile(AmazonFile amazonFile);
 
     void deleteFile(String key);
+    
+    List<AmazonFile> getAll();
+
+	List<AmazonFile> getAllExpiredFiles();
+    
+    
     
 }

@@ -157,9 +157,10 @@
        <div class="col-md-10">
             <div class="inbox-body">
                  <div class="inbox-header">
-                            <h1 class="pull-left">Messages</h1>  
+                             
                  </div>
                  <div class="inbox-content">
+                 	<div  style="height:300px; overflow-y : scroll;">
                       <table class="table table-striped table-advance table-hover" id="datatables">
 	                          <thead>
 	                  		  </thead>
@@ -181,7 +182,8 @@
 						             </c:forEach>
 		                        </tbody>
                         </table>
-                               	<form:form name="myForm" commandName="message">
+                      </div>
+                            <!--  <form:form name="myForm" commandName="message">
 											<div class="conv-write">
 												<div class="write-wrap">
 													<div class="write-row cf">
@@ -193,6 +195,9 @@
 														<spring:bind path="conversationid">
 															<form:input path="conversationid" type="hidden"
 																		class="form-control " id="conversationid"/>
+														</spring:bind>
+														<spring:bind path="photoUrl">
+															<form:input path="photoUrl" type="hidden" class ="form-control" id="photoUrl"/>
 														</spring:bind>
 														<spring:bind path="sender">
 															<form:input path="sender" type="hidden" class="form-control "
@@ -208,7 +213,31 @@
 													</div>
 												</div>
 											</div>
-									</form:form>
+									</form:form>--> 
+									
+									 <c:if test="${serviceRequestStatus == 'OpenService'}">
+                            <form:form name="myForm" action='submitMessageAdmin' method="post" onsubmit="return validateForm()" commandName="message">
+                           		<div class="conv-write">
+                           			 <div class="write-wrap">
+                           			 	<div class="write-row cf">
+                           			 		<spring:bind path="message">
+                    							<form:textarea path="message" rows="3" cols="75" maxlength="600" class="form-control" id="message"/>
+               							    </spring:bind>   
+               							    <spring:bind path="conversationid">
+               							        <form:input path="conversationid" type="hidden" class="form-control " id="conversationid"/>
+               							    </spring:bind>
+               							    <spring:bind path="sender">
+               							        <form:input path="sender" type="hidden" class="form-control " id="sender"/>
+               							    </spring:bind>
+               							</div>  
+               							 <div class="write-controls cf">
+               							 		<span class="char-count"><em>0</em> / 600</span>
+												<div class="icn-submit"><input class="btn-standard btn-azure-grad btn-send-message"  type="submit" value="Send" /></div>                		
+               							 </div>             							
+                           			 </div>
+                          		</div> 
+                          </form:form> 
+                          </c:if>  	
                     </div>
                 </div> 	
       		</div>
@@ -256,7 +285,7 @@
 	        <div class="col-lg-6">
 			 	<div class="panel panel-primary">
 					 <div class="panel-heading">
-					         <h3 class="panel-title">Service Request Details</h3>
+					         <h3 class="panel-title">Service Request Files Details</h3>
 					 </div>
 					 <div class="panel-body">
 				          <div class="table-responsive">

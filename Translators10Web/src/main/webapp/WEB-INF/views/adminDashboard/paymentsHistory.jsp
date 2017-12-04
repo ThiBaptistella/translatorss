@@ -161,19 +161,21 @@
                                 <table class="table table-bordered table-hover table-striped" id="datatables">
                                     <thead>
                                     <tr>
-                                        <th class="text-center">ID</th>
                                         <th class="text-center">Date</th>
-                                        <th class="text-center">Name</th>
-                                        <th class="text-center">Creator</th>                                        
+                                        <th class="text-center">File Name</th>
+                                        <th class="text-center">User Creator</th> 
                                     </tr>
                                     </thead>
                                     <tbody>
-	                                        <tr class="active">
-	                                            <td>1</td>
-	                                            <td>29/12/1985</td>
-	                                            <td>Payment.csv</td>
-	                                            <td>Lucas</td>
-	                                        </tr>
+	                                        <c:forEach items="${paymentFilelist}" var="AmazonFile">
+										        <tr>
+										        	<td>${AmazonFile.createdAt}</td>
+													<td>
+														<a href="${AmazonFile.url}" download="${AmazonFile.fileName}">${AmazonFile.fileName}</a>
+													</td>
+										        	<td>${AmazonFile.createdBy.name}</td>
+										        </tr>
+										    </c:forEach>
                                     </tbody>
                                 </table>
                             </div>
@@ -182,6 +184,45 @@
         </div>
       </div>
       <!-- /.row -->
+      
+       <div class="row">
+          <div class="panel panel-primary">
+           <div class="panel-heading">
+              <h3 class="panel-title">Refund History</h3>
+            </div>
+            <div class="panel-body">
+			 	    <div class="col-lg-8">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover table-striped" id="datatables">
+                                    <thead>
+                                    <tr>
+                                        <th class="text-center">Date</th>
+                                        <th class="text-center">File Name</th>
+                                        <th class="text-center">User Creator</th> 
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+	                                        <c:forEach items="${refundFilelist}" var="AmazonFile">
+										        <tr>
+										        	<td>${AmazonFile.createdAt}</td>
+													<td>
+														<a href="${AmazonFile.url}" download="${AmazonFile.fileName}">${AmazonFile.fileName}</a>
+													</td>
+										        	<td>${AmazonFile.createdBy.name}</td>
+										        </tr>
+										    </c:forEach>
+                                    </tbody>
+                                </table>
+                            </div>
+                   </div>
+            </div>
+        </div>
+      </div>
+      
+      
+      
+      
+      
     </div>
     <!-- /.container-fluid -->
 

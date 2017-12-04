@@ -5,9 +5,11 @@ import java.util.Date;
 public class BusinessUserDTO {
 
     private String email;
-    private Date creationdate;
+    private String paypalid;
+	private Date creationdate;
     private Date updatedate;
     private String fullname;
+    private String preferedname;
     private String phone;
     private String address;
     private String password;
@@ -16,7 +18,15 @@ public class BusinessUserDTO {
 	public BusinessUserDTO(){
         
     }
-	
+
+    public String getPreferedname() {
+        return preferedname;
+    }
+
+    public void setPreferedname(String preferedname) {
+        this.preferedname = preferedname;
+    }
+
 	public Long getId() {
 		return id;
 	}
@@ -81,4 +91,11 @@ public class BusinessUserDTO {
 		this.password = password;
 	}
 
+	public String getPaypalid() {
+		return paypalid;
+	}
+
+	public void setPaypalid(String paypalid) {
+		this.paypalid = paypalid;
+	}
 }

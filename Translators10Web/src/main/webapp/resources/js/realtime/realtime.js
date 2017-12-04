@@ -70,14 +70,22 @@ function addMessage(content) {
     var img = document.createElement('img');
     img.src = content.photoUrl;
     img.className="img-circle";
-    img.height="72";
+    img.height="62";
     img.width="52";
 
+    var footer = document.createElement('footer');
+    var span = document.createElement('span'); 
+    var sender = document.createTextNode(content.sender);
+    span.appendChild(sender);
+    footer.appendChild(span);
+    
     var newCell = newRow.insertCell(0);
     newCell.className = 'text-center';
     var newText = document.createTextNode(content.sender);
     newCell.appendChild(img);
+    newCell.appendChild(footer);
 
+    
     newCell = newRow.insertCell(1);
     newCell.className = 'text-center';
     newText = document.createTextNode(content.message);
@@ -99,7 +107,10 @@ function toStringDate(date2) {
     var hour = ("0" + date.getHours()).slice(-2);
     var milliSeconds = date.getMilliseconds();
 
-    return day + " " + month + " " + year+" "+ hour + ":" + minutes + ":" + seconds + "." + milliSeconds
+    //return day + " " + month + " " + year+" "+ hour + ":" + minutes + ":" + seconds + "." + milliSeconds
+    return year + "-" + month + "-" + day + " "+ hour + ":" + minutes + ":" +seconds+"."+milliSeconds
+
+    
 }
 function markAsRead(id) {
     var tr = document.getElementById(id);

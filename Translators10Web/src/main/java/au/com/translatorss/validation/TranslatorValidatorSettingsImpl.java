@@ -31,13 +31,8 @@ public class TranslatorValidatorSettingsImpl implements TranslatorValidatorSetti
 	@Override
 	public void validate(Object target, Errors errors) {
 		TranslatorDTO translatorDTO= (TranslatorDTO) target;
-		Translator translator = (Translator)translatorService.getTranslatorByNatiNumber(translatorDTO.getNaatiNumber());
-//		if(translator!=null && (!translatorDTO.getId().equals(translator.getId()))){
-//			errors.rejectValue("naatiNumber", "naatiNumberUsed");
-//		}
-//		if(!userService.isAvailableEmailAndExcludeUser(translatorDTO.getEmail(), translatorDTO.getUserId())){
-//			errors.rejectValue("email", "emailUsed");
-//		}
+		Translator translator = (Translator)translatorService.getTranslatorById(translatorDTO.getId());
+
 		if(!userService.isAvailableEmailAndExcludeUser(translatorDTO.getEmail(), translator.getUser().getId())){
 			errors.rejectValue("email", "emailUsed");
 		}

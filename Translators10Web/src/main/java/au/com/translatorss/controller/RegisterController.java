@@ -3,8 +3,13 @@ package au.com.translatorss.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collection;
 
 import javax.servlet.http.HttpSession;
+
+import au.com.translatorss.service.UserService;
+import org.springframework.http.ResponseEntity;
+import au.com.translatorss.bean.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.http.MediaType;
+import  org.springframework.http.HttpStatus;
+
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
@@ -36,6 +44,9 @@ import au.com.translatorss.service.TranslatorQuotationService;
 import au.com.translatorss.validation.CreateServiceRequestValidator;
 import au.com.translatorss.validation.RegisterValidator;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.RequestBody;
+
+
 
 @Controller
 public class RegisterController {
@@ -50,7 +61,10 @@ public class RegisterController {
 	
     @Autowired
     private TranslatorQuotationService quotationService;
-    
+
+	@Autowired
+	private UserService userService;
+
     @Value("${donation.value}")
     private String donationValue;
     
@@ -59,12 +73,21 @@ public class RegisterController {
         binder.addValidators(createServiceRequestValidator);
     }
 
+	@RequestMapping(value = "/users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	/* ResponseEntity representa una respuesta HTTP */
+	public ResponseEntity<Collection<User>> getUsers() {
+	    List<User> userList = userService.findAll();
+		return new ResponseEntity<Collection<User>>(userList, HttpStatus.OK);
+	}
+
 	@RequestMapping(value = "serviceRequestProcesorHome",method = RequestMethod.POST)
 	public String serviceRequestProcesorHome(@ModelAttribute("serviceRequestDTO")@Validated ServiceRequestDTO serviceRequestDTO,BindingResult result, Model model,HttpSession session) throws IllegalStateException, IOException{
 		logger.info("Welcome RegisterController: businessUser");
 		if (result.hasErrors()) {
-            return "redirect:/";
-        }
+			model.addAttribute("serviceRequestDTO", serviceRequestDTO);
+			model.addAttribute("languageList", initializeProfiles());
+			return "home";
+		}
 		BusinessUser usinessUser = new BusinessUser();
 		session.setAttribute("servcieRequestLead", serviceRequestDTO);
 		List<MultipartFile> files = serviceRequestDTO.getFiles();
@@ -76,15 +99,15 @@ public class RegisterController {
 		model.addAttribute("businessUserForm", usinessUser);
 		List<TranslatorQuotationDTO> quoteList= quotationService.getQuotationArrayDTO(serviceRequestDTO);
 		if(!quoteList.isEmpty()){
-			session.setAttribute("translatorQuoteList",quoteList );
+			session.setAttribute("translatorQuoteList",quoteList);
 			model.addAttribute("translatorQuoteList", quoteList);
-	        model.addAttribute("donationValue", donationValue);
+			model.addAttribute("donationValue", donationValue);
 			return "HomeQuotes";
 		}else{
 			return "redirect:/businessUserForm";
 		}
 	}
-	
+
 	@RequestMapping(value = "/businessUserForm")
 	public String businessUserForm(HttpSession session, Model model) {
 		logger.info("Welcome BusinessUserDashboardController: businessUserForm");
@@ -93,5 +116,10 @@ public class RegisterController {
 		model.addAttribute("businessUserForm", businessUserDTO);
 		model.addAttribute("loginSRForm", loggin);
 		return "/businessUserForm";
+	}
+
+	public List<Language> initializeProfiles() {
+		List<Language> languageList = languageService.getAvailableLanguages();
+		return languageList;
 	}
 }

@@ -33,27 +33,31 @@ public class RealtimeHandler {
 
     private static final Logger LOGGER = LogManager.getLogger(RealtimeHandler.class);
 
-    @Around(value = "execution(* au.com.translatorss.service.impl.ChatMessageServiceImpl.saveOrUpdate(..)) && args(chatMessage)")
-    public Object saveOrUpdateMessage(ProceedingJoinPoint pjp, ChatMessage chatMessage) throws Throwable {
+    //@Around(value = "execution(* au.com.translatorss.service.impl.ChatMessageServiceImpl.saveOrUpdate(..)) && args(chatMessage)")
+    @Around(value = "execution(* au.com.translatorss.dao.impl.ChatMessageDaoImpl.persistMessage(..)) && args(message)")
+    public Object saveOrUpdateMessage(ProceedingJoinPoint pjp, ChatMessage message) throws Throwable {
+
         Object proceed = pjp.proceed();
-        Conversation conversation = chatMessage.getConversation();
+        Conversation conversation = message.getConversation();
         ServiceRequest serviceRequest = conversation.getServiceRequest();
 
-        conversation.setLastMessage(chatMessage.getMessage());
-        conversation.setSender(chatMessage.getSender());
-        conversation.setUpdated(chatMessage.getDate());
+        conversation.setLastMessage(message.getMessage());
+        conversation.setSender(message.getSender());
+        conversation.setUpdated(message.getDate());
         conversationService.saveOrUpdate(conversation);
-        
-        User customer = userService.getByEmail(serviceRequest.getCustomer().getUser().getEmail());
-        User translator = userService.getByEmail(chatMessage.getConversation().getTranslator().getUser().getEmail());
 
-        saveMessageInChat(chatMessage);
+        User customer = userService.getByEmail(serviceRequest.getCustomer().getUser().getEmail());
+        User translator = userService.getByEmail(message.getConversation().getTranslator().getUser().getEmail());
+
+        saveMessageInChat(message);
         notifyUnreadMessageChanged(customer);
         notifyUnreadMessageChanged(translator);
-        notifyUnreadMessageChanged(translator, chatMessage.getConversation().getId());
-        notifyUnreadMessageChanged(customer, chatMessage.getConversation().getId());
+        notifyUnreadMessageChanged(translator, message.getConversation().getId());
+        notifyUnreadMessageChanged(customer, message.getConversation().getId());
+
         return proceed;
     }
+
     public void saveMessageInChat(ChatMessage message) {
         ChatMessageDTO dto = mapToDto(message);
 
@@ -130,13 +134,17 @@ public class RealtimeHandler {
         User user = this.userService.getById(message.getSenderId());
         AmazonFilePhoto photo = amazonFilePhotoService.getAmazonFilePhotoByUserId(user);
         ChatMessageDTO dto = new ChatMessageDTO();
+        if (photo != null) {
+            dto.setPhotoUrl(photo.getUrl());
+        } else {
+            dto.setPhotoUrl("resources/assets/layouts/layout2/img/avatar.png");
+        }
         dto.setRead(message.getRead());
         dto.setDate(message.getDate());
         dto.setConversationid(message.getConversation().getId());
         dto.setSender(message.getSender());
         dto.setMessage(message.getMessage());
         dto.setId(message.getId());
-        dto.setPhotoUrl(photo.getUrl());
         return dto;
     }
 }

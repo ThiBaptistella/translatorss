@@ -27,14 +27,14 @@ public class ServiceRequest implements java.io.Serializable {
     private Date creationDate;
     private Date finishQuoteSelection;
     private Date finishDate;
-    private Set<Quotation> quotationList = new HashSet<Quotation>(0);
+    private Date paidDate;
+	private Set<Quotation> quotationList = new HashSet<Quotation>(0);
     private Set<ServiceRequestFiles> serviceRequestFiles = new HashSet<ServiceRequestFiles>(0);
     private Set<Conversation> conversationList = new HashSet<Conversation>(0);
     private Translator translator;
     private ServiceRequestPayment serviceRequestPayment;
     private Invoice invoice;
     private List<AmazonFile> amazonFiles = new ArrayList<AmazonFile>();
-//    private ServiceResponse serviceResponse;
 
 	@Id
     @GenericGenerator(name = "generator", strategy = "increment")
@@ -58,7 +58,6 @@ public class ServiceRequest implements java.io.Serializable {
         this.customer = customer;
     }
 
-   // @Column(name = "timeframeid", nullable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "timeframeid", nullable = false)
     public TimeFrame getTimeFrame() {
@@ -98,6 +97,17 @@ public class ServiceRequest implements java.io.Serializable {
         this.finishDate = finishDate;
     }
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "paid_date", nullable = false, length = 29)
+    public Date getPaidDate() {
+		return paidDate;
+	}
+
+	public void setPaidDate(Date paidDate) {
+		this.paidDate = paidDate;
+	}
+    
+    
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "servicerequeststatusid")
     public ServiceRequestStatus getServiceRequestStatus() {
@@ -145,7 +155,7 @@ public class ServiceRequest implements java.io.Serializable {
         this.hardcopy = hardcopy;
     }
 
-    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER, mappedBy = "serviceRequest", orphanRemoval=true)
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY, mappedBy = "serviceRequest", orphanRemoval=true)
     public Set<Quotation> getQuotationList() {
         return quotationList;
     }
@@ -154,15 +164,6 @@ public class ServiceRequest implements java.io.Serializable {
         this.quotationList = quotationList;
     }
 
-//    public ServiceResponse getServiceResponse() {
-//		return serviceResponse;
-//	}
-//
-//    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER, mappedBy = "serviceRequest", orphanRemoval=true)
-//	public void setServiceResponse(ServiceResponse serviceResponse) {
-//		this.serviceResponse = serviceResponse;
-//	}
-    
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER, mappedBy = "serviceRequest", orphanRemoval=true)
     public Set<Conversation> getConversationList() {
         return conversationList;
@@ -172,7 +173,7 @@ public class ServiceRequest implements java.io.Serializable {
         this.conversationList = conversationList;
     }
 
-    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER, mappedBy = "serviceRequest")
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER, mappedBy = "serviceRequest", orphanRemoval=true)
     public Set<ServiceRequestFiles> getServiceRequestFiles() {
         return serviceRequestFiles;
     }
@@ -192,7 +193,6 @@ public class ServiceRequest implements java.io.Serializable {
       this.translator = translator;
     }
     
-  //@OneToOne(fetch = FetchType.LAZY, mappedBy = "servicerequest")
     @OneToOne(mappedBy="serviceRequest", cascade = CascadeType.ALL)
     @Fetch(FetchMode.SELECT)
     public ServiceRequestPayment getServiceRequestPayment() {
@@ -201,19 +201,6 @@ public class ServiceRequest implements java.io.Serializable {
 
     public void setServiceRequestPayment(ServiceRequestPayment serviceRequestPayment) {
     	this.serviceRequestPayment = serviceRequestPayment;
-    }
-
-    public boolean hasQuoteFrom(Long id) {
-        for(Quotation quotation: this.quotationList){
-            if(quotation.getTranslator().getId().equals(id)){
-                return true;
-            }
-        }
-        return false;
-    }
- 
-    public boolean IsStandar(){
-        return this.serviceRequestCategory.getDefaultPrice();
     }
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -243,4 +230,19 @@ public class ServiceRequest implements java.io.Serializable {
     public void setAmazonFiles(List<AmazonFile> amazonFiles) {
         this.amazonFiles = amazonFiles;
     }
+    
+
+    public boolean hasQuoteFrom(Long id) {
+        for(Quotation quotation: this.quotationList){
+            if(quotation.getTranslator().getId().equals(id)){
+                return true;
+            }
+        }
+        return false;
+    }
+ 
+    public boolean IsStandar(){
+        return this.serviceRequestCategory.getDefaultPrice();
+    }
+    
 }

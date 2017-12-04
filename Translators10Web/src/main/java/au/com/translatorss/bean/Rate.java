@@ -42,7 +42,7 @@ public class Rate implements java.io.Serializable {
 		this.id = id;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "customerid", nullable = false)
 	public Customer getCustomer() {
 		return this.customer;
