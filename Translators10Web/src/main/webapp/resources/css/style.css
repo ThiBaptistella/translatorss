@@ -1,6 +1,4 @@
-
-
-@import url("../css/Translators.css");
+@import url("Translators.css");
 .module-translator .nice-select {
   padding-left: 8px !important;
 }
